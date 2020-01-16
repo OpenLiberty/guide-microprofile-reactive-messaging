@@ -1,0 +1,6 @@
+.project
+.settings/
+.vscode/
+target/
+kafka_*
+.classpath
