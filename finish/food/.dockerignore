@@ -6,3 +6,4 @@ target/
 !target/*.war
 src/
 !src/main/liberty/config
+.DS_Store
