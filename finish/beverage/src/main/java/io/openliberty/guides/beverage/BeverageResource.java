@@ -1,4 +1,4 @@
-package io.openliberty.guides.food;
+package io.openliberty.guides.beverage;
 
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -23,8 +23,8 @@ import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
 
 @ApplicationScoped
-@Path("/foodMessaging")
-public class FoodResource {
+@Path("/beverageMessaging")
+public class BeverageResource {
 
 	private Random random = new Random();
 	private Executor executor = Executors.newSingleThreadExecutor();
@@ -32,23 +32,23 @@ public class FoodResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getProperties() {
-		return Response.ok("In food Service")
+		return Response.ok("In beverage Service")
 				.build();
 	}
 
-	@Incoming("foodOrderConsume")
-	@Outgoing("foodOrderPublish")
-	public CompletionStage<Order> initFoodOrder(String newOrder) {
+	@Incoming("beverageOrderConsume")
+	@Outgoing("beverageOrderPublish")
+	public CompletionStage<Order> initBeverageOrder(String newOrder) {
 		Jsonb jsonb = JsonbBuilder.create();
 		Order order = jsonb.fromJson(newOrder, Order.class);
-		System.out.println(" Food Order is being prepared...");
+		System.out.println(" Beverage Order is being prepared...");
 		return prepareOrder(order);
 	}
 
 	private CompletionStage<Order> prepareOrder(Order order) {
 		return CompletableFuture.supplyAsync(() -> {
 			order.setStatus(Status.IN_PROGRESS);
-			System.out.println(" Food Order in Progress... ");
+			System.out.println(" Beverage Order in Progress... ");
 			prepare();
 			return order.setStatus(Status.READY);
 		}, executor);
