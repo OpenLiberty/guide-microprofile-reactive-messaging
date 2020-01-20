@@ -4,3 +4,4 @@
 target/
 kafka_*
 .classpath
+.DS_Store
