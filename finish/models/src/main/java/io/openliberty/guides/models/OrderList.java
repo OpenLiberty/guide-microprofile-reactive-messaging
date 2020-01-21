@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class OrderList{
     private ArrayList<Order> foodOrderArrayList = new ArrayList<>();
     private ArrayList<Order> drinkOrderArrayList = new ArrayList<>();
-    private int tableID;
+    private String tableID;
 
     public OrderList(newOrder order){ // Creates a list of Orders to easily feed into the Order microservice
         tableID = order.getTableID();
@@ -38,11 +38,11 @@ public class OrderList{
         this.drinkOrderArrayList = drinkOrderArrayList;
     }
 
-    public int getTableID() {
+    public String getTableID() {
         return tableID;
     }
 
-    public void setTableID(int tableID) {
+    public void setTableID(String tableID) {
         this.tableID = tableID;
     }
 }

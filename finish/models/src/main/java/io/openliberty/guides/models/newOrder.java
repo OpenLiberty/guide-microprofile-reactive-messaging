@@ -3,15 +3,15 @@ package io.openliberty.guides.models;
 import java.util.ArrayList;
 
 public class newOrder {
-    private int tableID;
+    private String tableID;
     private ArrayList<String> foodList = new ArrayList<>();
     private ArrayList<String> drinkList = new ArrayList<>();
 
-    public int getTableID() {
+    public String getTableID() {
         return tableID;
     }
 
-    public void setTableID(int tableID) {
+    public void setTableID(String tableID) {
         this.tableID = tableID;
     }
 
