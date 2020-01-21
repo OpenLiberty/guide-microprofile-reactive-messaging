@@ -18,6 +18,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -25,26 +27,54 @@ import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Type;
 import io.openliberty.guides.models.Status;
 
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
+import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
+
 @ApplicationScoped
 @Path("/orders")
 public class OrderResource {
     @Inject
     private OrderManager manager;
 
+    private BlockingQueue<Order> foodQueue = new LinkedBlockingQueue<>();
+    private BlockingQueue<Order> drinkQueue = new LinkedBlockingQueue<>();
+
     private AtomicInteger counter = new AtomicInteger();
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/drink")
-    public Response orderDrink() {
+    @Path("{orderType}")
+    public Response createOrder(@PathParam("orderType") String orderType) {
+        Type type;
+
+        try {
+            type = Type.valueOf(orderType.toUpperCase());
+        } catch (Exception e) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("Invalid order type.")
+                    .build();
+        }
+
         String orderId = String.format("%04d", counter.incrementAndGet());
 
         Order order = new Order();
         order.setOrderID(orderId);
-        order.setType(Type.DRINK);
+        order.setType(type);
         order.setStatus(Status.NEW);
 
         manager.addOrder(orderId, order);
+
+        switch(type) {
+            case FOOD:
+                foodQueue.add(order);
+                break;
+            case DRINK:
+                drinkQueue.add(order);
+                break;
+        }
 
         return Response
                 .status(Response.Status.OK)
@@ -52,24 +82,28 @@ public class OrderResource {
                 .build();
     }
 
+    @Outgoing("food")
+    public PublisherBuilder<Order> sendFoodOrder() {
+        return ReactiveStreams.generate(() -> {
+            try {
+                return foodQueue.take();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
+    }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/food")
-    public Response orderFood() {
-        String orderId = String.format("%04d", counter.incrementAndGet());
-
-        Order order = new Order();
-        order.setOrderID(orderId);
-        order.setType(Type.FOOD);
-        order.setStatus(Status.NEW);
-
-        manager.addOrder(orderId, order);
-
-        return Response
-                .status(Response.Status.OK)
-                .entity(order)
-                .build();
+    @Outgoing("drink")
+    public PublisherBuilder<Order> sendDrinkOrder() {
+        return ReactiveStreams.generate(() -> {
+            try {
+                return drinkQueue.take();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
     }
 
     @GET
@@ -105,5 +139,10 @@ public class OrderResource {
                 .status(Response.Status.OK)
                 .entity(ordersList)
                 .build();
+    }
+
+    @Incoming("updateStatus")
+    public void updateStatus(Order order)  {
+        manager.getOrder(order.getOrderID()).setStatus(order.getStatus());
     }
 }
