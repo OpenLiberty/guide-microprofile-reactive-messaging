@@ -2,13 +2,14 @@ package io.openliberty.guides.restaurant;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.OrderList;
+import io.openliberty.guides.models.newOrder;
 import io.openliberty.guides.restaurant.client.OrderClient;
 
 @ApplicationScoped
@@ -18,23 +19,39 @@ public class RestaurantOrderResource {
     @Inject
     private OrderClient orderClient;
 
+    OrderList newOrderList = null;
+
     @GET 
     @Produces(MediaType.APPLICATION_JSON)
-    public OrderList getOrders(){ //TODO Return list of all orders
-        return null;
+    public Response listOrders(){ //TODO Return list of all orders, needs to consume
+        if(newOrderList == null){
+            return null;
+        }else{
+            return Response
+                    .status(Response.Status.OK)
+                    .entity(newOrderList)
+                    .build();
+        }
     }
 
-    @GET
-    @Path("orderDrink")
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response orderDrink(){ //TODO Change from Response return to Order object
-        return orderClient.createDrink();
-    }
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getOrder(newOrder order){
+        newOrderList = new OrderList(order); // Divides the new order into multiple single orders
 
-    @GET
-    @Path("orderFood")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response orderFood(){ //TODO Submit an order for a drink + return new drink object
-        return orderClient.createFood();
+        //Submits each food/drink order to the OrderClient class to send to the Order service
+        for(Order aSingleFoodOrder : newOrderList.getFoodOrderArrayList()){
+            orderClient.createFood(aSingleFoodOrder);
+        }
+
+        for(Order aSingleDrinkOrder : newOrderList.getDrinkOrderArrayList()){
+            orderClient.createDrink(aSingleDrinkOrder);
+        }
+
+        return Response
+                .status(Response.Status.OK)
+                .entity(newOrderList)
+                .build();
     }
 }

@@ -10,19 +10,14 @@ public class OrderList{
     public OrderList(newOrder order){ // Creates a list of Orders to easily feed into the Order microservice
         tableID = order.getTableID();
 
-        Order newFoodOrder = new Order();
-        newFoodOrder.setTableID(tableID);
-
         //Parses through the newOrder object and creates single orders of FOOD types
-        newFoodOrder.setType(Type.FOOD);
         for(String foodItem : order.getFoodList()){
-            newFoodOrder.setItem(foodItem);
+            Order newFoodOrder = new Order(tableID, foodItem, Type.FOOD);
             foodOrderArrayList.add(newFoodOrder);
         }
 
-        newFoodOrder.setType(Type.DRINK);
         for(String drinkItem : order.getDrinkList()){
-            newFoodOrder.setItem(drinkItem);
+            Order newFoodOrder = new Order(tableID, drinkItem, Type.DRINK);
             drinkOrderArrayList.add(newFoodOrder);
         }
     }
