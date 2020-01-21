@@ -55,6 +55,11 @@
             <artifactId>kafka_2.12</artifactId>
             <version>2.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.reactive.messaging</groupId>
+            <artifactId>microprofile-reactive-messaging-api</artifactId>
+            <version>1.0</version>
+        </dependency>
 
         <!-- For tests -->
         <dependency>
