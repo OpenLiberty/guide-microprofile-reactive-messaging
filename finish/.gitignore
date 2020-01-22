@@ -1,7 +1,0 @@
-.project
-.settings/
-.vscode/
-target/
-kafka_*
-.classpath
-.DS_Store
