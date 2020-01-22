@@ -1,4 +1,4 @@
-package io.openliberty.guides.restaurant.client;
+package io.openliberty.guides.restaurant.order;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -30,20 +30,17 @@ public class OrderClient {
         this.target = null;
     }
 
-    //Sends single drink order to Order API for processing
-    public Response createDrink(Order drinkOrder){
+    //Sends single order to Order API for processing
+    public Response createOrder(Order order){
         Jsonb jsonb = JsonbBuilder.create();
-        return iBuilder(webTarget().path("drink"))
-                .post(Entity.json(jsonb.toJson(drinkOrder)));
+        return iBuilder(webTarget())
+                .post(Entity.json(jsonb.toJson(order)));
     }
 
-    //Sends single food order to Order API for processing
-    public Response createFood(Order foodOrder){
-        Jsonb jsonb = JsonbBuilder.create();
-        return iBuilder(webTarget().path("drink"))
-                .post(Entity.json(jsonb.toJson(foodOrder)));
+    public Response getOrders(){
+        return iBuilder(webTarget())
+                .get();
     }
-
 
     private Invocation.Builder iBuilder(WebTarget target) {
         return target

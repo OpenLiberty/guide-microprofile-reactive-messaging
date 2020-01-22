@@ -1,4 +1,4 @@
-package io.openliberty.guides.models;
+package io.openliberty.guides.restaurant.order;
 
 import java.util.ArrayList;
 
