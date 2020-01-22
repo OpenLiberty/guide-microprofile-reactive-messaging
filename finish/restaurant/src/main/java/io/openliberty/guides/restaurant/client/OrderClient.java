@@ -1,4 +1,4 @@
-package io.openliberty.guides.restaurant.order;
+package io.openliberty.guides.restaurant.client;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;

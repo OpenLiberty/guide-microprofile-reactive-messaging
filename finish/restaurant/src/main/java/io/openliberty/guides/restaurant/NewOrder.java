@@ -1,8 +1,8 @@
-package io.openliberty.guides.restaurant.order;
+package io.openliberty.guides.restaurant;
 
 import java.util.ArrayList;
 
-public class newOrder {
+public class NewOrder { //TODO Fix NewOrder
     private String tableID;
     private ArrayList<String> foodList = new ArrayList<>();
     private ArrayList<String> drinkList = new ArrayList<>();

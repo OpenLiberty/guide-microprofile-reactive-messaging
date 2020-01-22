@@ -1,4 +1,4 @@
-package io.openliberty.guides.restaurant.order;
+package io.openliberty.guides.restaurant;
 
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Type;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class OrderList{
     private ArrayList<Order> orderArrayList = new ArrayList<>();
 
-    public OrderList(newOrder order){ // Creates a list of Orders to easily feed into the Order microservice
+    public OrderList(NewOrder order){ // Creates a list of Orders to easily feed into the Order microservice
         String tableID = order.getTableID();
 
         //Parses through the newOrder object and creates single orders of FOOD types
