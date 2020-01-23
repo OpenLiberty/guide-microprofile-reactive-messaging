@@ -9,6 +9,12 @@ import javax.ws.rs.core.Response;
 
 import io.openliberty.guides.models.NewOrder;
 import io.openliberty.guides.restaurant.client.OrderClient;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+
+import java.util.ArrayList;
 
 @ApplicationScoped
 @Path("/orders")
