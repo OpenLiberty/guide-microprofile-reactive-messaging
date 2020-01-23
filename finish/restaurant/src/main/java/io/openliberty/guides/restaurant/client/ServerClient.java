@@ -18,7 +18,7 @@ import io.openliberty.guides.models.NewOrder;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @RequestScoped
-public class ServeClient {
+public class ServerClient {
 
     @Inject
     @ConfigProperty(name = "SERVER_SERVICE_BASE_URI", defaultValue = "http://localhost:9083") //TODO Verify port
@@ -26,7 +26,7 @@ public class ServeClient {
 
     private WebTarget target;
 
-    public ServeClient() {
+    public ServerClient() {
         this.target = null;
     }
 
