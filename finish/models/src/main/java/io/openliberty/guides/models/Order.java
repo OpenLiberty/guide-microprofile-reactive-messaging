@@ -7,10 +7,16 @@ public class Order {
     private String item;
     private Status status;
 
-    public Order(String tableID, String item, Type type){
+    public Order(String orderID,
+                 String tableID,
+                 Type type,
+                 String item,
+                 Status status){
+        this.orderID = orderID;
         this.tableID = tableID;
-        this.item = item;
         this.type = type;
+        this.item = item;
+        this.status = status;
     }
 
     public String getTableID() {

@@ -7,8 +7,14 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.openliberty.guides.models.Order;
+import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.restaurant.client.OrderClient;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+
+import java.util.ArrayList;
 
 @ApplicationScoped
 @Path("/orders")
@@ -16,8 +22,6 @@ public class RestaurantOrderResource {
 
     @Inject
     private OrderClient orderClient;
-
-    OrderList newOrderList = null;
 
     @GET 
     @Produces(MediaType.APPLICATION_JSON)
@@ -28,18 +32,7 @@ public class RestaurantOrderResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createOrder(NewOrder order){
-        //Consumes an Order from the end user in a specific format. See finish/order.json as an example
-        newOrderList = new OrderList(order); // Divides the new order into multiple single orders
-
-        //Submits each food/drink order individually to the OrderClient class to send to the Order service
-        for(Order aSingleOrder : newOrderList.getOrderArrayList()){
-            orderClient.createOrder(aSingleOrder);
-        }
-
-        return Response
-                .status(Response.Status.OK)
-                .entity(newOrderList)
-                .build();
+    public Response createOrder(OrderRequest orderRequest){
+        return orderClient.createOrder(orderRequest);
     }
 }

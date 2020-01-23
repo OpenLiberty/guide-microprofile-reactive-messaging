@@ -29,8 +29,8 @@ import javax.enterprise.context.ApplicationScoped;
 public class OrderManager {
     private Map<String, Order> orders = Collections.synchronizedMap(new HashMap<String, Order>());
 
-    public void addOrder(String orderId, Order order) {
-        orders.put(orderId, order);
+    public void addOrder(Order order) {
+        orders.put(order.getOrderID(), order);
     }
 
     public void updateStatus(String orderId, Status status) {

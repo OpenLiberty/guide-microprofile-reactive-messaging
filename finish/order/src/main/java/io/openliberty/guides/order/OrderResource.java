@@ -21,11 +21,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.bind.JsonbBuilder;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -35,6 +31,7 @@ import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
 import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 
 import io.openliberty.guides.models.Order;
+import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.models.Status;
 import io.openliberty.guides.models.Type;
 
@@ -44,50 +41,38 @@ public class OrderResource {
 	@Inject
 	private OrderManager manager;
 
-	private BlockingQueue<String> foodQueue = new LinkedBlockingQueue<>();
-	private BlockingQueue<String> drinkQueue = new LinkedBlockingQueue<>();
+	private BlockingQueue<Order> foodQueue = new LinkedBlockingQueue<>();
+	private BlockingQueue<Order> drinkQueue = new LinkedBlockingQueue<>();
 
 	private AtomicInteger counter = new AtomicInteger();
-	//Jsonb jsonb = JsonbBuilder.create();
 
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{orderType}")
-	public Response createOrder(@PathParam("orderType") String orderType) {
-		Type type;
+	@Path("/")
+	public Response createOrder(OrderRequest orderRequest) {
+		//Consumes an Order from the end user in a specific format. See finish/order.json as an example
+		String orderId;
+		Order newOrder;
 
-		try {
-			type = Type.valueOf(orderType.toUpperCase());
-		} catch (Exception e) {
-			return Response
-					.status(Response.Status.BAD_REQUEST)
-					.entity("Invalid order type.")
-					.build();
+		for(String foodItem : orderRequest.getFoodList()){
+			orderId = String.format("%04d", counter.incrementAndGet());
+
+			newOrder = new Order(orderId, orderRequest.getTableID(), Type.FOOD, foodItem, Status.NEW);
+			manager.addOrder(newOrder);
+			foodQueue.add(newOrder);
 		}
 
-		String orderId = String.format("%04d", counter.incrementAndGet());
+		for(String drinkItem : orderRequest.getDrinkList()){
+			orderId = String.format("%04d", counter.incrementAndGet());
 
-		Order order = new Order();
-		order.setOrderID(orderId);
-		order.setType(type);
-		order.setStatus(Status.NEW);
-
-		manager.addOrder(orderId, order);
-		String o = JsonbBuilder.create().toJson(order);
-		switch(type) {
-		case FOOD:
-			foodQueue.add(o);
-			
-			System.out.println(JsonbBuilder.create().fromJson(o,Order.class));
-			break;
-		case DRINK:
-			drinkQueue.add(o);
-			break;
+			newOrder = new Order(orderId, orderRequest.getTableID(), Type.DRINK, drinkItem, Status.NEW);
+			manager.addOrder(newOrder);
+			drinkQueue.add(newOrder);
 		}
 
 		return Response
 				.status(Response.Status.OK)
-				.entity(order)
+				.entity(orderRequest)
 				.build();
 	}
 
@@ -95,10 +80,7 @@ public class OrderResource {
 	public PublisherBuilder<String> sendFoodOrder() {
 		return ReactiveStreams.generate(() -> {
 			try {
-				//Jsonb jsonb = JsonbBuilder.create();
-				//String orderString = jsonb.toJson(foodQueue.take());
-				//System.out.println( orderString );
-				return foodQueue.take();
+				return JsonbBuilder.create().toJson(foodQueue.take());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				return null;
@@ -110,7 +92,7 @@ public class OrderResource {
 	public PublisherBuilder<String> sendDrinkOrder() {
 		return ReactiveStreams.generate(() -> {
 			try {
-				return drinkQueue.take();
+				return JsonbBuilder.create().toJson(drinkQueue.take());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				return null;
@@ -121,7 +103,7 @@ public class OrderResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{orderId}")
-	public Response getStatus(@PathParam("orderId") String orderId) {
+	public Response getOrder(@PathParam("orderId") String orderId) {
 		Order order = manager.getOrder(orderId);
 
 		if (order == null) {
@@ -133,19 +115,18 @@ public class OrderResource {
 
 		return Response
 				.status(Response.Status.OK)
-				.entity(order.getStatus())
+				.entity(order)
 				.build();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/")
-	public Response getOrdersList() {
-		System.out.println("In get");
+	public Response getOrdersList(@QueryParam("tableId") String tableId) {
 		List<Order> ordersList = manager.getOrders()
-				.entrySet()
+				.values()
 				.stream()
-				.map(es -> es.getValue())
+				.filter(order -> (tableId == null) || order.getTableID().equals(tableId))
 				.collect(Collectors.toList());
 
 		return Response

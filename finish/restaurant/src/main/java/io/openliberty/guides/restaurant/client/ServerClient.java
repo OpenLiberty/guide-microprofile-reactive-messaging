@@ -1,22 +1,34 @@
 package io.openliberty.guides.restaurant.client;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.ws.rs.client.ClientBuilder;
+
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-public class ServeClient {
+import io.openliberty.guides.models.OrderRequest;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+@RequestScoped
+public class ServerClient {
 
     @Inject
-    @ConfigProperty(name = "SERVE_SERVICE_BASE_URI", defaultValue = "http://localhost:9082") //FIXME
+    @ConfigProperty(name = "SERVER_SERVICE_BASE_URI", defaultValue = "http://localhost:9083") //TODO Verify port
     private String baseUri;
 
     private WebTarget target;
+
+    public ServerClient() {
+        this.target = null;
+    }
 
     public Response getReady2Serve(){
         return iBuilder(webTarget())
@@ -24,7 +36,9 @@ public class ServeClient {
     }
 
     public Response serveOrder(String orderID){
-        return null;
+        return iBuilder(webTarget())
+                .path("complete/" + orderID)
+                .post();
     }
 
     private Invocation.Builder iBuilder(WebTarget target) {
@@ -39,7 +53,7 @@ public class ServeClient {
             this.target = ClientBuilder
                     .newClient()
                     .target(baseUri)
-                    .path("/orders"); //FIXME
+                    .path("/server");
         }
         return this.target;
     }
