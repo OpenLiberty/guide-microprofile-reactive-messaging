@@ -15,5 +15,5 @@
 
   <httpEndpoint host="*" httpPort="${default.http.port}" httpsPort="${default.https.port}" id="defaultHttpEndpoint"/>
 
-  <webApplication location="foodServing.war" contextRoot="/"/>
+  <webApplication location="server.war" contextRoot="/"/>
 </server>

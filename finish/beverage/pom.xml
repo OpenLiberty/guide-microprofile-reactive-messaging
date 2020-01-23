@@ -20,8 +20,8 @@
 		<version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
 		<version.maven-failsafe-plugin>2.22.2</version.maven-failsafe-plugin>
 		<!-- Liberty configuration -->
-		<liberty.var.default.http.port>9080</liberty.var.default.http.port>
-		<liberty.var.default.https.port>9443</liberty.var.default.https.port>
+		<liberty.var.default.http.port>9083</liberty.var.default.http.port>
+		<liberty.var.default.https.port>9447</liberty.var.default.https.port>
 	</properties>
 
 	<dependencies>
@@ -61,6 +61,22 @@
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.12</artifactId>
 			<version>2.3.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.json.bind</groupId>
+			<artifactId>javax.json.bind-api</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>yasson</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>1.1</version>
 		</dependency>
 
 		<!-- For tests -->

@@ -2,7 +2,7 @@ package io.openliberty.guides.order;
 
 import java.util.ArrayList;
 
-public class NewOrder { //TODO Fix NewOrder
+public class OrderRequest { //TODO Fix OrderRequest
     private String tableID;
     private ArrayList<String> foodList = new ArrayList<>();
     private ArrayList<String> drinkList = new ArrayList<>();
