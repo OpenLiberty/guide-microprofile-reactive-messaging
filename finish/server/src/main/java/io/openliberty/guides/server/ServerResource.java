@@ -1,4 +1,4 @@
-package io.openliberty.guides.foodServing;
+package io.openliberty.guides.server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,8 @@ import io.openliberty.guides.models.Status;
  *
  */
 @ApplicationScoped
-@Path("/")
-public class FoodServingResource {
+@Path("/server")
+public class ServerResource {
 
 	private List<Order> readyList = new ArrayList<Order>();
 	private BlockingQueue<String> completedQueue = new LinkedBlockingQueue<>();
