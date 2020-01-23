@@ -10,13 +10,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @ApplicationScoped
-@Path("/serve")
+@Path("/server")
 public class RestaurantServeResource {
 
     @Inject
     private ServeClient serveClient;
 
-    //Returns all orders that are ready to serve
+    //Returns list of all ready orders
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getReady2Serve(){

@@ -18,10 +18,10 @@ import io.openliberty.guides.models.NewOrder;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @RequestScoped
-public class ServeClient { //FIXME WHOLE THING
+public class ServeClient {
 
     @Inject
-    @ConfigProperty(name = "SERVE_SERVICE_BASE_URI", defaultValue = "http://localhost:9082")
+    @ConfigProperty(name = "SERVER_SERVICE_BASE_URI", defaultValue = "http://localhost:9083") //TODO Verify port
     private String baseUri;
 
     private WebTarget target;
@@ -30,12 +30,15 @@ public class ServeClient { //FIXME WHOLE THING
         this.target = null;
     }
 
-    public Response getReady2Serve(){ //FIXME
-        return Response.ok().build();
+    public Response getReady2Serve(){
+        return iBuilder(webTarget())
+                .get();
     }
 
-    public Response serveOrder(String orderID){ //FIXME
-        return Response.ok().build();
+    public Response serveOrder(String orderID){
+        return iBuilder(webTarget())
+                .path("complete/" + orderID)
+                .post();
     }
 
     private Invocation.Builder iBuilder(WebTarget target) {
@@ -50,7 +53,7 @@ public class ServeClient { //FIXME WHOLE THING
             this.target = ClientBuilder
                     .newClient()
                     .target(baseUri)
-                    .path("/orders");
+                    .path("/server");
         }
         return this.target;
     }
