@@ -23,6 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import io.openliberty.guides.models.NewOrder;
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Type;
 import io.openliberty.guides.models.Status;

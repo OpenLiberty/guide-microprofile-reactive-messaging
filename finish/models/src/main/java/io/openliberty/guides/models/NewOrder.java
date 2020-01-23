@@ -1,4 +1,4 @@
-package io.openliberty.guides.order;
+package io.openliberty.guides.models;
 
 import java.util.ArrayList;
 
