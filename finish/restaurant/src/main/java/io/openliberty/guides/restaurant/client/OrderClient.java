@@ -31,7 +31,7 @@ public class OrderClient {
     }
 
     //Sends single order to Order API for processing
-    public Response createOrder(Order order){
+    public Response createOrder(Jsonb order){
         Jsonb jsonb = JsonbBuilder.create();
         return iBuilder(webTarget())
                 .post(Entity.json(jsonb.toJson(order)));

@@ -45,35 +45,27 @@ public class OrderResource {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("{orderType}")
-    public Response createOrder(@PathParam("orderType") String orderType) {
-        Type type;
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createOrder(NewOrder order) {
+        //Consumes an Order from the end user in a specific format. See finish/order.json as an example
 
-        try {
-            type = Type.valueOf(orderType.toUpperCase());
-        } catch (Exception e) {
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity("Invalid order type.")
-                    .build();
+        //Parses through the newOrder object and creates single orders of FOOD types
+        String orderId;
+
+        for(String foodItem : order.getFoodList()){
+            orderId = String.format("%04d", counter.incrementAndGet());
+
+            Order newFoodOrder = new Order(orderId, order.getTableID(), Type.FOOD, foodItem, Status.NEW);
+            manager.addOrder(newFoodOrder);
+            foodQueue.add(newFoodOrder);
         }
 
-        String orderId = String.format("%04d", counter.incrementAndGet());
+        for(String drinkItem : order.getDrinkList()){
+            orderId = String.format("%04d", counter.incrementAndGet());
 
-        Order order = new Order();
-        order.setOrderID(orderId);
-        order.setType(type);
-        order.setStatus(Status.NEW);
-
-        manager.addOrder(orderId, order);
-
-        switch(type) {
-            case FOOD:
-                foodQueue.add(order);
-                break;
-            case DRINK:
-                drinkQueue.add(order);
-                break;
+            Order newDrinkOrder = new Order(orderId, order.getTableID(), Type.DRINK, drinkItem, Status.NEW);
+            manager.addOrder(newDrinkOrder);
+            drinkQueue.add(newDrinkOrder);
         }
 
         return Response
@@ -82,7 +74,6 @@ public class OrderResource {
                 .build();
     }
 
-    @Outgoing("food")
     public PublisherBuilder<Order> sendFoodOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -94,7 +85,6 @@ public class OrderResource {
         });
     }
 
-    @Outgoing("drink")
     public PublisherBuilder<Order> sendDrinkOrder() {
         return ReactiveStreams.generate(() -> {
             try {
