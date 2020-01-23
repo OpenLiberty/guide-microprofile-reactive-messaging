@@ -74,6 +74,7 @@ public class OrderResource {
                 .build();
     }
 
+    @Outgoing("food")
     public PublisherBuilder<Order> sendFoodOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -85,6 +86,7 @@ public class OrderResource {
         });
     }
 
+    @Outgoing("drink")
     public PublisherBuilder<Order> sendDrinkOrder() {
         return ReactiveStreams.generate(() -> {
             try {
