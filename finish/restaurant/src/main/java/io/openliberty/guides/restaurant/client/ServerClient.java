@@ -3,10 +3,6 @@ package io.openliberty.guides.restaurant.client;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.client.ClientBuilder;
@@ -14,7 +10,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.openliberty.guides.models.NewOrder;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @RequestScoped
@@ -36,9 +31,8 @@ public class ServerClient {
     }
 
     public Response serveOrder(String orderID){
-        return iBuilder(webTarget())
-                .path("complete/" + orderID)
-                .post();
+        return iBuilder(webTarget().path("complete/" + orderID))
+                .post(null);
     }
 
     private Invocation.Builder iBuilder(WebTarget target) {
