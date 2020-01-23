@@ -7,7 +7,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.openliberty.guides.models.NewOrder;
+import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.restaurant.client.OrderClient;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -32,7 +32,7 @@ public class RestaurantOrderResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createOrder(NewOrder newOrder){
-        return orderClient.createOrder(newOrder);
+    public Response createOrder(OrderRequest orderRequest){
+        return orderClient.createOrder(orderRequest);
     }
 }

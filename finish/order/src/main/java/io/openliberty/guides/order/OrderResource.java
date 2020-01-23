@@ -31,6 +31,7 @@ import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
 import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 
 import io.openliberty.guides.models.Order;
+import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.models.Status;
 import io.openliberty.guides.models.Type;
 

@@ -14,7 +14,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.openliberty.guides.models.NewOrder;
+import io.openliberty.guides.models.OrderRequest;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @RequestScoped
@@ -31,7 +31,7 @@ public class OrderClient {
     }
 
     //Sends single order to Order API for processing
-    public Response createOrder(NewOrder newOrder){
+    public Response createOrder(OrderRequest orderRequest){
         return Response.ok().build();
 //        return iBuilder(webTarget())
 //                .post(Entity.json(newOrder));
