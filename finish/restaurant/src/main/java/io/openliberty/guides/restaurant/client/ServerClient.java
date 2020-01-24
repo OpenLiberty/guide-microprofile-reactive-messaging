@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 public class ServerClient {
 
     @Inject
-    @ConfigProperty(name = "SERVER_SERVICE_BASE_URI", defaultValue = "http://localhost:9083") //TODO Verify port
+    @ConfigProperty(name = "SERVER_SERVICE_BASE_URI", defaultValue = "http://localhost:9082") //TODO Verify port
     private String baseUri;
 
     private WebTarget target;

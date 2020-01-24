@@ -19,6 +19,10 @@ public class Order {
         this.status = status;
     }
 
+    public Order(){
+
+    }
+
     public String getTableID() {
         return tableID;
     }
