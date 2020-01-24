@@ -10,11 +10,7 @@ import javax.ws.rs.core.Response;
 import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.restaurant.client.OrderClient;
 import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.media.Content;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
-
-import java.util.ArrayList;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 @ApplicationScoped
 @Path("/orders")
@@ -25,6 +21,12 @@ public class RestaurantOrderResource {
 
     @GET 
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "listAllOrders",
+            summary = "Lists all of the submitted orders",
+            description = "This operation retrieves all of the submitted orders " +
+                    "and order details from the order database")
+    @Tag(name = "Order",
+            description = "Submitting and listing Orders")
     public Response listOrders(){ //TODO Return list of all orders, still have to figure out how to store orders
         return orderClient.getOrders();
     }
@@ -32,6 +34,7 @@ public class RestaurantOrderResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @Tag(name = "Order")
     public Response createOrder(OrderRequest orderRequest){
         return orderClient.createOrder(orderRequest);
     }

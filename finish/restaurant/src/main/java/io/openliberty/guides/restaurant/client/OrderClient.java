@@ -32,15 +32,13 @@ public class OrderClient {
 
     //Sends single order to Order API for processing
     public Response createOrder(OrderRequest orderRequest){
-        return Response.ok().build();
-//        return iBuilder(webTarget())
-//                .post(Entity.json(newOrder));
+        return iBuilder(webTarget())
+                .post(Entity.json(orderRequest));
     }
 
     public Response getOrders(){
-        return Response.ok().build();
-//        return iBuilder(webTarget())
-//                .get();
+        return iBuilder(webTarget())
+                .get();
     }
 
     private Invocation.Builder iBuilder(WebTarget target) {
