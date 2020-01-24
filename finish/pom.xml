@@ -10,10 +10,11 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>models</module>
         <module>food</module>
-        <module>server</module>
         <module>beverage</module>
+        <module>server</module>
         <module>order</module>
-        <module>restaurantBFF</module>
+        <module>restaurant</module>
     </modules>
 </project>
