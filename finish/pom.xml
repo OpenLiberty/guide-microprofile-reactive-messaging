@@ -11,7 +11,7 @@
 
     <modules>
         <module>food</module>
-        <module>foodServing</module>
+        <module>server</module>
         <module>beverage</module>
         <module>order</module>
         <module>restaurantBFF</module>

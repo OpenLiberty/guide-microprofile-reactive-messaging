@@ -1,5 +1,8 @@
 package io.openliberty.guides.restaurant.client;
 
+import io.openliberty.guides.models.OrderRequest;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
@@ -9,8 +12,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @RequestScoped
 public class ServerClient {
