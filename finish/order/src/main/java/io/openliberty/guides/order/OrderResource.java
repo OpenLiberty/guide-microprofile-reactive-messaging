@@ -12,6 +12,11 @@
 // end::copyright[]
 package io.openliberty.guides.order;
 
+import io.openliberty.guides.models.Order;
+import io.openliberty.guides.models.OrderRequest;
+import io.openliberty.guides.models.Status;
+import io.openliberty.guides.models.Type;
+
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -29,11 +34,6 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
 import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
-
-import io.openliberty.guides.models.Order;
-import io.openliberty.guides.models.OrderRequest;
-import io.openliberty.guides.models.Status;
-import io.openliberty.guides.models.Type;
 
 @ApplicationScoped
 @Path("/orders")

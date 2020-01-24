@@ -15,10 +15,11 @@ package io.openliberty.guides.order;
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class OrderManager {
