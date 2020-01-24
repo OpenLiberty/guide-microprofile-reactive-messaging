@@ -57,7 +57,8 @@ public class ServerResource {
 	 */
 	@POST
 	@Path("/complete/{orderId}")
-	public void markOrderComplete( @PathParam("orderId") String orderId ) {
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response markOrderComplete( @PathParam("orderId") String orderId ) {
 		for ( Order order : readyList ) {
 			if ( order.getOrderID().equals(orderId)) {
 				System.out.println( "\n Marking Order : " + orderId + " as Completed... ");
@@ -65,8 +66,16 @@ public class ServerResource {
 				System.out.println(  " Order : " + jsonb.toJson(order) );
 				completedQueue.add(jsonb.toJson(order));
 				readyList.remove(order);
+				return Response
+						.status(Response.Status.OK)
+						.entity(order)
+						.build();
 			}
 		}
+		return Response
+				.status(Response.Status.NOT_FOUND)
+				.entity("Requested orderID does not exist")
+				.build();
 	}
 
 	/**
