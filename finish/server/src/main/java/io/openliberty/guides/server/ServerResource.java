@@ -64,6 +64,7 @@ public class ServerResource {
 				order.setStatus(Status.COMPLETED);
 				System.out.println(  " Order : " + jsonb.toJson(order) );
 				completedQueue.add(jsonb.toJson(order));
+				readyList.remove(order);
 			}
 		}
 	}
