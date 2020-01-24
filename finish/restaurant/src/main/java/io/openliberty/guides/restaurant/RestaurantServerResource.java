@@ -24,7 +24,7 @@ public class RestaurantServerResource {
     }
 
     @POST
-    @Path("complete:{orderID}")
+    @Path("complete/{orderID}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response serveOrder(@PathParam("orderID") String orderID){
         return serverClient.serveOrder(orderID);

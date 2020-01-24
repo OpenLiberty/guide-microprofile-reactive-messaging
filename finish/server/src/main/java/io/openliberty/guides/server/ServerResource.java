@@ -56,7 +56,7 @@ public class ServerResource {
 	 * @param orderId
 	 */
 	@POST
-	@Path("/complete:{orderId}")
+	@Path("/complete/{orderId}")
 	public void markOrderComplete( @PathParam("orderId") String orderId ) {
 		for ( Order order : readyList ) {
 			if ( order.getOrderID().equals(orderId)) {

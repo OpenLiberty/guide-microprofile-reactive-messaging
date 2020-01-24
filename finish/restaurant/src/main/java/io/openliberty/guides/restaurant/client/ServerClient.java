@@ -32,7 +32,7 @@ public class ServerClient {
     }
 
     public Response serveOrder(String orderID){
-        return iBuilder(webTarget().path("complete:" + orderID))
+        return iBuilder(webTarget().path("complete/" + orderID))
                 .post(null);
     }
 
