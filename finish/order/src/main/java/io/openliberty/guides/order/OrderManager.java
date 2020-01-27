@@ -16,21 +16,22 @@ import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class OrderManager {
-    private Map<String, Order> orders = Collections.synchronizedMap(new HashMap<String, Order>());
+    private Map<String, Order> orders = Collections.synchronizedMap(new TreeMap<String, Order>());
 
     public void addOrder(Order order) {
         orders.put(order.getOrderID(), order);
     }
 
     public void updateStatus(String orderId, Status status) {
-        orders.get(orderId).setStatus(status);
+        Order order = orders.get(orderId);
+        if (order != null) order.setStatus(status);
     }
 
     public Order getOrder(String orderId) {
@@ -38,7 +39,6 @@ public class OrderManager {
     }
 
     public Map<String, Order> getOrders() {
-        return new HashMap<>(orders);
+        return new TreeMap<>(orders);
     }
-
  }

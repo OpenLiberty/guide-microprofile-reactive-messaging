@@ -17,7 +17,9 @@ import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.models.Status;
 import io.openliberty.guides.models.Type;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,7 +27,12 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.json.bind.JsonbBuilder;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -41,6 +48,9 @@ public class OrderResource {
 	@Inject
 	private OrderManager manager;
 
+	@Inject
+	private Validator validator;
+
 	private BlockingQueue<Order> foodQueue = new LinkedBlockingQueue<>();
 	private BlockingQueue<Order> drinkQueue = new LinkedBlockingQueue<>();
 
@@ -50,11 +60,36 @@ public class OrderResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/")
 	public Response createOrder(OrderRequest orderRequest) {
-		//Consumes an Order from the end user in a specific format. See finish/order.json as an example
+		// validate OrderRequest
+		Set<ConstraintViolation<OrderRequest>> violations = validator.validate(orderRequest);
+
+		JsonArrayBuilder builder = Json.createArrayBuilder();
+
+		for (ConstraintViolation<OrderRequest> v : violations) {
+			builder.add(v.getMessage());
+		}
+
+		ArrayList<String> foodList = orderRequest.getFoodList();
+		ArrayList<String> drinkList = orderRequest.getDrinkList();
+
+		if (foodList.size() == 0 && drinkList.size() == 0) {
+			builder.add("Order request must contain at least one food or drink item!");
+		}
+
+		JsonArray messages = builder.build();
+
+		if (messages.size() > 0) {
+			return Response
+					.status(Response.Status.BAD_REQUEST)
+					.entity(messages.toString())
+					.build();
+		}
+
+		// Create invdividual Orders from OrderRequest
 		String orderId;
 		Order newOrder;
 
-		for(String foodItem : orderRequest.getFoodList()){
+		for (String foodItem : foodList) {
 			orderId = String.format("%04d", counter.incrementAndGet());
 
 			newOrder = new Order(orderId, orderRequest.getTableID(), Type.FOOD, foodItem, Status.NEW);
@@ -62,7 +97,7 @@ public class OrderResource {
 			foodQueue.add(newOrder);
 		}
 
-		for(String drinkItem : orderRequest.getDrinkList()){
+		for (String drinkItem : drinkList) {
 			orderId = String.format("%04d", counter.incrementAndGet());
 
 			newOrder = new Order(orderId, orderRequest.getTableID(), Type.DRINK, drinkItem, Status.NEW);
@@ -136,10 +171,9 @@ public class OrderResource {
 	}
 
 	@Incoming("updateStatus")
-	public void updateStatus(String stringOrder)  {
-		System.out.println(" In Update Status method ");
-		Order order = JsonbBuilder.create().fromJson(stringOrder,Order.class);
-		manager.getOrder(order.getOrderID()).setStatus(order.getStatus());
-		System.out.println(stringOrder);
+	public void updateStatus(String orderString)  {
+		Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
+		manager.updateStatus(order.getOrderID(), order.getStatus());
+		System.out.println("Updated Order " + order.getOrderID() + " status to " + order.getStatus());
 	}
 }
