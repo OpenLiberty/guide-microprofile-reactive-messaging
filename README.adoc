@@ -87,13 +87,15 @@ mp-reactive messaging definition
 
 === Try what you'll build
 
-== Creating a reactive messaging within an application
+== Creating a reactive messaging application
 
 === @Outgoing
 
 === @Incoming
 
 === Channel
+
+=== Connector
 
 
 
