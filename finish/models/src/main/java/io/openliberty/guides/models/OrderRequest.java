@@ -6,7 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-
+@OrderListNotEmpty
 public class OrderRequest {
 
     @NotNull(message="Table ID is not specified!")

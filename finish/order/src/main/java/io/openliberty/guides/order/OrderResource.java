@@ -24,7 +24,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
+//
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
@@ -63,25 +63,16 @@ public class OrderResource {
 		// validate OrderRequest
 		Set<ConstraintViolation<OrderRequest>> violations = validator.validate(orderRequest);
 
-		JsonArrayBuilder builder = Json.createArrayBuilder();
+		if (violations.size() > 0) {
+			JsonArrayBuilder messages = Json.createArrayBuilder();
 
-		for (ConstraintViolation<OrderRequest> v : violations) {
-			builder.add(v.getMessage());
-		}
+			for (ConstraintViolation<OrderRequest> v : violations) {
+				messages.add(v.getMessage());
+			}
 
-		ArrayList<String> foodList = orderRequest.getFoodList();
-		ArrayList<String> drinkList = orderRequest.getDrinkList();
-
-		if (foodList.size() == 0 && drinkList.size() == 0) {
-			builder.add("Order request must contain at least one food or drink item!");
-		}
-
-		JsonArray messages = builder.build();
-
-		if (messages.size() > 0) {
 			return Response
 					.status(Response.Status.BAD_REQUEST)
-					.entity(messages.toString())
+					.entity(messages.build().toString())
 					.build();
 		}
 
@@ -89,7 +80,7 @@ public class OrderResource {
 		String orderId;
 		Order newOrder;
 
-		for (String foodItem : foodList) {
+		for (String foodItem : orderRequest.getFoodList()) {
 			orderId = String.format("%04d", counter.incrementAndGet());
 
 			newOrder = new Order(orderId, orderRequest.getTableID(), Type.FOOD, foodItem, Status.NEW);
@@ -97,7 +88,7 @@ public class OrderResource {
 			foodQueue.add(newOrder);
 		}
 
-		for (String drinkItem : drinkList) {
+		for (String drinkItem : orderRequest.getDrinkList()) {
 			orderId = String.format("%04d", counter.incrementAndGet());
 
 			newOrder = new Order(orderId, orderRequest.getTableID(), Type.DRINK, drinkItem, Status.NEW);
