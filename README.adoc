@@ -96,7 +96,7 @@ Asynchronous communication allows temporal decoupling of services in a microserv
 // mvn liberty:stop
 // ```
 
-//== Getting started
+
 // Getting Started
 
 [role='command']
