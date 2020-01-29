@@ -34,8 +34,9 @@ Learn how to create a REST microservice with MP-reactive messaging, and Open Lib
 // =================================================================================================
 // Prerequisites
 // =================================================================================================
-[role='command']
-include::{common-includes}/kube-prereq.adoc[]
+== Additional prerequisites
+
+Before you begin, you need a containerization software for building containers. Kubernetes supports various container runtimes. You will use Docker in this guide. For Docker installation instructions, refer to the official Docker documentation.
 
 == What you'll learn
 
@@ -118,12 +119,15 @@ mvn liberty:run
 // changes to the code and stuff
 
 === @Outgoing
+Outgoing is an annotation indicating that the method feeds a stream. The name of the stream is given as attribute:
 
 === @Incoming
-
-=== Channel
+Incoming is an annotation indicating that the method consumes a stream. The name of the stream is given as attribute
 
 === Connector
+Reactive messaging uses  Connectors to attach one end of a channel  and are configured using MicroProfile Config.
+Open Liberty includes the liberty-kafka connector for sending and receiving messages from an Apache Kafka broker.
+
 
 
 
