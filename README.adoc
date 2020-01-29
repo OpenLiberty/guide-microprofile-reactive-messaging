@@ -31,12 +31,19 @@ Learn how to create a REST microservice with MP-reactive messaging, and Open Lib
 
 == What you'll learn
 
-This guide explains MP-reactive messaging concept and demonstrates how to use MP-reactive messaging between microservices using kafka borker.
+This guide explains MP-reactive messaging concept and demonstrates how to use MP-reactive messaging between microservices using kafka broker.
+
+// =================================================================================================
+// Prerequisites
+// =================================================================================================
+[role='command']
+include::{common-includes}/kube-prereq.adoc[]
+
 
 *What is asynchronous programming?* +
 Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-image::reactive-messaging-restaurant.png[Reactive Inventory System,align="center"]
+image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
 // You will learn how to build and test a simple REST service with JAX-RS and JSON-B, which will expose
 // the JVM's system properties. The REST service will respond to `GET` requests made to the `\http://localhost:9080/LibertyProject/System/properties` URL.
@@ -89,7 +96,8 @@ Asynchronous communication allows temporal decoupling of services in a microserv
 // mvn liberty:stop
 // ```
 
-== Getting started
+//== Getting started
+// Getting Started
 
 [role='command']
 include::{common-includes}/gitclone.adoc[]
