@@ -256,7 +256,7 @@ To get the service running, the Liberty server needs to be correctly configured.
 // How to build and run the application
 
 // add name of the micro services
-instructions on how to build and run the application. This will enlist various steps required.
+Instructions on how to build and run the application. This will enlist various steps required.
 
 // The Open Liberty server was started in development mode at the beginning of the guide and all the 
 // changes were automatically picked up.
