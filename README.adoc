@@ -63,6 +63,10 @@ image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 // [role="command"]
 // include::{common-includes}/gitclone.adoc[]
 
+=== What is MP-reactive messaging?
+
+Asynchronous communication allows temporal decoupling of services in a microservice-based architecture. MicroProfile Reactive Messaging delivers a way to build systems of microservices promoting responsive, non-blocking, location transparency, elastic, resiliency to failure and temporal decoupling, enforcing asynchronous message passing between the different parts of the system.
+
 // =================================================================================================
 // Prerequisites
 // =================================================================================================
@@ -71,12 +75,6 @@ image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 You will build and run the  microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
-
-=== What is MP-reactive messaging?
-
-Asynchronous communication allows temporal decoupling of services in a microservice-based architecture. MicroProfile Reactive Messaging delivers a way to build systems of microservices promoting responsive, non-blocking, location transparency, elastic, resiliency to failure and temporal decoupling, enforcing asynchronous message passing between the different parts of the system.
-
-
 
 // The `finish` directory in the root of this guide contains the finished application. Give it a try before you proceed.
 
