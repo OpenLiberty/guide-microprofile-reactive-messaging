@@ -6,31 +6,36 @@
 // Contributors:
 //     IBM Corporation
 //
-:projectid: mp-reactive messaging
+:projectid: MP-reactive messaging
 :page-layout: guide-multipane
 :page-duration: 30 minutes
 :page-releasedate: 2020-01-15
 :page-guide-category: microprofile
 :page-essential: true
 :page-essential-order: 1
-:page-description: Learn how to create a REST service with mp-reactive messaging and Open Liberty.
+:page-description: Learn how to create a REST service with MP-reactive messaging and Open Liberty.
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile', 'Java EE', 'Jakarta EE']
 :page-related-guides: []
 :page-permalink: /guides/{projectid}
-:page-seo-title: Creating a mp-reactive messaging REST service 
-:page-seo-description: A tutorial on how to create a REST service in Open Liberty using mp-reactive messaging
+:page-seo-title: Creating a MP-reactive messaging REST service 
+:page-seo-description: A tutorial on how to create a REST service in Open Liberty using MP-reactive messaging
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
-= Creating a RESTful web service using mp-reactive messaging
+= Creating asynchronous reactive microservices using MP-reactive messaging
 
 [.hidden]
 NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].
 
-Learn how to create a REST service with mp-reactive messaging, and Open Liberty.
+Learn how to create a REST microservice with MP-reactive messaging, and Open Liberty.
 
 == What you'll learn
 
-This guide explains mp-reactive messaging concept and demonstrate how to use mp-reactive messaging within a service/application.
+This guide explains MP-reactive messaging concept and demonstrates how to use MP-reactive messaging between microservices using kafka borker.
+
+*What is asynchronous programming?* +
+Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
+
+image::reactive-messaging-restaurant.png[Reactive Inventory System,align="center"]
 
 // You will learn how to build and test a simple REST service with JAX-RS and JSON-B, which will expose
 // the JVM's system properties. The REST service will respond to `GET` requests made to the `\http://localhost:9080/LibertyProject/System/properties` URL.
@@ -56,9 +61,10 @@ This guide explains mp-reactive messaging concept and demonstrate how to use mp-
 
 // [role="command"]
 // include::{common-includes}/gitclone.adoc[]
-=== What is mp-reactive messaging?
+=== What is MP-reactive messaging?
 
-mp-reactive messaging definition
+Asynchronous communication allows temporal decoupling of services in a microservice-based architecture. MicroProfile Reactive Messaging delivers a way to build systems of microservices promoting responsive, non-blocking, location transparency, elastic, resiliency to failure and temporal decoupling, enforcing asynchronous message passing between the different parts of the system.
+
 
 
 // The `finish` directory in the root of this guide contains the finished application. Give it a try before you proceed.
@@ -84,10 +90,22 @@ mp-reactive messaging definition
 
 == Getting started
 
+[role='command']
+include::{common-includes}/gitclone.adoc[]
 
 === Try what you'll build
+The `finish` directory in the root of this guide contains the finished application. Give it a try before you proceed.
+
+To try out the application, first go to the `finish` directory and run the following Maven 
+goal to build the application and deploy it to Open Liberty:
+[role='command']
+```
+mvn liberty:run
+```
 
 == Creating a reactive messaging application
+
+// changes to the code and stuff
 
 === @Outgoing
 
@@ -96,7 +114,6 @@ mp-reactive messaging definition
 === Channel
 
 === Connector
-
 
 
 
@@ -186,23 +203,24 @@ mp-reactive messaging definition
 
 server.xml configuration
 
-// To get the service running, the Liberty server needs to be correctly configured.
+To get the service running, the Liberty server needs to be correctly configured.
 
-// [role="code_command hotspot", subs="quotes"]
-// ----
-// #Replace the server configuration file.#
-// `src/main/liberty/config/server.xml`
-// ----
+ [role="code_command hotspot", subs="quotes"]
+ ----
+ #Replace the server configuration file.#
+ `src/main/liberty/config/server.xml`
+ ----
 
-// server.xml
-// [source,xml,linenums,role="code_column"]
-// ----
-// include::finish/src/main/liberty/config/server.xml[]
-// ----
+ server.xml
+ [source,xml,linenums,role="code_column"]
+ ----
+ include::finish/src/main/liberty/config/server.xml[]
+ ----
 
-// The configuration does the following actions:
+ The configuration does the following actions:
 
-// . Configures the server to enable JAX-RS. This is specified in the [hotspot=featureManager file=0]`featureManager` element.
+ . Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureManager file=0]`featureManager` element.
+ <feature>mpReactiveMessaging-1.0</feature>
 // . Configures the server to resolve the HTTP port numbers from variables, which are then specified in
 // the Maven [hotspot=defaultHttpPort hotspot=defaultHttpsPort file=1]`pom.xml` file. This is specified in the [hotspot=httpEndpoint file=0]`<httpEndpoint/>` element. Variables use the `${variableName}` syntax.
 // . Configures the server to run the produced web application on a context root specified in the 
@@ -218,7 +236,12 @@ server.xml configuration
 
 == Building and running the application
 
-How to build and run the application
+// How to build and run the application
+
+// add name of the micro services
+You will build and run the  microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+
+Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
 // The Open Liberty server was started in development mode at the beginning of the guide and all the 
 // changes were automatically picked up.
@@ -230,6 +253,8 @@ How to build and run the application
 == Testing the service
 
 Test development
+
+You will create an unit tests to test the basic functionality of the microservices. If a test failure occurs, then you may have introduced a bug into the code.
 
 // You can test this service manually by starting a server and pointing a web browser at the
 // http://localhost:9080/LibertyProject/System/properties[^] URL. Automated tests are a much better
@@ -285,6 +310,15 @@ Test development
 === Running the tests
 
 Run tests
+
+Navigate to the directory, then verify that the tests pass by using the Maven `verify` goal:
+
+[role='command']
+```
+mvn verify
+```
+
+When the tests succeed, you see output similar to the following example:
 // Since you started Open Liberty in development mode at the start of the guide, press
 // `enter/return` key to run the tests. You will see the following output:
 
@@ -310,7 +344,7 @@ Run tests
 
 == Great work! You're done!
 
-You developed a REST service in Open Liberty by using mp-reactive messaging
+You have just developed an application using MP-reactive messaging, Open Liberty and Kakfa.
 
 == Related Links
 
