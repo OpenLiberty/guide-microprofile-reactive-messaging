@@ -36,7 +36,9 @@ Learn how to create a REST microservice with MP-reactive messaging, and Open Lib
 // =================================================================================================
 == Additional prerequisites
 
-Before you begin, you need a containerization software for building containers. Kubernetes supports various container runtimes. You will use Docker in this guide. For Docker installation instructions, refer to the official Docker documentation.
+You will build and run the  microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+
+Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
 == What you'll learn
 
@@ -127,6 +129,7 @@ Incoming is an annotation indicating that the method consumes a stream. The nam
 === Connector
 Reactive messaging uses  Connectors to attach one end of a channel  and are configured using MicroProfile Config.
 Open Liberty includes the liberty-kafka connector for sending and receiving messages from an Apache Kafka broker.
+
 
 
 
@@ -253,9 +256,7 @@ To get the service running, the Liberty server needs to be correctly configured.
 // How to build and run the application
 
 // add name of the micro services
-You will build and run the  microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
-
-Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
+instructions on how to build and run the application. This will enlist various steps required.
 
 // The Open Liberty server was started in development mode at the beginning of the guide and all the 
 // changes were automatically picked up.
