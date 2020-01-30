@@ -45,6 +45,9 @@ https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that ma
 === What is asynchronous programming?
 Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
+You'll update order , food , beverage and server microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty.
+
+image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
 The Restaurant application that you'll be working with consists of five microservices namely `restaurant`, `order`, `server`, `food` and `beverage`
 
@@ -60,9 +63,7 @@ The Order begins with a NEW status. `food` and `beverage` microservices consume 
 `server` Microservice contains a list of all ready to serve food and beverages. It consumes these statuses from food and beverage services.
 Once the server serves the order, it’s marked as COMPLETED and the status is sent back to the order service as a message.
 
-image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
-You'll update order , food , beverage and server microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty.
 
 // =================================================================================================
 // Prerequisites
