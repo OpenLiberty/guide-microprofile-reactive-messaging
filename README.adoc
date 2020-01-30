@@ -23,7 +23,6 @@
 :page-seo-description: A tutorial on how to create a microservices in Open Liberty using MP-reactive messaging
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :source-highlighter: prettify
-
 = Creating asynchronous reactive microservices using MP-reactive messaging
 
 [.hidden]
