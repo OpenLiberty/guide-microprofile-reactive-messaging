@@ -49,7 +49,7 @@ public class OrderResource {
 	private Validator validator;
 
 	private BlockingQueue<Order> foodQueue = new LinkedBlockingQueue<>();
-	private BlockingQueue<Order> drinkQueue = new LinkedBlockingQueue<>();
+	private BlockingQueue<Order> beverageQueue = new LinkedBlockingQueue<>();
 
 	private AtomicInteger counter = new AtomicInteger();
 
@@ -85,12 +85,12 @@ public class OrderResource {
 			foodQueue.add(newOrder);
 		}
 
-		for (String drinkItem : orderRequest.getDrinkList()) {
+		for (String beverageItem : orderRequest.getBeverageList()) {
 			orderId = String.format("%04d", counter.incrementAndGet());
 
-			newOrder = new Order(orderId, orderRequest.getTableID(), Type.DRINK, drinkItem, Status.NEW);
+			newOrder = new Order(orderId, orderRequest.getTableID(), Type.BEVERAGE, beverageItem, Status.NEW);
 			manager.addOrder(newOrder);
-			drinkQueue.add(newOrder);
+			beverageQueue.add(newOrder);
 		}
 
 		return Response
@@ -111,11 +111,11 @@ public class OrderResource {
 		});
 	}
 
-	@Outgoing("drink")
-	public PublisherBuilder<String> sendDrinkOrder() {
+	@Outgoing("bar")
+	public PublisherBuilder<String> sendBeverageOrder() {
 		return ReactiveStreams.generate(() -> {
 			try {
-				return JsonbBuilder.create().toJson(drinkQueue.take());
+				return JsonbBuilder.create().toJson(beverageQueue.take());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				return null;

@@ -1,6 +1,6 @@
 FROM open-liberty
 
 COPY src/main/liberty/config /config/
-COPY target/order.war /config/apps
+COPY target/restaurantBFF.war /config/apps
 
 RUN configure.sh

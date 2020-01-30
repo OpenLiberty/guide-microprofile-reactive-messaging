@@ -15,7 +15,7 @@ public class OrderRequest {
 
     private ArrayList<@NotBlank(message="Food item name cannot be an empty string!") String> foodList = new ArrayList<>();
 
-    private ArrayList<@NotBlank(message="Drink item name cannot be an empty string!") String> drinkList = new ArrayList<>();
+    private ArrayList<@NotBlank(message="Beverage item name cannot be an empty string!") String> beverageList = new ArrayList<>();
 
     public String getTableID() {
         return tableID;
@@ -33,11 +33,11 @@ public class OrderRequest {
         this.foodList = foodList;
     }
 
-    public ArrayList<String> getDrinkList() {
-        return drinkList;
+    public ArrayList<String> getBeverageList() {
+        return beverageList;
     }
 
-    public void setDrinkList(ArrayList<String> drinkList) {
-        this.drinkList = drinkList;
+    public void setBeverageList(ArrayList<String> beverageList) {
+        this.beverageList = beverageList;
     }
 }
