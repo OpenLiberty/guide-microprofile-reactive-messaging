@@ -13,59 +13,57 @@
 :page-guide-category: microprofile
 :page-essential: true
 :page-essential-order: 1
-:page-description: Learn how to create a REST service with MP-reactive messaging and Open Liberty.
+:page-description: Learn how to create a microservice with MP-reactive messaging and Open Liberty.
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile', 'Java EE', 'Jakarta EE']
 :page-related-guides: []
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
 :page-seo-title: Creating a MP-reactive messaging REST service 
-:page-seo-description: A tutorial on how to create a REST service in Open Liberty using MP-reactive messaging
+:page-seo-description: A tutorial on how to create a microservices in Open Liberty using MP-reactive messaging
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
+:source-highlighter: prettify
+
 = Creating asynchronous reactive microservices using MP-reactive messaging
 
 [.hidden]
 NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].
 
-Learn how to create a REST microservice with MP-reactive messaging, and Open Liberty.
+Learn how to create a REST microservices with MP-reactive messaging, and Open Liberty.
 
 == What you'll learn
 
-This guide explains MP-reactive messaging concept and demonstrates how to use MP-reactive messaging between microservices using kafka broker.
-
-*What is asynchronous programming?* +
-Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
-
-image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
-
-// You will learn how to build and test a simple REST service with JAX-RS and JSON-B, which will expose
-// the JVM's system properties. The REST service will respond to `GET` requests made to the `\http://localhost:9080/LibertyProject/System/properties` URL.
-
-// The service responds to a `GET` request with a JSON representation of the system properties, where
-// each property is a field in a JSON object like this:
-
-// [source,json,role="no_copy"]
-// ----
-// {
-//   "os.name":"Mac",
-//   "java.version": "1.8"
-// }
-// ----
-
-// When you create a new REST application, the design of the API is important. The JAX-RS APIs can be
-// used to create JSON-RPC, or XML-RPC APIs, but it wouldn't be a RESTful service. A good RESTful service
-// is designed around the resources that are exposed, and on how to create, read, update, and delete the
-// resources.
-
-// The service responds to `GET` requests to the `/System/properties` path. The `GET` request should
-// return a `200 OK` response that contains all of the JVM's system properties.
-
-// [role="command"]
-// include::{common-includes}/gitclone.adoc[]
+You will learn how to build microservices using MicroProfile reactive messaging. You'll also learn how to send messages between these microservices using Kafka broker. 
 
 === What is MP-reactive messaging?
 
 Asynchronous communication allows temporal decoupling of services in a microservice-based architecture. MicroProfile Reactive Messaging delivers a way to build systems of microservices promoting responsive, non-blocking, location transparency, elastic, resiliency to failure and temporal decoupling, enforcing asynchronous message passing between the different parts of the system.
+
+=== What is Kafka
+
+https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages.
+
+=== What is asynchronous programming?
+Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
+
+
+The Restaurant application that you'll be working with consists of five microservices namely `restaurant`, `order`, `server`, `food` and `beverage`
+
+The `restaurant` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
+It communicates with the backend microservices on the caller's behalf.
+
+The waiter places a request using a `restaurant` service.
+
+`order` service consumes the request, produces an order message and sends it to Kafka on food or drink channel depending on the type. 
+
+The Order begins with a NEW status. `food` and `beverage` microservices consume and processes the order and updates the status to IN_PROGRESS and READY consecutively. There’s a sleep time in between each status and the updates are reported back to the order Service via reactive messages on Kafka.
+
+`server` Microservice contains a list of all ready to serve food and beverages. It consumes these statuses from food and beverage services.
+Once the server serves the order, it’s marked as COMPLETED and the status is sent back to the order service as a message.
+
+image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
+
+You'll update order , food , beverage and server microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty.
 
 // =================================================================================================
 // Prerequisites
@@ -76,32 +74,16 @@ You will build and run the  microservices in Docker containers. You can learn mo
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
-// The `finish` directory in the root of this guide contains the finished application. Give it a try before you proceed.
-
-// To try out the application, first go to the `finish` directory and run the following Maven 
-// goal to build the application and deploy it to Open Liberty:
-// [role='command']
-// ```
-// mvn liberty:run
-// ```
-
-// Check out the service at the
-// http://localhost:9080/LibertyProject/System/properties[^] URL. 
-
-// After you are done checking out the application, stop the Open Liberty server by pressing `CTRL+C`
-// in the shell session where you ran the server. Alternatively, you can run the `liberty:stop` goal 
-// from the `finish` directory in another shell session:
-
-// [role='command']
-// ```
-// mvn liberty:stop
-// ```
-
+//add kafka data
 
 // Getting Started
 
 [role='command']
 include::{common-includes}/gitclone.adoc[]
+
+USE this Github Link for the time being:
+
+`https://github.com/ankitagrawa/foodOrderRestaurantApp`
 
 === Try what you'll build
 The `finish` directory in the root of this guide contains the finished application. Give it a try before you proceed.
@@ -118,33 +100,28 @@ mvn liberty:run
 // changes to the code and stuff
 
 === @Outgoing
-Outgoing is an annotation indicating that the method feeds a stream. The name of the stream is given as attribute:
+Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute:
 
 === @Incoming
-Incoming is an annotation indicating that the method consumes a stream. The name of the stream is given as attribute
+Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute
+
+=== channel
+A channel is a name indicating which source or destination of messages is used. Channels are opaque Strings
 
 === Connector
-Reactive messaging uses  Connectors to attach one end of a channel  and are configured using MicroProfile Config.
+Reactive messaging uses Connectors to attach one end of a channel  and are configured using MicroProfile Config.
 Open Liberty includes the liberty-kafka connector for sending and receiving messages from an Apache Kafka broker.
 
+Navigate to the `start` directory to begin.
 
+ Start Open Liberty in development mode, which starts the Open Liberty server and listens 
+ for file changes:
 
+ [role="command"]
+ ```
+ mvn liberty:dev
+ ```
 
-
-// Navigate to the `start` directory to begin.
-
-// Start Open Liberty in development mode, which starts the Open Liberty server and listens 
-// for file changes:
-
-// [role="command"]
-// ```
-// mvn liberty:dev
-// ```
-
-
-// JAX-RS has two key concepts for creating REST APIs. The most obvious one is the resource itself, which is
-// modelled as a class. The second is a JAX-RS application, which groups all exposed resources under a
-// common path. You can think of the JAX-RS application as a wrapper for all of your resources.
 
 
 // [role="code_command hotspot" ,subs="quotes"]
@@ -234,7 +211,7 @@ To get the service running, the Liberty server needs to be correctly configured.
  The configuration does the following actions:
 
  . Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureManager file=0]`featureManager` element.
- <feature>mpReactiveMessaging-1.0</feature>
+ `<feature>mpReactiveMessaging-1.0</feature>`
 // . Configures the server to resolve the HTTP port numbers from variables, which are then specified in
 // the Maven [hotspot=defaultHttpPort hotspot=defaultHttpsPort file=1]`pom.xml` file. This is specified in the [hotspot=httpEndpoint file=0]`<httpEndpoint/>` element. Variables use the `${variableName}` syntax.
 // . Configures the server to run the produced web application on a context root specified in the 
