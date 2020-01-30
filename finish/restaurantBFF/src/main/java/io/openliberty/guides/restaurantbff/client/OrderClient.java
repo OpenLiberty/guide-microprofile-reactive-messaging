@@ -33,8 +33,15 @@ public class OrderClient {
                 .post(Entity.json(orderRequest));
     }
 
+    //Get list of Order objects, processed from the new order JSON by the Order API
     public Response getOrders(){
         return iBuilder(webTarget())
+                .get();
+    }
+
+    public Response getSingleOrder(String orderId){
+        return iBuilder(webTarget()
+                .path(orderId))
                 .get();
     }
 

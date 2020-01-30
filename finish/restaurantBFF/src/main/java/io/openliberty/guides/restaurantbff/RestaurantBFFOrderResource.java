@@ -27,8 +27,16 @@ public class RestaurantBFFOrderResource {
                     "and order details from the order database")
     @Tag(name = "Order",
             description = "Submitting and listing Orders")
-    public Response listOrders(){ //TODO Return list of all orders, still have to figure out how to store orders
+    public Response getOrders(){ //TODO Return list of all orders, still have to figure out how to store orders
         return orderClient.getOrders();
+    }
+
+    @GET
+    @Path("{orderId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Tag(name = "Order")
+    public Response getSingleOrder(@PathParam("orderId") String orderId){
+        return orderClient.getSingleOrder(orderId);
     }
 
     @POST
