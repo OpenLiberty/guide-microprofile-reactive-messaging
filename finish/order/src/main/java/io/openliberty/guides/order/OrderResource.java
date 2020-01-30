@@ -111,7 +111,7 @@ public class OrderResource {
 		});
 	}
 
-	@Outgoing("bar")
+	@Outgoing("beverage")
 	public PublisherBuilder<String> sendBeverageOrder() {
 		return ReactiveStreams.generate(() -> {
 			try {

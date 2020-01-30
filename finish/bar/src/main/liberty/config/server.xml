@@ -1,4 +1,4 @@
-<server description="Sample Liberty server">
+<server description="Bar Service">
 
   <featureManager>
     <feature>jaxrs-2.1</feature>
@@ -14,5 +14,5 @@
 
   <httpEndpoint host="*" httpPort="${default.http.port}" httpsPort="${default.https.port}" id="defaultHttpEndpoint"/>
 
-  <webApplication location="beverage.war" contextRoot="/"/>
+  <webApplication location="bar.war" contextRoot="/"/>
 </server>
