@@ -38,7 +38,7 @@ You will learn how to build microservices using MicroProfile reactive messaging.
 
 Asynchronous communication allows temporal decoupling of services in a microservice-based architecture. MicroProfile Reactive Messaging delivers a way to build systems of microservices promoting responsive, non-blocking, location transparency, elastic, resiliency to failure and temporal decoupling, enforcing asynchronous message passing between the different parts of the system.
 
-=== What is Kafka
+=== What is Kafka?
 
 https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages.
 
@@ -58,7 +58,7 @@ It communicates with the backend microservices on the caller's behalf.
 
 The waiter places a request using a `restaurantBFF` service.
 
-`order` service consumes the request, produces an order message and sends it to Kafka on food or beverage    channel depending on the type. 
+`order` service consumes the request, produces an order message and sends it to Kafka on food or beverage channel depending on the type. 
 
 The Order begins with a NEW status. `kitchen` and `bar` microservices consume and processes the order and updates the status to IN_PROGRESS and READY consecutively. There’s a sleep time in between each status and the updates are reported back to the order Service via reactive messages on Kafka.
 
