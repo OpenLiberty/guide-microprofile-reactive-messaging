@@ -16,7 +16,7 @@ package io.openliberty.guides.kitchen;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ApplicationPath;
 
-@ApplicationPath("food")
+@ApplicationPath("kitchen")
 public class KitchenApplication extends Application {
 
 }
