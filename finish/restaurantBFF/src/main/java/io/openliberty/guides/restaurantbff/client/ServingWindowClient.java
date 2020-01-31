@@ -16,9 +16,14 @@ import javax.ws.rs.core.Response;
 public class ServingWindowClient {
 
     @Inject
-    @ConfigProperty(name = "SERVING_WINDOW_SERVICE_BASE_URI", defaultValue = "http://localhost:9082") //TODO Verify port
-    private String baseUri;
+    @ConfigProperty(name = "SERVINGWINDOW_SERVICE_HOSTNAME", defaultValue = "localhost")
+    private String hostname;
 
+    @Inject
+    @ConfigProperty(name = "SERVINGWINDOW_SERVICE_PORT", defaultValue = "9082")
+    private String port;
+
+    private String baseUri = "http://" + hostname + ":" + port;
     private WebTarget target;
 
     public ServingWindowClient() {

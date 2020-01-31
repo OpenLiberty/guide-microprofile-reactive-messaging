@@ -18,9 +18,14 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 public class OrderClient {
 
     @Inject
-    @ConfigProperty(name = "ORDER_SERVICE_BASE_URI", defaultValue = "http://172.17.0.3:9081")
-    private String baseUri;
+    @ConfigProperty(name = "ORDER_SERVICE_HOSTNAME", defaultValue = "localhost")
+    private String hostname;
 
+    @Inject
+    @ConfigProperty(name = "ORDER_SERVICE_PORT", defaultValue = "9081")
+    private String port;
+
+    private String baseUri = "http://" + hostname + ":" + port;
     private WebTarget target;
 
     public OrderClient() {
