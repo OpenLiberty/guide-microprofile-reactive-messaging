@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd kitchen
+cd ../kitchen
 mvn liberty:stop
 
 cd ../bar
