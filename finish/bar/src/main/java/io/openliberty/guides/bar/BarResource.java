@@ -27,7 +27,7 @@ import io.openliberty.guides.models.Status;
 
 /**
  * 
- * Beverage Microservice using Eclipse
+ * Bar Microservice using Eclipse
  * microprofile reactive messaging 
  * running on Open Liberty 
  *

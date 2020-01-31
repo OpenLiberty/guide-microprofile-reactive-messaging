@@ -27,7 +27,7 @@ import io.openliberty.guides.models.Status;
 
 /**
  * 
- * Food Microservice using Eclipse
+ * Kitchen Microservice using Eclipse
  * microprofile reactive messaging 
  * running on Open Liberty
  * 
