@@ -45,6 +45,8 @@ https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that ma
 === What is asynchronous programming?
 Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
+The Reactive Restaurant application mentioned below is designed on Microservices architecture. The application has five microservices and uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+
 You'll update order , food , beverage and server microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]

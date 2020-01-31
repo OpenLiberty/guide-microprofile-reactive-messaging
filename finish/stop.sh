@@ -1,18 +1,18 @@
 #!/bin/bash
 
-cd food
+cd kitchen
 mvn liberty:stop
 
-cd ../beverage
+cd ../bar
 mvn liberty:stop
 
-cd ../server
+cd ../servingWindow
 mvn liberty:stop
 
 cd ../order
 mvn liberty:stop
 
-cd ../restaurant
+cd ../restaurantBFF
 mvn liberty:stop
 
 brew services stop zookeeper

@@ -11,10 +11,10 @@
 
     <modules>
         <module>models</module>
-        <module>food</module>
-        <module>beverage</module>
-        <module>server</module>
+        <module>kitchen</module>
+        <module>bar</module>
+        <module>servingWindow</module>
         <module>order</module>
-        <module>restaurant</module>
+        <module>restaurantBFF</module>
     </modules>
 </project>
