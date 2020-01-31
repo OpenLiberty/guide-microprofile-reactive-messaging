@@ -6,17 +6,17 @@ brew services start kafka
 cd models
 mvn clean install
 
-cd ../food
+cd ../kitchen
 mvn clean package liberty:create liberty:install-feature liberty:deploy liberty:start
 
-cd ../beverage
+cd ../bar
 mvn clean package liberty:create liberty:install-feature liberty:deploy liberty:start
 
-cd ../server
+cd ../servingWindow
 mvn clean package liberty:create liberty:install-feature liberty:deploy liberty:start
 
 cd ../order
 mvn clean package liberty:create liberty:install-feature liberty:deploy liberty:start
 
-cd ../restaurant
+cd ../restaurantBFF
 mvn clean package liberty:create liberty:install-feature liberty:deploy liberty:start
