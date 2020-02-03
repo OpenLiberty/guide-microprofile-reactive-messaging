@@ -99,7 +99,7 @@ mvn liberty:run
 
 == Creating a reactive messaging application
 
-The section will talk about the following topics with descrbing and explaining the required code:
+This section will describe the following topics and explain the required code:
 
 === @Outgoing
 Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute:
@@ -194,7 +194,8 @@ Navigate to the `start` directory to begin.
 
 == Configuring the server
 
-server.xml configuration
+This section will enlist the server.xml configuration
+
 
 To get the service running, the Liberty server needs to be correctly configured.
 
