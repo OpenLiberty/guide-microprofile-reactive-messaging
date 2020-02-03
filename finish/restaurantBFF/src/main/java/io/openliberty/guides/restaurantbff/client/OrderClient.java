@@ -25,8 +25,8 @@ public class OrderClient {
     @ConfigProperty(name = "ORDER_SERVICE_PORT", defaultValue = "9081")
     private String port;
 
-    private String baseUri = "http://" + hostname + ":" + port;
     private WebTarget target;
+    private String baseUri;
 
     public OrderClient() {
         this.target = null;
@@ -59,6 +59,7 @@ public class OrderClient {
     //Sets target to endpoint provided by Order API
     private WebTarget webTarget() {
         if (this.target == null) {
+            baseUri = "http://" + hostname + ":" + port;
             this.target = ClientBuilder
                     .newClient()
                     .target(baseUri)

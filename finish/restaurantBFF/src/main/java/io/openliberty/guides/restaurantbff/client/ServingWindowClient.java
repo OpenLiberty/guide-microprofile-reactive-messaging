@@ -23,8 +23,8 @@ public class ServingWindowClient {
     @ConfigProperty(name = "SERVINGWINDOW_SERVICE_PORT", defaultValue = "9082")
     private String port;
 
-    private String baseUri = "http://" + hostname + ":" + port;
     private WebTarget target;
+    private String baseUri;
 
     public ServingWindowClient() {
         this.target = null;
@@ -49,6 +49,8 @@ public class ServingWindowClient {
     //Sets target to endpoint provided by Order API
     private WebTarget webTarget() {
         if (this.target == null) {
+            baseUri = "http://" + hostname + ":" + port;
+
             this.target = ClientBuilder
                     .newClient()
                     .target(baseUri)
