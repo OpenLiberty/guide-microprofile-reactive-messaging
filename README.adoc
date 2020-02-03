@@ -47,23 +47,23 @@ Imagine asynchronous programming as a restaurant. After you're seated, a waiter 
 
 The Reactive Restaurant application mentioned below is designed on Microservices architecture. The application has five microservices and uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
-You'll update order , kitchen , bar and servingWindow microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty.
+You'll update the `order`, `kitchen, `bar`, and `servingWindow` microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty servers.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
-The Restaurant application that you'll be working with consists of five microservices namely `restaurantBFF`, `order`, `servingWindow`, `kitchen` and `bar`
+The Restaurant application that you'll be working with consists of five microservices namely `restaurantBFF`, `order`, `servingWindow`, `kitchen` and `bar`.
 
-The `restaurantBFF` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
+The `restaurantBFF` service is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend microservices on the caller's behalf.
 
-The waiter places a request using a `restaurantBFF` service.
+The waiter places a request using the `restaurantBFF` service.
 
-`order` service consumes the request, produces an order message and sends it to Kafka on food or beverage channel depending on the type. 
+The `order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
 
-The Order begins with a NEW status. `kitchen` and `bar` microservices consume and processes the order and updates the status to IN_PROGRESS and READY consecutively. There’s a sleep time in between each status and the updates are reported back to the order Service via reactive messages on Kafka.
+An order begins with a NEW status. The `kitchen` and `bar` microservices consume and processes the order and updates the status to IN_PROGRESS and READY consecutively. There’s a sleep operation in between each status to represent the cooking time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
 
-`servingWindow` Microservice contains a list of all ready to serve food and beverages. It consumes these statuses from kitchen and bar services.
-Once the order is served, it’s marked as COMPLETED and the status is sent back to the order service as a message.
+The `servingWindow` microservice contains a list of all ready to serve food and beverages. It consumes these statuses from kitchen and bar microservices.
+Once the order is served, it’s marked as COMPLETED and the status is sent back to the `order` microservice as a message.
 
 
 
@@ -99,7 +99,7 @@ mvn liberty:run
 
 == Creating a reactive messaging application
 
-// changes to the code and stuff
+The section will talk about the following topics with descrbing and explaining the required code:
 
 === @Outgoing
 Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute:
