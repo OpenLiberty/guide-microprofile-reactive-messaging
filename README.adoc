@@ -263,6 +263,107 @@ changes were automatically picked up.
 Check out the service that you created at the
 http://localhost:9080/openapi/ui[^] URL.
 
+Expand the `/api/orders POST request to post an Order` and click *Try it out*. Copy the following example input
+into the text box:
+ 
+[source, role='command']
+----
+{{
+  "tableID": "1",
+  "foodList": [
+    "burger"
+  ],
+  "beverageList": [
+    "coke"
+  ]
+}
+----
+
+Click `Execute` and you receive the 200 response.
+
+Now Expand the `/api/orders GET request to get the Order status` and click *Try it out*.
+
+Click `Execute` and you shall see the response with `IN_PROGRESS` status 
+
+[source, role='command']
+----
+[
+  {
+    "item": "burger",
+    "orderID": "0001",
+    "status": "IN_PROGRESS",
+    "tableID": "1",
+    "type": "FOOD"
+  },
+  {
+    "item": "coke",
+    "orderID": "0002",
+    "status": "IN_PROGRESS",
+    "tableID": "1",
+    "type": "BEVERAGE"
+  }
+]
+----
+
+Click `Execute` again and you shall see the response with `READY` status 
+
+[source, role='command']
+----
+[
+  {
+    "item": "burger",
+    "orderID": "0001",
+    "status": "READY",
+    "tableID": "1",
+    "type": "FOOD"
+  },
+  {
+    "item": "coke",
+    "orderID": "0002",
+    "status": "READY",
+    "tableID": "1",
+    "type": "BEVERAGE"
+  }
+]
+----
+
+Expand the `/api/servingWindow/complete/{orderID} POST request to complete an Order` and click *Try it out*. Copy the following example input
+into the text box:
+ 
+[source, role='command']
+----
+
+0002
+----
+
+Click `Execute` and you receive the 200 response.
+
+Now Expand the `/api/orders GET request to get the Order status` and click *Try it out*.
+
+Click `Execute` and you shall see the response with `IN_PROGRESS` status 
+
+[source, role='command']
+----
+[
+  {
+    "item": "burger",
+    "orderID": "0001",
+    "status": "IN_PROGRESS",
+    "tableID": "1",
+    "type": "FOOD"
+  },
+  {
+    "item": "coke",
+    "orderID": "0002",
+    "status": "COMPLETED",
+    "tableID": "1",
+    "type": "BEVERAGE"
+  }
+]
+----
+
+As you can see the order `0002` has been marked `COMPLETED` in `servingWindow` microservice and the update is cascaded to the `order` microservice 
+
 == Testing the service
 
 You will create an unit tests to test the basic functionality of the microservices. If a test failure occurs, then you may have introduced a bug into the code.
