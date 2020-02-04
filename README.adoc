@@ -116,14 +116,67 @@ Open Liberty includes the liberty-kafka connector for sending and receiving me
 
 Navigate to the `start` directory to begin.
 
- Start Open Liberty in development mode, which starts the Open Liberty server and listens 
- for file changes:
+//Start Open Liberty in development mode, which starts the Open Liberty server and listens 
+//for file changes:
 
- [role="command"]
- ```
- mvn liberty:dev
- ```
+[role=command]
+include::{common-includes}/devmode-start.adoc[]
 
+The `order` service uses a microprofile reactive messaging to send messagew to `bar` and `kitchen` microservices over kafka.
+You will update method in `order`,`bar` and `kitchen` service to use MP-ReactiveMessaging to use `@Outgoing` and `@Incoming` annotations.
+
+`order` creates an Order and sends it to the kafka topic on `beverage` or `food` channel. Depending on the type `bar` or `kitchen` receives an Order, processes it and sends back all the statuses back to kafka on MP-reactive messaging channels.
+
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `OrderResource` class.#
+`order/src/main/java/io/openliberty/guides/order/OrderResource.java`
+----
+OrderResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.java[]
+----
+
+//Kitchen
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `KitchenResource` class.#
+`kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResource.java`
+----
+KitchenResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResource.java[]
+----
+
+//bar
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `BarResource` class.#
+`bar/src/main/java/io/openliberty/guides/bar/BarResource.java`
+----
+BarResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/bar/src/main/java/io/openliberty/guides/bar/BarResource.java[]
+----
+
+`ServingWindowResource` microservice receives the `Ready` Order from the `bar` and `kitchen` microservices over kafka topics.
+Once the order is served it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MP-ReactiveMessaging
+
+//ServingWindow
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `ServingWindowResource` class.#
+`servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java`
+----
+ServingWindowResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java[]
+----
+ServingWindowResource
 
 
 // [role="code_command hotspot" ,subs="quotes"]
@@ -230,6 +283,50 @@ To get the service running, the Liberty server needs to be correctly configured.
 
 == Building and running the application
 
+You will build and run the `bar`, `kitchen`, `order`, and `servingWindow` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+
+Start your Docker environment.
+
+To build the application, run the Maven `install` goal from the command line in the `start` directory:
+
+[role='command']
+```
+mvn clean install
+```
+
+Run the following commands to build and containerize the application:
+
+[role='command']
+```
+docker build -t order:1.0-SNAPSHOT order/.
+docker build -t bar:1.0-SNAPSHOT bar/.
+docker build -t kitchen:1.0-SNAPSHOT kitchen/.
+docker build -t servingWindow:1.0-SNAPSHOT servingWindow/.
+```
+
+Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
+
+include::{common-includes}/os-tabs.adoc[]
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/start-app
+```
+--
+
+[.tab_content.windows_section]
+--
+[role='command']
+```
+.\scripts\start-app.bat
+```
+--
+
+The services take some time to become available.
+You can access the application by making requests to the `restaurantBFF` endpoint using OpenAPI. 
+
 // How to build and run the application
 
 // add name of the micro services
@@ -303,7 +400,7 @@ You will create an unit tests to test the basic functionality of the microservic
 
 Run tests
 
-Navigate to the directory, then verify that the tests pass by using the Maven `verify` goal:
+Navigate to the `restaurantBFF` directory, then verify that the tests pass by using the Maven `verify` goal:
 
 [role='command']
 ```
@@ -333,6 +430,29 @@ When the tests succeed, you see output similar to the following example:
 // When you are done checking out the service, exit development mode by typing `q` in the shell session where
 // you ran the server and then pressing the `enter/return` key.
 
+== Tearing down the environment
+
+Navigate back to the `start` directory.
+
+Finally, use the following script to stop the application:
+
+include::{common-includes}/os-tabs.adoc[]
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/stop-app
+```
+--
+
+[.tab_content.windows_section]
+--
+[role='command']
+```
+.\scripts\stop-app.bat
+```
+--
 
 == Great work! You're done!
 
