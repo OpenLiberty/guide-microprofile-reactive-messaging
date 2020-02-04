@@ -60,7 +60,7 @@ The waiter places a request using the `restaurantBFF` service.
 
 The `order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
 
-An order begins with a NEW status. The `kitchen` and `bar` microservices consume and processes the order and updates the status to IN_PROGRESS and READY consecutively. There’s a sleep operation in between each status to represent the cooking time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
+An order begins with a NEW status. The `kitchen` and `bar` microservices consume and processes the order and updates the status to IN_PROGRESS and READY consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
 
 The `servingWindow` microservice contains a list of all ready to serve food and beverages. It consumes these statuses from kitchen and bar microservices.
 Once the order is served, it’s marked as COMPLETED and the status is sent back to the `order` microservice as a message.
@@ -74,6 +74,9 @@ You will build and run the  microservices in Docker containers. You can learn mo
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
+// =================================================================================================
+// Getting started
+// =================================================================================================
 [role='command']
 include::{common-includes}/gitclone.adoc[]
 
@@ -83,7 +86,7 @@ USE this Github Link for the time being:
 
 == Creating a reactive messaging application
 
-MP-reactive messaging key concepts are as follows :
+=== MP-reactive messaging key concepts are as follows :
 
 === @Outgoing
 Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute:
@@ -91,7 +94,7 @@ Outgoing is an annotation indicating that the method feeds a channel. The name 
 === @Incoming
 Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute
 
-=== channel
+=== Channel
 A channel is a name indicating which source or destination of messages is used. Channels are opaque Strings
 
 === Connector
@@ -103,7 +106,7 @@ Navigate to the `start` directory to begin.
 [role=command]
 include::{common-includes}/devmode-start.adoc[]
 
-The `order` service uses a microprofile reactive messaging to send messages to `bar` and `kitchen` microservices over kafka.
+The `order` service uses microprofile reactive messaging to send messages to `bar` and `kitchen` microservices over kafka.
 You will update methods in `order`,`bar`,`ServingWindowResource` and `kitchen` services to use `@Outgoing` and `@Incoming` MP-ReactiveMessaging annotations.
 
 `order` microservice creates an Order and sends it to the kafka topic on `beverage` or `food` channel. 
