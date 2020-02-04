@@ -47,7 +47,7 @@ Imagine asynchronous programming as a restaurant. After you're seated, a waiter 
 
 The Reactive Restaurant application mentioned below is designed on Microservices architecture. The application has five microservices and uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
-You'll update the `order`, `kitchen, `bar`, and `servingWindow` microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty servers.
+You'll update the `order`, `kitchen`, `bar`, and `servingWindow` microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty servers.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
@@ -65,8 +65,6 @@ An order begins with a NEW status. The `kitchen` and `bar` microservices consume
 The `servingWindow` microservice contains a list of all ready to serve food and beverages. It consumes these statuses from kitchen and bar microservices.
 Once the order is served, it’s marked as COMPLETED and the status is sent back to the `order` microservice as a message.
 
-
-
 // =================================================================================================
 // Prerequisites
 // =================================================================================================
@@ -76,10 +74,6 @@ You will build and run the  microservices in Docker containers. You can learn mo
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
-//add kafka data
-
-// Getting Started
-
 [role='command']
 include::{common-includes}/gitclone.adoc[]
 
@@ -87,19 +81,9 @@ USE this Github Link for the time being:
 
 `https://github.com/ankitagrawa/foodOrderRestaurantApp`
 
-=== Try what you'll build
-The `finish` directory in the root of this guide contains the finished application. Give it a try before you proceed.
-
-To try out the application, first go to the `finish` directory and run the following Maven 
-goal to build the application and deploy it to Open Liberty:
-[role='command']
-```
-mvn liberty:run
-```
-
 == Creating a reactive messaging application
 
-This section will describe the following topics and explain the required code:
+MP-reactive messaging key concepts are as follows :
 
 === @Outgoing
 Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute:
@@ -116,16 +100,13 @@ Open Liberty includes the liberty-kafka connector for sending and receiving me
 
 Navigate to the `start` directory to begin.
 
-//Start Open Liberty in development mode, which starts the Open Liberty server and listens 
-//for file changes:
-
 [role=command]
 include::{common-includes}/devmode-start.adoc[]
 
-The `order` service uses a microprofile reactive messaging to send messagew to `bar` and `kitchen` microservices over kafka.
-You will update method in `order`,`bar` and `kitchen` service to use MP-ReactiveMessaging to use `@Outgoing` and `@Incoming` annotations.
+The `order` service uses a microprofile reactive messaging to send messages to `bar` and `kitchen` microservices over kafka.
+You will update methods in `order`,`bar`,`ServingWindowResource` and `kitchen` services to use `@Outgoing` and `@Incoming` MP-ReactiveMessaging annotations.
 
-`order` creates an Order and sends it to the kafka topic on `beverage` or `food` channel. Depending on the type `bar` or `kitchen` receives an Order, processes it and sends back all the statuses back to kafka on MP-reactive messaging channels.
+`order` microservice creates an Order and sends it to the kafka topic on `beverage` or `food` channel. 
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -138,6 +119,8 @@ OrderResource.java
 include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.java[]
 ----
 
+If the order is a food, `kitchen` service receives an Order, processes it and sends back all the statuses to kafka on MP-reactive messaging channels.
+
 //Kitchen
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -149,6 +132,8 @@ KitchenResource.java
 ----
 include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResource.java[]
 ----
+
+If the order is a drink, `bar` service receives an Order, processes it and sends back all the statuses to kafka on MP-reactive messaging channels.
 
 //bar
 [role="code_command hotspot", subs="quotes"]
@@ -176,110 +161,35 @@ ServingWindowResource.java
 ----
 include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java[]
 ----
-ServingWindowResource
-
-
-// [role="code_command hotspot" ,subs="quotes"]
-// ----
-// #Replace the `SystemApplication` class.#
-// `src/main/java/io/openliberty/guides/rest/SystemApplication.java`
-// ----
-
-// The [hotspot=systemApplication]`SystemApplication` class extends the `Application` class, which in turn associates all JAX-RS
-// resource classes in the WAR file with this JAX-RS application, making them available under the common
-// path specified in the [hotspot=systemApplication]`SystemApplication` class. The [hotspot=applicationPath]`@ApplicationPath` annotation has a
-// value that indicates the path within the WAR that the JAX-RS application accepts requests from.
-
-// SystemApplication.java
-// [source, Java, linenums, role='code_column hide_tags=comment']
-// ----
-// include::finish/src/main/java/io/openliberty/guides/rest/SystemApplication.java[]
-// ----
-
-//            //== Creating the JAX-RS resource
-
-// In JAX-RS, a single class should represent a single resource, or a group of resources of the same type.
-// In this application, a resource might be a system property, or a set of system properties. It is easy
-// to have a single class handle multiple different resources, but keeping a clean separation between types
-// of resources helps with maintainability in the long run.
-
-// [role="code_command hotspot", subs="quotes"]
-// ----
-// #Create the `PropertiesResource` class.#
-// `src/main/java/io/openliberty/guides/rest/PropertiesResource.java`
-// ----
-
-// This resource class has quite a bit of code in it, so let's break it down into manageable chunks.
-
-// The [hotspot=path file=0]`@Path` annotation on the class indicates that this resource responds to the `properties` path
-// in the JAX-RS application. The [hotspot=applicationPath file=1]`@ApplicationPath` annotation in the [hotspot=systemApplication file=1]`SystemApplication` class together with
-// the [hotspot=path file=0]`@Path` annotation in this class indicates that the resource is available at the `System/properties`
-// path.
-
-// JAX-RS maps the HTTP methods on the URL to the methods on the class. The method to call is determined
-// by the annotations that are specified on the methods. In the application you are building, an HTTP `GET` request
-// to the `System/properties` path results in the system properties being returned.
-
-// The [hotspot=get file=0]`@GET` annotation on the method indicates that this method is to be called for the HTTP `GET`
-// method. The [hotspot=produces file=0]`@Produces` annotation indicates the format of the content that will be returned. The
-// value of the [hotspot=produces file=0]`@Produces` annotation will be specified in the HTTP `Content-Type` response header.
-// For this application, a JSON structure is to be returned. The desired `Content-Type` for a JSON
-// response is `application/json` with `MediaType.APPLICATION_JSON` instead of the `String` content type. Using a constant such as `MediaType.APPLICATION_JSON` is better because if there's a spelling error, a compile failure occurs.
-
-// JAX-RS supports a number of ways to marshal JSON. The JAX-RS 2.1 specification mandates JSON-Binding
-// (JSON-B) and JAX-B. 
-
-// The method body returns the result of `System.getProperties()` that is of type `java.util.Properties`. Since the method 
-// is annotated with `@Produces(MediaType.APPLICATION_JSON)`, JAX-RS uses JSON-B to automatically convert the returned object
-// to JSON data in the HTTP response.
-
-// PropertiesResource.java
-// [source,java,linenums,role='code_column hide_tags=comment']
-// ----
-// include::finish/src/main/java/io/openliberty/guides/rest/PropertiesResource.java[]
-// ----
-
-// SystemApplication.java
-// [source,java,linenums,role='code_column hide_tags=comment']
-// ----
-// include::finish/src/main/java/io/openliberty/guides/rest/SystemApplication.java[]
-// ----
 
 == Configuring the server
 
-This section will enlist the server.xml configuration
-
-
 To get the service running, the Liberty server needs to be correctly configured.
 
- [role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot", subs="quotes"]
  ----
  #Replace the server configuration file.#
  `src/main/liberty/config/server.xml`
  ----
 
  server.xml
- [source,xml,linenums,role="code_column"]
+[source,xml,linenums,role="code_column"]
  ----
  include::finish/src/main/liberty/config/server.xml[]
  ----
 
  The configuration does the following actions:
 
- . Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureManager file=0]`featureManager` element.
- `<feature>mpReactiveMessaging-1.0</feature>`
-// . Configures the server to resolve the HTTP port numbers from variables, which are then specified in
-// the Maven [hotspot=defaultHttpPort hotspot=defaultHttpsPort file=1]`pom.xml` file. This is specified in the [hotspot=httpEndpoint file=0]`<httpEndpoint/>` element. Variables use the `${variableName}` syntax.
-// . Configures the server to run the produced web application on a context root specified in the 
-// [hotspot=appContextRoot file=1]`pom.xml` file. This is specified in the [hotspot=webApplication file=0]`<webApplication/>` element.
+ . Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureManager file=0]`<feature>` element.
 
-// pom.xml
-// [source,xml,linenums,role="code_column"]
-// ----
-// include::finish/pom.xml[]
-// ----
+Before you can build the project, you define the Maven Project Object Model (POM) file, the pom.xml. 
+Replace the file to include `microprofile-reactive-messaging-api` dependency
 
-// The variables that are being used in the [hotspot=httpEndpoint hotspot=webApplication file=0]`server.xml` file are provided by the properties set in the Maven [hotspot=defaultHttpPort hotspot=defaultHttpsPort hotspot=appContextRoot file=1]`pom.xml` file. The properties must be formatted as `liberty.var.variableName`.
+pom.xml
+[source,xml,linenums,role="code_column"]
+ ----
+ include::finish/pom.xml[]
+ ----
 
 == Building and running the application
 
@@ -327,21 +237,13 @@ include::{common-includes}/os-tabs.adoc[]
 The services take some time to become available.
 You can access the application by making requests to the `restaurantBFF` endpoint using OpenAPI. 
 
-// How to build and run the application
+The Open Liberty server was started in development mode at the beginning of the guide and all the 
+changes were automatically picked up.
 
-// add name of the micro services
-Instructions on how to build and run the application. This will enlist various steps required.
-
-// The Open Liberty server was started in development mode at the beginning of the guide and all the 
-// changes were automatically picked up.
-
-// Check out the service that you created at the
-// http://localhost:9080/LibertyProject/System/properties[^] URL. 
-
+Check out the service that you created at the
+http://localhost:9080/openapi/ui[^] URL.
 
 == Testing the service
-
-Test development
 
 You will create an unit tests to test the basic functionality of the microservices. If a test failure occurs, then you may have introduced a bug into the code.
 
@@ -466,5 +368,6 @@ https://microprofile.io/[See the MicroProfile specs^]
 
 https://openliberty.io/docs/ref/microprofile[View the MicroProfile API^]
 
+https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html#_microprofile_reactive_messaging[View the MicroProfile Reactive Messaging Specification^]
 
 include::{common-includes}/attribution.adoc[subs="attributes"]
