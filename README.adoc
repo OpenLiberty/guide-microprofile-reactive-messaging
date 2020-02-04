@@ -268,7 +268,7 @@ into the text box:
  
 [source, role='command']
 ----
-{{
+{
   "tableID": "1",
   "foodList": [
     "burger"
@@ -279,11 +279,11 @@ into the text box:
 }
 ----
 
-Click `Execute` and you receive the 200 response.
+Click `Execute` and you will receive the 200 response.
 
 Now Expand the `/api/orders GET request to get the Order status` and click *Try it out*.
 
-Click `Execute` and you shall see the response with `IN_PROGRESS` status 
+Click `Execute` and you will see the response with `IN_PROGRESS` status 
 
 [source, role='command']
 ----
@@ -305,7 +305,7 @@ Click `Execute` and you shall see the response with `IN_PROGRESS` status
 ]
 ----
 
-Click `Execute` again and you shall see the response with `READY` status 
+Click `Execute` again and you will see the response with `READY` status 
 
 [source, role='command']
 ----
@@ -336,11 +336,11 @@ into the text box:
 0002
 ----
 
-Click `Execute` and you receive the 200 response.
+Click `Execute` and you will receive the 200 response.
 
 Now Expand the `/api/orders GET request to get the Order status` and click *Try it out*.
 
-Click `Execute` and you shall see the response with `IN_PROGRESS` status 
+Click `Execute` and you will see the response with `COMPLETED` status 
 
 [source, role='command']
 ----
