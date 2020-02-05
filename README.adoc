@@ -28,7 +28,7 @@
 [.hidden]
 NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].
 
-Learn how to create REST microservices with MP-reactive messaging, and Open Liberty.
+Learn how to create REST microservices with MP-reactive messaging, and Open Liberty.    
 
 == What you'll learn
 
@@ -111,7 +111,7 @@ You’ll update methods in `order`,`bar`, `ServingWindowResource` and `kitchen` 
 
 `order` microservice creates an Order and sends it to the kafka topic on `beverage` or `food` channel. 
 
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=0", subs="quotes"]
 ----
 #Replace the `OrderResource` class.#
 `order/src/main/java/io/openliberty/guides/order/OrderResource.java`
@@ -125,7 +125,7 @@ include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.ja
 If the order is a food, `kitchen` service receives an Order, processes it and sends back all the statuses to kafka on MP-reactive messaging channels.
 
 //Kitchen
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=1", subs="quotes"]
 ----
 #Replace the `KitchenResource` class.#
 `kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResource.java`
@@ -139,7 +139,7 @@ include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResou
 If the order is a drink, `bar` service receives an Order, processes it and sends back all the statuses to kafka on MP-reactive messaging channels.
 
 //bar
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=2", subs="quotes"]
 ----
 #Replace the `BarResource` class.#
 `bar/src/main/java/io/openliberty/guides/bar/BarResource.java`
@@ -154,7 +154,7 @@ include::finish/bar/src/main/java/io/openliberty/guides/bar/BarResource.java[]
 Once the order is served, it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MP-ReactiveMessaging
 
 //ServingWindow
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=3", subs="quotes"]
 ----
 #Replace the `ServingWindowResource` class.#
 `servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java`
@@ -168,7 +168,7 @@ include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/
 Each of the four microservices `order`,`bar`,`ServingWindowResource` and `kitchen` contains `microprofile-config.properties`
 file, which configures kafka connector with the MP-reactive messaging channels.
 
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=4", subs="quotes"]
 ----
 #microprofile-config.properties sample from  the kitchen microservice.#
 `finish/kitchen/src/main/resources/META-INF/microprofile-config.properties`
@@ -185,7 +185,7 @@ Rest all the microservices are configure similarly
 
 To get the service running, the Liberty server needs to be correctly configured.
 
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=0", subs="quotes"]
 ----
  #Replace the server configuration file.#
  `src/main/liberty/config/server.xml`
