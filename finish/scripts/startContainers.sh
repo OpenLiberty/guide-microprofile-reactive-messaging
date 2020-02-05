@@ -13,7 +13,7 @@ docker run -d \
   --network=$NETWORK \
   --name=zookeeper \
   --rm \
-  bitnami/zookeeper:3
+  bitnami/zookeeper:3 &
 
 docker run -d \
   -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 \
@@ -23,35 +23,35 @@ docker run -d \
   --network=$NETWORK \
   --name=kafka \
   --rm \
-  bitnami/kafka:2
+  bitnami/kafka:2 &
 
 docker run -d \
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
   --network=$NETWORK \
   --name=kitchen \
   --rm \
-  kitchen:1.0-SNAPSHOT
+  kitchen:1.0-SNAPSHOT &
 
 docker run -d \
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
   --network=$NETWORK \
   --name=bar \
   --rm \
-  bar:1.0-SNAPSHOT
+  bar:1.0-SNAPSHOT &
 
 docker run -d \
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
   --network=$NETWORK \
   --name=servingwindow \
   --rm \
-  servingwindow:1.0-SNAPSHOT
+  servingwindow:1.0-SNAPSHOT &
 
 docker run -d \
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
   --network=$NETWORK \
   --name=order \
   --rm \
-  order:1.0-SNAPSHOT
+  order:1.0-SNAPSHOT &
 
 docker run -d \
   -e ORDER_SERVICE_HOSTNAME="order" \
@@ -62,4 +62,6 @@ docker run -d \
   --network=$NETWORK \
   --name=restaurantbff \
   --rm \
-  restaurantbff:1.0-SNAPSHOT
+  restaurantbff:1.0-SNAPSHOT &
+  
+wait
