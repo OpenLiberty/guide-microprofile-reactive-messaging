@@ -12,6 +12,7 @@
 // end::copyright[]
 package io.openliberty.guides.bar;
 
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -37,19 +38,13 @@ import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
 
-/**
- * 
- * Bar Microservice using Eclipse
- * microprofile reactive messaging 
- * running on Open Liberty 
- *
- */
 @ApplicationScoped
 @Path("/beverageMessaging")
 public class BarResource {
 
 	private Executor executor = Executors.newSingleThreadExecutor();
 	private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
+	private Random random = new Random();
 	Jsonb jsonb = JsonbBuilder.create();
 
 	@GET
@@ -59,11 +54,6 @@ public class BarResource {
 				.build();
 	}
 
-	/**
-	 * Bar message Order processor
-	 * @param newOrder
-	 * @return CompletionStage<String>
-	 */
 	@Incoming("bevOrderConsume")
 	@Outgoing("bevOrderPublishInter")
 	public CompletionStage<String> initBeverageOrder(String newOrder) {
@@ -75,7 +65,7 @@ public class BarResource {
 
 	private CompletionStage<Order> prepareOrder(Order order) {
 		return CompletableFuture.supplyAsync(() -> {
-			prepare(4000);
+			prepare();
 			System.out.println(" Beverage Order in Progress... ");
 			Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
 			System.out.println(  " Order : " + jsonb.toJson(inProgressOrder) );
@@ -84,24 +74,20 @@ public class BarResource {
 		}, executor);
 	}
 
-	private void prepare(long milliSec) {
+	private void prepare() {
 		try {
-			Thread.sleep(milliSec);
+			Thread.sleep((random.nextInt(3)+4) * 1000);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
 	}
 
-	/**
-	 * Publish Ready Beverage Order message to Kafka
-	 * @return PublisherBuilder<String>
-	 */
 	@Outgoing("beverageOrderPublish")
 	public PublisherBuilder<String> sendReadyOrder() {
 		return ReactiveStreams.generate(() -> {
 			try {
 				Order order = inProgress.take();
-				prepare(3000);
+				prepare();
 				order.setStatus(Status.READY);
 				System.out.println(" Beverage Order Ready... ");
 				System.out.println(  " Order : " + jsonb.toJson(order) );
