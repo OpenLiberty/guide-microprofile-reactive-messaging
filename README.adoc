@@ -60,7 +60,7 @@ The waiter places a request using the `restaurantBFF` service.
 
 The `order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
 
-An order begins with a NEW status. The `kitchen` and `bar` microservices consume and processes the order and updates the status to IN_PROGRESS and READY consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
+An order begins with a NEW status. The `kitchen` and `bar` microservices consume and process the order and update the status to IN_PROGRESS and READY consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
 
 The `servingWindow` microservice contains a list of all ready to serve food and beverages. It consumes these statuses from kitchen and bar microservices.
 Once the order is served, it’s marked as COMPLETED and the status is sent back to the `order` microservice as a message.
@@ -107,7 +107,7 @@ Navigate to the `start` directory to begin.
 include::{common-includes}/devmode-start.adoc[]
 
 The `order` service uses microprofile reactive messaging to send messages to `bar` and `kitchen` microservices over kafka.
-You will update methods in `order`,`bar`,`ServingWindowResource` and `kitchen` services to use `@Outgoing` and `@Incoming` MP-ReactiveMessaging annotations.
+You’ll update methods in `order`,`bar`, `ServingWindowResource` and `kitchen` services to use `@Outgoing` and `@Incoming` MP-ReactiveMessaging annotations.
 
 `order` microservice creates an Order and sends it to the kafka topic on `beverage` or `food` channel. 
 
@@ -151,7 +151,7 @@ include::finish/bar/src/main/java/io/openliberty/guides/bar/BarResource.java[]
 ----
 
 `ServingWindowResource` microservice receives the `Ready` Order from the `bar` and `kitchen` microservices over kafka topics.
-Once the order is served it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MP-ReactiveMessaging
+Once the order is served, it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MP-ReactiveMessaging
 
 //ServingWindow
 [role="code_command hotspot", subs="quotes"]
@@ -166,7 +166,7 @@ include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/
 ----
 
 Each of the four microservices `order`,`bar`,`ServingWindowResource` and `kitchen` contains `microprofile-config.properties`
-file which configures kafka connector with the MP-reactive messaging channels.
+file, which configures kafka connector with the MP-reactive messaging channels.
 
 [role="code_command hotspot", subs="quotes"]
 ----
@@ -263,7 +263,7 @@ changes were automatically picked up.
 Check out the service that you created at the
 http://localhost:9080/openapi/ui[^] URL.
 
-Expand the `/api/orders POST request to post an Order` and click *Try it out*. Copy the following example input
+Expand the `/api/orders` `POST` request to post an Order and click *Try it out*. Copy the following example input
 into the text box:
  
 [source, role='command']
@@ -281,7 +281,7 @@ into the text box:
 
 Click `Execute` and you will receive the 200 response.
 
-Now Expand the `/api/orders GET request to get the Order status` and click *Try it out*.
+Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
 
 Click `Execute` and you will see the response with `IN_PROGRESS` status 
 
@@ -327,7 +327,7 @@ Click `Execute` again and you will see the response with `READY` status
 ]
 ----
 
-Expand the `/api/servingWindow/complete/{orderID} POST request to complete an Order` and click *Try it out*. Copy the following example input
+Expand the `/api/servingWindow/complete/{orderID}` `POST` request to complete an Order and click *Try it out*. Copy the following example input
 into the text box:
  
 [source, role='command']
@@ -338,7 +338,7 @@ into the text box:
 
 Click `Execute` and you will receive the 200 response.
 
-Now Expand the `/api/orders GET request to get the Order status` and click *Try it out*.
+Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
 
 Click `Execute` and you will see the response with `COMPLETED` status 
 
