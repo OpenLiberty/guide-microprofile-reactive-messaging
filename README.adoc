@@ -213,7 +213,7 @@ include::finish/pom.xml[]
 
 == Building and running the application
 
-You will build and run the `bar`, `kitchen`, `order`, and `servingWindow` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+You will build and run the `bar`, `kitchen`, `order`, `restaurantBFF` and `servingWindow` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
 Start your Docker environment.
 
@@ -221,7 +221,8 @@ To build the application, run the Maven `install` goal from the command line in 
 
 [role='command']
 ```
-mvn clean install
+mvn -pl models clean install
+mvn clean package
 ```
 
 Run the following commands to build and containerize the application:
@@ -232,6 +233,7 @@ docker build -t order:1.0-SNAPSHOT order/.
 docker build -t bar:1.0-SNAPSHOT bar/.
 docker build -t kitchen:1.0-SNAPSHOT kitchen/.
 docker build -t servingWindow:1.0-SNAPSHOT servingWindow/.
+docker build -t restaurantbff:1.0-SNAPSHOT restaurantBFF/.
 ```
 
 Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
@@ -242,7 +244,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-./scripts/start-app
+./scripts/startContainers.sh
 ```
 --
 
@@ -250,7 +252,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-.\scripts\start-app.bat
+.\scripts\startContainers.sh
 ```
 --
 
@@ -465,7 +467,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-./scripts/stop-app
+./scripts/stopContainers.sh
 ```
 --
 
@@ -473,7 +475,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-.\scripts\stop-app.bat
+.\scripts\stopContainers.sh
 ```
 --
 
