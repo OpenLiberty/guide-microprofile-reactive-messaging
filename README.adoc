@@ -188,13 +188,15 @@ To get the service running, the Liberty server needs to be correctly configured.
 [role="code_command hotspot file=0", subs="quotes"]
 ----
  #Replace the server configuration file.#
- `src/main/liberty/config/server.xml`
+ `/bar/src/main/liberty/config/server.xml`
 ----
 server.xml
 [source,xml,linenums,role="code_column"]
 ----
-include::finish/src/main/liberty/config/server.xml[]
+include::finish/bar/src/main/liberty/config/server.xml[]
 ----
+
+Rest all the microservices have already configured `server.xml`
 
  The configuration does the following actions:
 
@@ -202,14 +204,13 @@ include::finish/src/main/liberty/config/server.xml[]
  
 
 pom.xml
-[source,xml,linenums,role="code_column"]
+[source, XML ,linenums,role="code_column"]
 ----
-include::finish/pom.xml[]
+include::finish/bar/pom.xml[]
 ----
 
 
 . MP-microprofile dependency is included in the Maven [hotspot=reactiveMessaging file=1]`pom.xml` file. This is specified in the [hotspot=reactiveMessaging file=0]`<dependency>` element.
-
 
 == Building and running the application
 
