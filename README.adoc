@@ -109,8 +109,6 @@ include::{common-includes}/devmode-start.adoc[]
 The `order` service uses microprofile reactive messaging to send messages to `bar` and `kitchen` microservices over kafka.
 You’ll update methods in `order`,`bar`, `ServingWindowResource` and `kitchen` services to use `@Outgoing` and `@Incoming` MP-ReactiveMessaging annotations.
 
-`order` microservice creates an Order and sends it to the kafka topic on `beverage` or `food` channel. 
-
 [role="code_command hotspot file=0", subs="quotes"]
 ----
 #Replace the `OrderResource` class.#
@@ -121,6 +119,9 @@ OrderResource.java
 ----
 include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.java[]
 ----
+
+`order` microservice creates an Order and sends it to the kafka topic on `@Outgoing("food")` or `@Outgoing("beverage")` channel.
+The `@Incoming("updateStatus")` channel receives an updated Order status from the kafka.
 
 If the order is a food, `kitchen` service receives an Order, processes it and sends back all the statuses to kafka on MP-reactive messaging channels.
 
@@ -196,10 +197,9 @@ server.xml
 include::finish/bar/src/main/liberty/config/server.xml[]
 ----
 
-Rest all the microservices have `server.xml` already configured similarly.
+Rest all the microservices have `server.xml` already configured.
 
 The configuration does the following actions:
-
 . Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureManager file=0]`<feature>` element.
  
 [role="code_command hotspot file=1", subs="quotes"]
