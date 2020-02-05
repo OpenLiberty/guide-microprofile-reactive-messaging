@@ -1,6 +1,6 @@
-FROM open-liberty
+FROM open-liberty:kernel
 
-COPY src/main/liberty/config /config/
-COPY target/kitchen.war /config/apps
+COPY --chown=1001:0 src/main/liberty/config /config/
+COPY --chown=1001:0 target/kitchen.war /config/apps
 
 RUN configure.sh
