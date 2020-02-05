@@ -170,7 +170,7 @@ file, which configures kafka connector with the MP-reactive messaging channels.
 
 [role="code_command hotspot file=4", subs="quotes"]
 ----
-#microprofile-config.properties sample from  the kitchen microservice.#
+#microprofile-config.properties sample from the kitchen microservice.#
 `finish/kitchen/src/main/resources/META-INF/microprofile-config.properties`
 ----
 microprofile-config.properties
@@ -179,7 +179,7 @@ microprofile-config.properties
 include::finish/kitchen/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-Rest all the microservices are configure similarly
+Rest all the microservices use similar `microprofile-config.properties` configuration
 
 == Configuring the server
 
@@ -196,21 +196,25 @@ server.xml
 include::finish/bar/src/main/liberty/config/server.xml[]
 ----
 
-Rest all the microservices have already configured `server.xml`
+Rest all the microservices have `server.xml` already configured similarly.
 
- The configuration does the following actions:
+The configuration does the following actions:
 
- . Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureManager file=0]`<feature>` element.
+. Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureManager file=0]`<feature>` element.
  
-
+[role="code_command hotspot file=1", subs="quotes"]
+----
+ #pom.xml configuration#
+ `/bar/pom.xml`
+---- 
 pom.xml
 [source, XML ,linenums,role="code_column"]
 ----
 include::finish/bar/pom.xml[]
 ----
 
-
 . MP-microprofile dependency is included in the Maven [hotspot=reactiveMessaging file=1]`pom.xml` file. This is specified in the [hotspot=reactiveMessaging file=0]`<dependency>` element.
+
 
 == Building and running the application
 
