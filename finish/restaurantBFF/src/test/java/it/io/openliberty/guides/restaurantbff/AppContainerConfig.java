@@ -78,11 +78,13 @@ public class AppContainerConfig implements SharedContainerConfiguration {
                         .withStatusCode(200)
                         .withHeader("Content-Type", "application/json"));
 
-        foodList.add("Pho");
-        beverageList.add("Iced Tea");
-        orderRequest.setTableID("10");
-        orderRequest.setFoodList(foodList);
-        orderRequest.setBeverageList(beverageList);
+        if(foodList.isEmpty()){
+            foodList.add("Pho");
+            beverageList.add("Iced Tea");
+            orderRequest.setTableID("10");
+            orderRequest.setFoodList(foodList);
+            orderRequest.setBeverageList(beverageList);
+        }
 
         //For createOrder() in Order Client
         mockClient
