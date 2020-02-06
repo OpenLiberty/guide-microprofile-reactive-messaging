@@ -15,7 +15,7 @@
 :page-essential-order: 1
 :page-description: Learn how to create a microservice with MP-reactive messaging and Open Liberty.
 :guide-author: Open Liberty
-:page-tags: ['MicroProfile', 'Jakarta EE']
+:page-tags: ['MicroProfile', 'Jakarta EE', 'Microservices']
 :page-related-guides: []
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
