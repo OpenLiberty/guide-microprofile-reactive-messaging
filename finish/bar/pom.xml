@@ -51,7 +51,7 @@
 			<artifactId>microprofile-reactive-messaging-api</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<!-- tag::reactiveMessaging[] -->
+		<!-- end::reactiveMessaging[] -->
 		<!-- Required dependencies -->
 		<dependency>
 			<groupId>io.openliberty.guides</groupId>

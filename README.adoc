@@ -210,7 +210,7 @@ pom.xml
 include::finish/bar/pom.xml[]
 ----
 
-. MP-microprofile dependency is included in the Maven [hotspot=reactiveMessagingPOM file=1]`pom.xml` file. This is specified in the [hotspot=reactiveMessaging file=1]`<dependency>` element.
+- MP-microprofile dependency is included in the Maven `pom.xml` file. This is specified in the [hotspot=reactiveMessaging file=1]`<dependency>` element.
 
 
 == Building and running the application
