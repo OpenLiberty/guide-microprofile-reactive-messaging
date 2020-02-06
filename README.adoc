@@ -15,7 +15,7 @@
 :page-essential-order: 1
 :page-description: Learn how to create a microservice with MP-reactive messaging and Open Liberty.
 :guide-author: Open Liberty
-:page-tags: ['MicroProfile', 'Java EE', 'Jakarta EE']
+:page-tags: ['MicroProfile', 'Jakarta EE']
 :page-related-guides: []
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
@@ -45,25 +45,23 @@ https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that ma
 === What is asynchronous programming?
 Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-The Reactive Restaurant application mentioned below is designed on Microservices architecture. The application has five microservices and uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+The Reactive Restaurant application mentioned below is designed on Microservices architecture. The application that you'll be working with consists of five microservices namely `restaurantBFF`, `order`, `servingWindow`, `kitchen` and `bar`. And uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
-You'll update the `order`, `kitchen`, `bar`, and `servingWindow` microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty servers.
+You'll update the `order`, `kitchen`, `bar`, and `servingWindow` microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
-
-The Restaurant application that you'll be working with consists of five microservices namely `restaurantBFF`, `order`, `servingWindow`, `kitchen` and `bar`.
 
 The `restaurantBFF` service is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend microservices on the caller's behalf.
 
 The waiter places a request using the `restaurantBFF` service.
 
-The `order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
+The `order` microservice consumes the request, produces Order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
 
-An order begins with a NEW status. The `kitchen` and `bar` microservices consume and process the order and update the status to IN_PROGRESS and READY consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
+An Order begins with a `NEW` status. The `kitchen` and `bar` microservices consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
 
-The `servingWindow` microservice contains a list of all ready to serve food and beverages. It consumes these statuses from kitchen and bar microservices.
-Once the order is served, it’s marked as COMPLETED and the status is sent back to the `order` microservice as a message.
+The `servingWindow` microservice contains a list of all ready to serve food and beverages. It consumes these statuses from `kitchen` and `bar` microservices.
+Once the Order is served, it’s marked as `COMPLETED` and the status is sent back to the `order` microservice as a message.
 
 // =================================================================================================
 // Prerequisites
@@ -89,13 +87,13 @@ USE this Github Link for the time being:
 === MP-reactive messaging key concepts are as follows :
 
 === @Outgoing
-Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute:
+Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute.
 
 === @Incoming
-Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute
+Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute.
 
 === Channel
-A channel is a name indicating which source or destination of messages is used. Channels are opaque Strings
+A channel is a name indicating which source or destination of messages is used. Channels are opaque Strings.
 
 === Connector
 Reactive messaging uses Connectors to attach one end of a channel  and are configured using MicroProfile Config.
@@ -107,7 +105,6 @@ Navigate to the `start` directory to begin.
 include::{common-includes}/devmode-start.adoc[]
 
 The `order` service uses microprofile reactive messaging to send messages to `bar` and `kitchen` microservices over kafka.
-You’ll update methods in `order`,`bar`, `ServingWindowResource` and `kitchen` services to use `@Outgoing` and `@Incoming` MP-ReactiveMessaging annotations.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -152,7 +149,7 @@ include::finish/bar/src/main/java/io/openliberty/guides/bar/BarResource.java[]
 ----
 
 `ServingWindowResource` microservice receives the `Ready` Order from the `bar` and `kitchen` microservices over kafka topics.
-Once the order is served, it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MP-ReactiveMessaging
+Once the order is served, it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MP-reactive messaging.
 
 //ServingWindow
 [role="code_command hotspot file=3", subs="quotes"]
@@ -171,7 +168,7 @@ file, which configures kafka connector with the MP-reactive messaging channels.
 
 [role="code_command hotspot file=4", subs="quotes"]
 ----
-#microprofile-config.properties sample from the kitchen microservice.#
+#microprofile-config.properties example from the kitchen microservice.#
 `finish/kitchen/src/main/resources/META-INF/microprofile-config.properties`
 ----
 microprofile-config.properties
@@ -180,7 +177,7 @@ microprofile-config.properties
 include::finish/kitchen/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-Rest all the microservices use similar `microprofile-config.properties` configuration
+Rest all the microservices use similar `microprofile-config.properties` configuration.
 
 == Configuring the server
 
@@ -188,8 +185,8 @@ To get the service running, the Liberty server needs to be correctly configured.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
- #Replace the server configuration file.#
- `/bar/src/main/liberty/config/server.xml`
+ #Replace the bar server configuration file.#
+ `bar/src/main/liberty/config/server.xml`
 ----
 server.xml
 [source,xml,linenums,role="code_column"]
@@ -199,13 +196,13 @@ include::finish/bar/src/main/liberty/config/server.xml[]
 
 Rest all the microservices have `server.xml` already configured.
 
-The configuration does the following actions:
-. Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureManager file=0]`<feature>` element.
+.The configuration does the following actions:
+- Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureMP file=0]`<feature>` element.
  
 [role="code_command hotspot file=1", subs="quotes"]
 ----
  #pom.xml configuration#
- `/bar/pom.xml`
+ `bar/pom.xml`
 ---- 
 pom.xml
 [source, XML ,linenums,role="code_column"]
@@ -213,7 +210,7 @@ pom.xml
 include::finish/bar/pom.xml[]
 ----
 
-. MP-microprofile dependency is included in the Maven [hotspot=reactiveMessaging file=1]`pom.xml` file. This is specified in the [hotspot=reactiveMessaging file=0]`<dependency>` element.
+. MP-microprofile dependency is included in the Maven [hotspot=reactiveMessagingPOM file=1]`pom.xml` file. This is specified in the [hotspot=reactiveMessaging file=1]`<dependency>` element.
 
 
 == Building and running the application
@@ -290,7 +287,7 @@ Click `Execute` and you will receive the 200 response.
 
 Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
 
-Click `Execute` and you will see the response with `IN_PROGRESS` status 
+Click `Execute` and you will see the response with `IN_PROGRESS` status. 
 
 [source, role='command']
 ----
@@ -312,7 +309,7 @@ Click `Execute` and you will see the response with `IN_PROGRESS` status
 ]
 ----
 
-Click `Execute` again and you will see the response with `READY` status 
+Click `Execute` again and you will see the response with `READY` status. 
 
 [source, role='command']
 ----
@@ -347,7 +344,7 @@ Click `Execute` and you will receive the 200 response.
 
 Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
 
-Click `Execute` and you will see the response with `COMPLETED` status 
+Click `Execute` and you will see the response with `COMPLETED` status for `orderID 0002`. This updated status is cascaded to the `order` microservice.
 
 [source, role='command']
 ----
@@ -368,8 +365,6 @@ Click `Execute` and you will see the response with `COMPLETED` status
   }
 ]
 ----
-
-As you can see the order `0002` has been marked `COMPLETED` in `servingWindow` microservice and the update is cascaded to the `order` microservice 
 
 == Testing the service
 

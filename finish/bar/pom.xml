@@ -45,12 +45,13 @@
 			<type>pom</type>
 			<scope>provided</scope>
 		</dependency>
+		<!-- tag::reactiveMessaging[] -->
 		<dependency>
 			<groupId>org.eclipse.microprofile.reactive.messaging</groupId>
 			<artifactId>microprofile-reactive-messaging-api</artifactId>
 			<version>1.0</version>
 		</dependency>
-
+		<!-- tag::reactiveMessaging[] -->
 		<!-- Required dependencies -->
 		<dependency>
 			<groupId>io.openliberty.guides</groupId>
