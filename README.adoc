@@ -120,8 +120,8 @@ OrderResource.java
 include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.java[]
 ----
 
-`order` microservice creates an Order and sends it to the kafka topic on `@Outgoing("food")` or `@Outgoing("beverage")` channel.
-The `@Incoming("updateStatus")` channel receives an updated Order status from the kafka.
+`order` microservice creates an Order and sends it to the kafka topic on [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channel.
+The [hotspot=IncomingStatus file=0]`@Incoming("updateStatus")` channel receives an updated Order status from the kafka.
 
 If the order is a food, `kitchen` service receives an Order, processes it and sends back all the statuses to kafka on MP-reactive messaging channels.
 

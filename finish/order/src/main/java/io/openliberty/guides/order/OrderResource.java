@@ -98,7 +98,7 @@ public class OrderResource {
 				.entity(orderRequest)
 				.build();
 	}
-
+	// tag::OutgoingFood[]
 	@Outgoing("food")
 	public PublisherBuilder<String> sendFoodOrder() {
 		return ReactiveStreams.generate(() -> {
@@ -110,7 +110,9 @@ public class OrderResource {
 			}
 		});
 	}
+	// end::OutgoingFood[]
 
+	// tag::OutgoingBev[]
 	@Outgoing("beverage")
 	public PublisherBuilder<String> sendBeverageOrder() {
 		return ReactiveStreams.generate(() -> {
@@ -122,6 +124,7 @@ public class OrderResource {
 			}
 		});
 	}
+	// end::OutgoingBev[]
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -158,10 +161,13 @@ public class OrderResource {
 				.build();
 	}
 
+	// tag::IncomingStatus[]
 	@Incoming("updateStatus")
 	public void updateStatus(String orderString)  {
 		Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
 		manager.updateStatus(order.getOrderID(), order.getStatus());
 		System.out.println("Updated Order " + order.getOrderID() + " status to " + order.getStatus());
 	}
+	// end::IncomingStatus[]
+
 }
