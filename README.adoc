@@ -231,10 +231,10 @@ Run the following commands to build and containerize the application:
 
 [role='command']
 ```
-docker build -t order:1.0-SNAPSHOT order/.
-docker build -t bar:1.0-SNAPSHOT bar/.
-docker build -t kitchen:1.0-SNAPSHOT kitchen/.
-docker build -t servingWindow:1.0-SNAPSHOT servingWindow/.
+docker build -t order:1.0-SNAPSHOT order/. &
+docker build -t bar:1.0-SNAPSHOT bar/. &
+docker build -t kitchen:1.0-SNAPSHOT kitchen/. &
+docker build -t servingWindow:1.0-SNAPSHOT servingWindow/. &
 docker build -t restaurantbff:1.0-SNAPSHOT restaurantBFF/.
 ```
 
