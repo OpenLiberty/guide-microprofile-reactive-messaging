@@ -1,3 +1,15 @@
+// tag::copyright[]
+/*******************************************************************************
+ * Copyright (c) 2020 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - Initial implementation
+ *******************************************************************************/
+// end::copyright[]
 package io.openliberty.guides.servingWindow;
 
 import java.util.ArrayList;
@@ -24,13 +36,6 @@ import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
 
-/**
- * 
- * Serving Window Microservice using Eclipse
- * microprofile reactive messaging 
- * running on Open Liberty
- *
- */
 @ApplicationScoped
 @Path("/servingWindow")
 public class ServingWindowResource {
@@ -39,9 +44,6 @@ public class ServingWindowResource {
 	private BlockingQueue<String> completedQueue = new LinkedBlockingQueue<>();
 	Jsonb jsonb = JsonbBuilder.create();
 
-	/**
-	 * Get list of all Ready Orders
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response listContents() {
@@ -51,10 +53,6 @@ public class ServingWindowResource {
 				.build();
 	}
 
-	/**
-	 * Mark Order as completed
-	 * @param orderId
-	 */
 	@POST
 	@Path("/complete/{orderId}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -74,14 +72,10 @@ public class ServingWindowResource {
 		}
 		return Response
 				.status(Response.Status.NOT_FOUND)
-				.entity("Requested orderID does not exist")
+				.entity("Requested orderId does not exist")
 				.build();
 	}
 
-	/**
-	 * Consume Ready Order
-	 * @param readyOrder
-	 */
 	@Incoming("orderReady")
 	public void addReadyOrder(String readyOrder)  {
 		Order order = JsonbBuilder.create().fromJson(readyOrder,Order.class);
@@ -89,10 +83,6 @@ public class ServingWindowResource {
 			readyList.add(order);
 	}
 
-	/**
-	 * Publish Completed Order
-	 * @return PublisherBuilder<String>
-	 */
 	@Outgoing("completedOrder")
 	public PublisherBuilder<String> sendCompletedOrder() {
 		return ReactiveStreams.generate(() -> {

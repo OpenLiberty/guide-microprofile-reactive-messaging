@@ -1,5 +1,18 @@
+// tag::copyright[]
+/*******************************************************************************
+ * Copyright (c) 2020 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - Initial implementation
+ *******************************************************************************/
+// end::copyright[]
 package io.openliberty.guides.kitchen;
 
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -25,19 +38,13 @@ import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
 
-/**
- * 
- * Kitchen Microservice using Eclipse
- * microprofile reactive messaging 
- * running on Open Liberty
- * 
- */
 @ApplicationScoped
 @Path("/foodMessaging")
 public class KitchenResource {
 
 	private Executor executor = Executors.newSingleThreadExecutor();
 	private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
+	private Random random = new Random();
 	Jsonb jsonb = JsonbBuilder.create();
 
 	@GET
@@ -46,11 +53,6 @@ public class KitchenResource {
 		return Response.ok().entity(" In food service ").build();
 	}
 
-	/**
-	 * Food message Order processor
-	 * @param newOrder
-	 * @return CompletionStage<String>
-	 */
 	@Incoming("foodOrderConsume")
 	@Outgoing("foodOrderPublishIntermediate")
 	public CompletionStage<String> initFoodOrder(String newOrder) {
@@ -62,7 +64,7 @@ public class KitchenResource {
 
 	private CompletionStage<Order> prepareOrder(Order order) {
 		return CompletableFuture.supplyAsync(() -> {
-			prepare(4000);
+			prepare();
 			System.out.println(" Food Order in Progress... ");
 			Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
 			System.out.println(  " Order : " + jsonb.toJson(inProgressOrder) );
@@ -71,24 +73,20 @@ public class KitchenResource {
 		}, executor);
 	}
 
-	private void prepare(long milliSec) {
+	private void prepare() {
 		try {
-			Thread.sleep(milliSec);
+			Thread.sleep((random.nextInt(3)+4) * 1000);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
 	}
 
-	/**
-	 * Publish Ready Food Order message to Kafka
-	 * @return PublisherBuilder<String>
-	 */
 	@Outgoing("foodOrderPublish")
 	public PublisherBuilder<String> sendReadyOrder() {
 		return ReactiveStreams.generate(() -> {
 			try {
 				Order order = inProgress.take();
-				prepare(3000);
+				prepare();
 				order.setStatus(Status.READY);
 				System.out.println(" Food Order Ready... ");
 				System.out.println(  " Order : " + jsonb.toJson(order) );
