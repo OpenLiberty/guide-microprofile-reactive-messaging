@@ -42,59 +42,59 @@ import io.openliberty.guides.models.Status;
 @Path("/foodMessaging")
 public class KitchenResource {
 
-	private Executor executor = Executors.newSingleThreadExecutor();
-	private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
-	private Random random = new Random();
-	Jsonb jsonb = JsonbBuilder.create();
+    private Executor executor = Executors.newSingleThreadExecutor();
+    private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
+    private Random random = new Random();
+    Jsonb jsonb = JsonbBuilder.create();
 
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response getProperties() {
-		return Response.ok().entity(" In food service ").build();
-	}
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getProperties() {
+        return Response.ok().entity(" In food service ").build();
+    }
 
-	@Incoming("foodOrderConsume")
-	@Outgoing("foodOrderPublishIntermediate")
-	public CompletionStage<String> initFoodOrder(String newOrder) {
-		System.out.println("\n New Food Order received ");
-		System.out.println( " Order : " + newOrder);
-		Order order = jsonb.fromJson(newOrder, Order.class);
-		return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
-	}
+    @Incoming("foodOrderConsume")
+    @Outgoing("foodOrderPublishIntermediate")
+    public CompletionStage<String> initFoodOrder(String newOrder) {
+        System.out.println("\n New Food Order received ");
+        System.out.println( " Order : " + newOrder);
+        Order order = jsonb.fromJson(newOrder, Order.class);
+        return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
+    }
 
-	private CompletionStage<Order> prepareOrder(Order order) {
-		return CompletableFuture.supplyAsync(() -> {
-			prepare();
-			System.out.println(" Food Order in Progress... ");
-			Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
-			System.out.println(  " Order : " + jsonb.toJson(inProgressOrder) );
-			inProgress.add(inProgressOrder);
-			return inProgressOrder;
-		}, executor);
-	}
+    private CompletionStage<Order> prepareOrder(Order order) {
+        return CompletableFuture.supplyAsync(() -> {
+            prepare();
+            System.out.println(" Food Order in Progress... ");
+            Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
+            System.out.println(  " Order : " + jsonb.toJson(inProgressOrder) );
+            inProgress.add(inProgressOrder);
+            return inProgressOrder;
+        }, executor);
+    }
 
-	private void prepare() {
-		try {
-			Thread.sleep((random.nextInt(3)+4) * 1000);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
-	}
+    private void prepare() {
+        try {
+            Thread.sleep((random.nextInt(3)+4) * 1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 
-	@Outgoing("foodOrderPublish")
-	public PublisherBuilder<String> sendReadyOrder() {
-		return ReactiveStreams.generate(() -> {
-			try {
-				Order order = inProgress.take();
-				prepare();
-				order.setStatus(Status.READY);
-				System.out.println(" Food Order Ready... ");
-				System.out.println(  " Order : " + jsonb.toJson(order) );
-				return jsonb.toJson(order);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				return null;
-			}
-		});
-	}
+    @Outgoing("foodOrderPublish")
+    public PublisherBuilder<String> sendReadyOrder() {
+        return ReactiveStreams.generate(() -> {
+            try {
+                Order order = inProgress.take();
+                prepare();
+                order.setStatus(Status.READY);
+                System.out.println(" Food Order Ready... ");
+                System.out.println(  " Order : " + jsonb.toJson(order) );
+                return jsonb.toJson(order);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
+    }
 }
