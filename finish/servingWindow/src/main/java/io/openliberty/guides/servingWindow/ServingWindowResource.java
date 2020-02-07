@@ -40,59 +40,60 @@ import io.openliberty.guides.models.Status;
 @Path("/servingWindow")
 public class ServingWindowResource {
 
-	private List<Order> readyList = new ArrayList<Order>();
-	private BlockingQueue<String> completedQueue = new LinkedBlockingQueue<>();
-	Jsonb jsonb = JsonbBuilder.create();
+    private List<Order> readyList = new ArrayList<Order>();
+    private BlockingQueue<String> completedQueue = new LinkedBlockingQueue<>();
+    Jsonb jsonb = JsonbBuilder.create();
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listContents() {
-		return Response
-				.status(Response.Status.OK)
-				.entity(readyList)
-				.build();
-	}
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listContents() {
+        return Response
+                .status(Response.Status.OK)
+                .entity(readyList)
+                .build();
+    }
 
-	@POST
-	@Path("/complete/{orderId}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response markOrderComplete( @PathParam("orderId") String orderId ) {
-		for ( Order order : readyList ) {
-			if ( order.getOrderID().equals(orderId)) {
-				System.out.println( "\n Marking Order : " + orderId + " as Completed... ");
-				order.setStatus(Status.COMPLETED);
-				System.out.println(  " Order : " + jsonb.toJson(order) );
-				completedQueue.add(jsonb.toJson(order));
-				readyList.remove(order);
-				return Response
-						.status(Response.Status.OK)
-						.entity(order)
-						.build();
-			}
-		}
-		return Response
-				.status(Response.Status.NOT_FOUND)
-				.entity("Requested orderId does not exist")
-				.build();
-	}
+    @POST
+    @Path("/complete/{orderId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response markOrderComplete( @PathParam("orderId") String orderId ) {
+        for ( Order order : readyList ) {
+            if ( order.getOrderID().equals(orderId)) {
+                System.out.println( "\n Marking Order : " + orderId +
+                		" as Completed... ");
+                order.setStatus(Status.COMPLETED);
+                System.out.println(  " Order : " + jsonb.toJson(order) );
+                completedQueue.add(jsonb.toJson(order));
+                readyList.remove(order);
+                return Response
+                        .status(Response.Status.OK)
+                        .entity(order)
+                        .build();
+            }
+        }
+        return Response
+                .status(Response.Status.NOT_FOUND)
+                .entity("Requested orderId does not exist")
+                .build();
+    }
 
-	@Incoming("orderReady")
-	public void addReadyOrder(String readyOrder)  {
-		Order order = JsonbBuilder.create().fromJson(readyOrder,Order.class);
-		if ( order.getStatus().equals(Status.READY))
-			readyList.add(order);
-	}
+    @Incoming("orderReady")
+    public void addReadyOrder(String readyOrder)  {
+        Order order = JsonbBuilder.create().fromJson(readyOrder,Order.class);
+        if ( order.getStatus().equals(Status.READY))
+            readyList.add(order);
+    }
 
-	@Outgoing("completedOrder")
-	public PublisherBuilder<String> sendCompletedOrder() {
-		return ReactiveStreams.generate(() -> {
-			try {
-				return completedQueue.take();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				return null;
-			}
-		});
-	}
+    @Outgoing("completedOrder")
+    public PublisherBuilder<String> sendCompletedOrder() {
+        return ReactiveStreams.generate(() -> {
+            try {
+                return completedQueue.take();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
+    }
 
 }
