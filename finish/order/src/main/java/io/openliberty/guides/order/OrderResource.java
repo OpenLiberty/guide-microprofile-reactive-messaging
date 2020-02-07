@@ -58,7 +58,8 @@ public class OrderResource {
     @Path("/")
     public Response createOrder(OrderRequest orderRequest) {
         // validate OrderRequest
-        Set<ConstraintViolation<OrderRequest>> violations = validator.validate(orderRequest);
+        Set<ConstraintViolation<OrderRequest>> violations = 
+        		validator.validate(orderRequest);
 
         if (violations.size() > 0) {
             JsonArrayBuilder messages = Json.createArrayBuilder();
@@ -80,7 +81,8 @@ public class OrderResource {
         for (String foodItem : orderRequest.getFoodList()) {
             orderId = String.format("%04d", counter.incrementAndGet());
 
-            newOrder = new Order(orderId, orderRequest.getTableID(), Type.FOOD, foodItem, Status.NEW);
+            newOrder = new Order(orderId, orderRequest.getTableID(),
+            		Type.FOOD, foodItem, Status.NEW);
             manager.addOrder(newOrder);
             foodQueue.add(newOrder);
         }
@@ -88,7 +90,8 @@ public class OrderResource {
         for (String beverageItem : orderRequest.getBeverageList()) {
             orderId = String.format("%04d", counter.incrementAndGet());
 
-            newOrder = new Order(orderId, orderRequest.getTableID(), Type.BEVERAGE, beverageItem, Status.NEW);
+            newOrder = new Order(orderId, orderRequest.getTableID(),
+            		Type.BEVERAGE, beverageItem, Status.NEW);
             manager.addOrder(newOrder);
             beverageQueue.add(newOrder);
         }
