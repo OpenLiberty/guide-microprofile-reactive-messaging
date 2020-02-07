@@ -10,55 +10,55 @@
 :page-layout: guide-multipane
 :page-duration: 30 minutes
 :page-releasedate: 2020-01-15
-:page-guide-category: microprofile
+:page-guide-category: MicroProfile
 :page-essential: true
 :page-essential-order: 1
-:page-description: Learn how to create a microservice with MP-reactive messaging and Open Liberty.
+:page-description: Learn how to use MicroProfile Reactive Messaging to implement reactive architecture application
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile', 'Jakarta EE', 'Microservices']
 :page-related-guides: []
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
-:page-seo-title: Creating a MP-reactive messaging REST service 
-:page-seo-description: A tutorial on how to create a microservices in Open Liberty using MP-reactive messaging
+:page-seo-title: Creating a MicroProfile Reactive Messaging REST service
+:page-seo-description: A tutorial on how to create a microservices in Open Liberty using MicroProfile Reactive Messaging
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :source-highlighter: prettify
-= Creating asynchronous reactive microservices using MP-reactive messaging
+= Creating asynchronous reactive microservices using MicroProfile Reactive Messaging
 
 [.hidden]
-NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].
+NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].   
 
-Learn how to create REST microservices with MP-reactive messaging, and Open Liberty.    
+Learn how to use MicroProfile Reactive Messaging to implement reactive architecture application.
 
 == What you'll learn
 
-You will learn how to build microservices using MicroProfile reactive messaging. You'll also learn how to send messages between these microservices using Kafka broker. 
+You will learn how to build reactive microservices using MicroProfile Reactive Messaging. You'll also learn how to send messages between these microservices using Kafka broker. 
 
-=== What is MP-reactive messaging?
+=== What is MicroProfile Reactive Messaging?
 
 Asynchronous communication allows temporal decoupling of services in a microservice-based architecture. MicroProfile Reactive Messaging delivers a way to build systems of microservices promoting responsive, non-blocking, location transparency, elastic, resiliency to failure and temporal decoupling, enforcing asynchronous message passing between the different parts of the system.
 
 === What is Kafka?
 
-https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages.
+https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages. Kafka Producer is a client or a program, which produces the message and pushes it to the Topic. Whereas Kafka Consumer is a client or a program, which consumes the published messages from the Producer.
 
 === What is asynchronous programming?
-Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
+Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your Order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-The Reactive Restaurant application mentioned below is designed on Microservices architecture. The application that you'll be working with consists of five microservices namely `restaurantBFF`, `order`, `servingWindow`, `kitchen` and `bar`. And uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+The Restaurant application is designed with Reactive Architecture. The application that you'll be working with consists of five microservices namely `order`, `kitchen`, `bar`, `servingWindow` and `restaurantBFF`. And uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
-You'll update the `order`, `kitchen`, `bar`, and `servingWindow` microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty.
+You'll update the `order`, `kitchen`, `bar`, and `servingWindow` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
-The `restaurantBFF` service is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
+The `restaurantBFF` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend microservices on the caller's behalf.
 
-The waiter places a request using the `restaurantBFF` service.
+The waiter places a request using the `restaurantBFF` microservice.
 
 The `order` microservice consumes the request, produces Order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
 
-An Order begins with a `NEW` status. The `kitchen` and `bar` microservices consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
+An Order begins with a `NEW` status. The `kitchen` and `bar` microservices consume and process the Order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the Order processing time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
 
 The `servingWindow` microservice contains a list of all ready to serve food and beverages. It consumes these statuses from `kitchen` and `bar` microservices.
 Once the Order is served, it’s marked as `COMPLETED` and the status is sent back to the `order` microservice as a message.
@@ -82,9 +82,9 @@ USE this Github Link for the time being:
 
 `https://github.com/ankitagrawa/foodOrderRestaurantApp`
 
-== Creating a reactive messaging application
+== Creating a Reactive Messaging application
 
-=== MP-reactive messaging key concepts are as follows :
+=== MicroProfile Reactive Messaging key concepts are as follows :
 
 === @Outgoing
 Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute.
@@ -104,7 +104,7 @@ Navigate to the `start` directory to begin.
 [role=command]
 include::{common-includes}/devmode-start.adoc[]
 
-The `order` service uses microprofile reactive messaging to send messages to `bar` and `kitchen` microservices over kafka.
+The `order` service uses MicroProfile reactive messaging to send messages to `bar` and `kitchen` microservices over kafka.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -120,7 +120,7 @@ include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.ja
 `order` microservice creates an Order and sends it to the kafka topic on [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channel.
 The [hotspot=IncomingStatus file=0]`@Incoming("updateStatus")` channel receives an updated Order status from the kafka.
 
-If the order is a food, `kitchen` service receives an Order, processes it and sends back all the statuses to kafka on MP-reactive messaging channels.
+If the order is a food, `kitchen` service receives an Order, processes it and sends back all the statuses to kafka on MicroProfile Reactive Messaging channels.
 
 //Kitchen
 [role="code_command hotspot file=1", subs="quotes"]
@@ -134,7 +134,7 @@ KitchenResource.java
 include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResource.java[]
 ----
 
-If the order is a drink, `bar` service receives an Order, processes it and sends back all the statuses to kafka on MP-reactive messaging channels.
+If the Order is a drink, `bar` service receives an Order, processes it and sends back all the statuses to kafka on MicroProfile Reactive Messaging channels.
 
 //bar
 [role="code_command hotspot file=2", subs="quotes"]
@@ -148,8 +148,8 @@ BarResource.java
 include::finish/bar/src/main/java/io/openliberty/guides/bar/BarResource.java[]
 ----
 
-`ServingWindowResource` microservice receives the `Ready` Order from the `bar` and `kitchen` microservices over kafka topics.
-Once the order is served, it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MP-reactive messaging.
+`servingWindow` microservice receives the `Ready` Order from the `bar` and `kitchen` microservices over kafka topics.
+Once the Order is served, it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MicroProfile Reactive Messaging.
 
 //ServingWindow
 [role="code_command hotspot file=3", subs="quotes"]
@@ -163,8 +163,8 @@ ServingWindowResource.java
 include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java[]
 ----
 
-Each of the four microservices `order`,`bar`,`ServingWindowResource` and `kitchen` contains `microprofile-config.properties`
-file, which configures kafka connector with the MP-reactive messaging channels.
+Each of the four microservices `order`, `kitchen`, `bar` and `servingWindow` contains `microprofile-config.properties`
+file, which configures kafka connector with the MicroProfile Reactive Messaging channels.
 
 [role="code_command hotspot file=4", subs="quotes"]
 ----
@@ -197,7 +197,7 @@ include::finish/bar/src/main/liberty/config/server.xml[]
 Rest all the microservices have `server.xml` already configured.
 
 .The configuration does the following actions:
-- Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureMP file=0]`<feature>` element.
+- Configures the server to enable MicroProfile Reactive Messaging. This is specified in the [hotspot=featureMP file=0]`<feature>` element.
  
 [role="code_command hotspot file=1", subs="quotes"]
 ----
@@ -210,12 +210,12 @@ pom.xml
 include::finish/bar/pom.xml[]
 ----
 
-- MP-microprofile dependency is included in the Maven `pom.xml` file. This is specified in the [hotspot=reactiveMessaging file=1]`<dependency>` element.
+- MicroProfile Reactive Messaging dependency is included in the Maven `pom.xml` file. This is specified in the [hotspot=reactiveMessaging file=1]`<dependency>` element.
 
 
 == Building and running the application
 
-You will build and run the `bar`, `kitchen`, `order`, `restaurantBFF` and `servingWindow` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+You will build and run the `order`, `kitchen`, `bar`, `servingWindow` and `restaurantBFF` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
 Start your Docker environment.
 
@@ -231,11 +231,11 @@ Run the following commands to build and containerize the application:
 
 [role='command']
 ```
-docker build -t order:1.0-SNAPSHOT order/. &
-docker build -t bar:1.0-SNAPSHOT bar/. &
-docker build -t kitchen:1.0-SNAPSHOT kitchen/. &
-docker build -t servingWindow:1.0-SNAPSHOT servingWindow/. &
-docker build -t restaurantbff:1.0-SNAPSHOT restaurantBFF/.
+docker build -t order:1.0-SNAPSHOT order/.
+docker build -t kitchen:1.0-SNAPSHOT kitchen/.
+docker build -t bar:1.0-SNAPSHOT bar/.
+docker build -t servingWindow:1.0-SNAPSHOT servingWindow/.
+docker build -t restaurantBFF:1.0-SNAPSHOT restaurantBFF/.
 ```
 
 Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
@@ -481,7 +481,7 @@ include::{common-includes}/os-tabs.adoc[]
 
 == Great work! You're done!
 
-You have just developed an application using MP-reactive messaging, Open Liberty and Kakfa.
+You have just developed an application using MicroProfile Reactive Messaging, Open Liberty and Kakfa.
 
 == Related Links
 
