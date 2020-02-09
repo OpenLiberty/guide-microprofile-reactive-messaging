@@ -37,6 +37,7 @@ You will learn how to build reactive microservices using MicroProfile Reactive M
 === What is MicroProfile Reactive Messaging?
 
 Asynchronous communication allows temporal decoupling of services in a microservice-based architecture. MicroProfile Reactive Messaging delivers a way to build systems of microservices promoting responsive, non-blocking, location transparency, elastic, resiliency to failure and temporal decoupling, enforcing asynchronous message passing between the different parts of the system.
+https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html#_microprofile_reactive_messaging[View the MicroProfile Reactive Messaging Specification^]
 
 === What is Kafka?
 
@@ -84,27 +85,29 @@ USE this Github Link for the time being:
 
 == Creating a Reactive Messaging application
 
-=== MicroProfile Reactive Messaging key concepts are as follows :
+=== Key Concepts
 
-=== @Outgoing
+==== @Outgoing
 Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute.
 
-=== @Incoming
+==== @Incoming
 Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute.
 
-=== Channel
+==== Channel
 A channel is a name indicating which source or destination of messages is used. Channels are opaque Strings.
 
-=== Connector
+==== Connector
 Reactive messaging uses Connectors to attach one end of a channel  and are configured using MicroProfile Config.
 Open Liberty includes the liberty-kafka connector for sending and receiving messages from an Apache Kafka broker.
 
-Navigate to the `start` directory to begin.
+*Navigate to the `start` directory to begin. Most of the code is already provided for use.*
 
 [role=command]
 include::{common-includes}/devmode-start.adoc[]
 
-The `order` service uses MicroProfile reactive messaging to send messages to `bar` and `kitchen` microservices over kafka.
+=== Building the order microservice
+
+The `order` microservice uses MicroProfile reactive messaging to send messages to `kitchen` and `bar` microservices over kafka.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -120,6 +123,8 @@ include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.ja
 `order` microservice creates an Order and sends it to the kafka topic on [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channel.
 The [hotspot=IncomingStatus file=0]`@Incoming("updateStatus")` channel receives an updated Order status from the kafka.
 
+=== Building the kitchen microservice
+
 If the order is a food, `kitchen` service receives an Order, processes it and sends back all the statuses to kafka on MicroProfile Reactive Messaging channels.
 
 //Kitchen
@@ -133,6 +138,8 @@ KitchenResource.java
 ----
 include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResource.java[]
 ----
+
+=== Building the bar microservice
 
 If the Order is a drink, `bar` service receives an Order, processes it and sends back all the statuses to kafka on MicroProfile Reactive Messaging channels.
 
@@ -148,6 +155,8 @@ BarResource.java
 include::finish/bar/src/main/java/io/openliberty/guides/bar/BarResource.java[]
 ----
 
+=== Building the servingWindow microservice
+
 `servingWindow` microservice receives the `Ready` Order from the `bar` and `kitchen` microservices over kafka topics.
 Once the Order is served, it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MicroProfile Reactive Messaging.
 
@@ -162,6 +171,8 @@ ServingWindowResource.java
 ----
 include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java[]
 ----
+
+=== Configuring the MicroProfile Reactive Messaging
 
 Each of the four microservices `order`, `kitchen`, `bar` and `servingWindow` contains `microprofile-config.properties`
 file, which configures kafka connector with the MicroProfile Reactive Messaging channels.
@@ -181,7 +192,9 @@ Rest all the microservices use similar `microprofile-config.properties` configur
 
 == Configuring the server
 
-To get the service running, the Liberty server needs to be correctly configured.
+To get the service running, the Open Liberty server needs to be correctly configured.
+
+Replace the `bar` `server.xml` to include [hotspot=featureMP file=0]`mpReactiveMessaging-1.0` `feature` element.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -197,7 +210,7 @@ include::finish/bar/src/main/liberty/config/server.xml[]
 Rest all the microservices have `server.xml` already configured.
 
 .The configuration does the following actions:
-- Configures the server to enable MicroProfile Reactive Messaging. This is specified in the [hotspot=featureMP file=0]`<feature>` element.
+- Configures the server to enable MicroProfile Reactive Messaging.
  
 [role="code_command hotspot file=1", subs="quotes"]
 ----
@@ -212,8 +225,7 @@ include::finish/bar/pom.xml[]
 
 - MicroProfile Reactive Messaging dependency is included in the Maven `pom.xml` file. This is specified in the [hotspot=reactiveMessaging file=1]`<dependency>` element.
 
-
-== Building and running the application
+== Building the application
 
 You will build and run the `order`, `kitchen`, `bar`, `servingWindow` and `restaurantBFF` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
@@ -223,11 +235,11 @@ To build the application, run the Maven `install` goal from the command line in 
 
 [role='command']
 ```
-mvn -pl models clean install
-mvn clean package
+mvn -pl models install
+mvn package
 ```
 
-Run the following commands to build and containerize the application:
+*Run the following commands to containerize the application:*
 
 [role='command']
 ```
@@ -254,18 +266,18 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-.\scripts\startContainers.sh
+.\scripts\startContainers.bat
 ```
 --
 
-The services take some time to become available.
-You can access the application by making requests to the `restaurantBFF` endpoint using OpenAPI. 
+== Trying the application
 
-The Open Liberty server was started in development mode at the beginning of the guide and all the 
-changes were automatically picked up.
+You can access the application by making requests to the `restaurantBFF` endpoint using OpenAPI.
 
-Check out the service that you created at the
+The services take some time to become available. Check out the service that you created at the
 http://localhost:9080/openapi/ui[^] URL.
+
+=== Place Orders
 
 Expand the `/api/orders` `POST` request to post an Order and click *Try it out*. Copy the following example input
 into the text box:
@@ -284,6 +296,8 @@ into the text box:
 ----
 
 Click `Execute` and you will receive the 200 response.
+
+=== Check IN_PROGRESS Order Status
 
 Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
 
@@ -309,6 +323,8 @@ Click `Execute` and you will see the response with `IN_PROGRESS` status.
 ]
 ----
 
+=== Check READY Order Status
+
 Click `Execute` again and you will see the response with `READY` status. 
 
 [source, role='command']
@@ -330,6 +346,8 @@ Click `Execute` again and you will see the response with `READY` status.
   }
 ]
 ----
+
+=== Complete an Order
 
 Expand the `/api/servingWindow/complete/{orderID}` `POST` request to complete an Order and click *Try it out*. Copy the following example input
 into the text box:
