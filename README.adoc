@@ -109,7 +109,7 @@ include::{common-includes}/devmode-start.adoc[]
 
 The `order` microservice uses MicroProfile reactive messaging to send messages to `kitchen` and `bar` microservices over kafka.
 
-[role="code_command", subs="quotes"]
+[role="code_command hotspot", subs="quotes"]
 ----
 #Replace the `OrderResource` class.#
 `order/src/main/java/io/openliberty/guides/order/OrderResource.java`
@@ -128,7 +128,7 @@ The [hotspot=IncomingStatus file=0]`@Incoming("updateStatus")` channel receives 
 If the order is a food, `kitchen` service receives an Order, processes it and sends back all the statuses to kafka on MicroProfile Reactive Messaging channels.
 
 //Kitchen
-[role="code_command", subs="quotes"]
+[role="code_command hotspot", subs="quotes"]
 ----
 #Replace the `KitchenResource` class.#
 `kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResource.java`
@@ -144,7 +144,7 @@ include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResou
 If the Order is a drink, `bar` service receives an Order, processes it and sends back all the statuses to kafka on MicroProfile Reactive Messaging channels.
 
 //bar
-[role="code_command", subs="quotes"]
+[role="code_command hotspot", subs="quotes"]
 ----
 #Replace the `BarResource` class.#
 `bar/src/main/java/io/openliberty/guides/bar/BarResource.java`
@@ -161,7 +161,7 @@ include::finish/bar/src/main/java/io/openliberty/guides/bar/BarResource.java[]
 Once the Order is served, it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MicroProfile Reactive Messaging.
 
 //ServingWindow
-[role="code_command", subs="quotes"]
+[role="code_command hotspot", subs="quotes"]
 ----
 #Replace the `ServingWindowResource` class.#
 `servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java`
@@ -177,7 +177,7 @@ include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/
 Each of the four microservices `order`, `kitchen`, `bar` and `servingWindow` contains `microprofile-config.properties`
 file, which configures kafka connector with the MicroProfile Reactive Messaging channels.
 
-[role="code_command", subs="quotes"]
+[role="code_command hotspot", subs="quotes"]
 ----
 #microprofile-config.properties example from the kitchen microservice.#
 `finish/kitchen/src/main/resources/META-INF/microprofile-config.properties`
