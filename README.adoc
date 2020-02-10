@@ -11,8 +11,6 @@
 :page-duration: 30 minutes
 :page-releasedate: 2020-01-15
 :page-guide-category: MicroProfile
-:page-essential: true
-:page-essential-order: 1
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement reactive architecture application
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile', 'Jakarta EE', 'Microservices']
