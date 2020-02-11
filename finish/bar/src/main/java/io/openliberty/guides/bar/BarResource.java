@@ -43,65 +43,64 @@ import io.openliberty.guides.models.Status;
 @Path("/beverageMessaging")
 public class BarResource {
 
-	private Executor executor = Executors.newSingleThreadExecutor();
-	private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
-	private Random random = new Random();
+    private Executor executor = Executors.newSingleThreadExecutor();
+    private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
+    private Random random = new Random();
 
-	private static Logger logger = Logger.getLogger(BarResource.class.getName());
+    private static Logger logger = Logger.getLogger(BarResource.class.getName());
 
-	Jsonb jsonb = JsonbBuilder.create();
+    Jsonb jsonb = JsonbBuilder.create();
 
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response getProperties() {
-		return Response.ok().entity(" In bar service ")
-				.build();
-	}
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getProperties() {
+        return Response.ok().entity(" In bar service ")
+                .build();
+    }
 
-	@Incoming("bevOrderConsume")
-	@Outgoing("bevOrderPublishInter")
-	public CompletionStage<String> initBeverageOrder(String newOrder) {
-		Order order = jsonb.fromJson(newOrder, Order.class);
-		logger.info("Order " + order.getOrderID() + " received as NEW");
-		logger.info(newOrder);
-		return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
-	}
+    @Incoming("bevOrderConsume")
+    @Outgoing("bevOrderPublishInter")
+    public CompletionStage<String> initBeverageOrder(String newOrder) {
+        Order order = jsonb.fromJson(newOrder, Order.class);
+        logger.info("Order " + order.getOrderID() + " received as NEW");
+        logger.info(newOrder);
+        return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
+    }
 
-	private CompletionStage<Order> prepareOrder(Order order) {
-		return CompletableFuture.supplyAsync(() -> {
-			prepare();
-			Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
-			logger.info("Order " + order.getOrderID() + " is IN PROGRESS");
-			logger.info(jsonb.toJson(order));
-			inProgress.add(inProgressOrder);
-			return inProgressOrder;
-		}, executor);
-	}
+    private CompletionStage<Order> prepareOrder(Order order) {
+        return CompletableFuture.supplyAsync(() -> {
+            prepare();
+            Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
+            logger.info("Order " + order.getOrderID() + " is IN PROGRESS");
+            logger.info(jsonb.toJson(order));
+            inProgress.add(inProgressOrder);
+            return inProgressOrder;
+        }, executor);
+    }
 
-	private void prepare() {
-		try {
-			Thread.sleep((random.nextInt(3)+4) * 1000);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
-	}
+    private void prepare() {
+        try {
+            Thread.sleep((random.nextInt(3)+4) * 1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 
-	@Outgoing("beverageOrderPublish")
-	public PublisherBuilder<String> sendReadyOrder() {
-		return ReactiveStreams.generate(() -> {
-			try {
-				Order order = inProgress.take();
-				prepare();
-				order.setStatus(Status.READY);
-				String orderString = jsonb.toJson(order);
-				logger.info("Order " + order.getOrderID() + " is READY");
-				logger.info(orderString);
-				return orderString;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				return null;
-			}
-		});
-	}
-
+    @Outgoing("beverageOrderPublish")
+    public PublisherBuilder<String> sendReadyOrder() {
+        return ReactiveStreams.generate(() -> {
+            try {
+                Order order = inProgress.take();
+                prepare();
+                order.setStatus(Status.READY);
+                String orderString = jsonb.toJson(order);
+                logger.info("Order " + order.getOrderID() + " is READY");
+                logger.info(orderString);
+                return orderString;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
+    }
 }
