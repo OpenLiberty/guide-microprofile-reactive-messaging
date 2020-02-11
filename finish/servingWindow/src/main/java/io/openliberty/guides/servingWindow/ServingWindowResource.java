@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
@@ -42,6 +43,9 @@ public class ServingWindowResource {
 
 	private List<Order> readyList = new ArrayList<Order>();
 	private BlockingQueue<String> completedQueue = new LinkedBlockingQueue<>();
+
+	private static Logger logger = Logger.getLogger(ServingWindowResource.class.getName());
+
 	Jsonb jsonb = JsonbBuilder.create();
 
 	@GET
@@ -59,9 +63,9 @@ public class ServingWindowResource {
 	public Response markOrderComplete( @PathParam("orderId") String orderId ) {
 		for ( Order order : readyList ) {
 			if ( order.getOrderID().equals(orderId)) {
-				System.out.println( "\n Marking Order : " + orderId + " as Completed... ");
 				order.setStatus(Status.COMPLETED);
-				System.out.println(  " Order : " + jsonb.toJson(order) );
+				logger.info("Order " + orderId + " is now COMPLETE");
+				logger.info(jsonb.toJson(order));
 				completedQueue.add(jsonb.toJson(order));
 				readyList.remove(order);
 				return Response
@@ -78,9 +82,12 @@ public class ServingWindowResource {
 
 	@Incoming("orderReady")
 	public void addReadyOrder(String readyOrder)  {
-		Order order = JsonbBuilder.create().fromJson(readyOrder,Order.class);
-		if ( order.getStatus().equals(Status.READY))
+		Order order = JsonbBuilder.create().fromJson(readyOrder, Order.class);
+		if ( order.getStatus().equals(Status.READY)) {
+			logger.info("Order " + order.getOrderID() + " is READY to be completed");
+			logger.info(readyOrder);
 			readyList.add(order);
+		}
 	}
 
 	@Outgoing("completedOrder")

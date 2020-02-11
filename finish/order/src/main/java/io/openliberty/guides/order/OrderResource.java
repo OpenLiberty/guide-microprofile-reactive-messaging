@@ -22,11 +22,13 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
+import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -47,6 +49,8 @@ public class OrderResource {
 
 	@Inject
 	private Validator validator;
+
+	private static Logger logger = Logger.getLogger(OrderResource.class.getName());
 
 	private BlockingQueue<Order> foodQueue = new LinkedBlockingQueue<>();
 	private BlockingQueue<Order> beverageQueue = new LinkedBlockingQueue<>();
@@ -73,23 +77,22 @@ public class OrderResource {
 					.build();
 		}
 
-		// Create invdividual Orders from OrderRequest
-		String orderId;
+		// Create individual Orders from OrderRequest
 		Order newOrder;
+		String orderId;
+		String tableId = orderRequest.getTableID();
 
 		for (String foodItem : orderRequest.getFoodList()) {
 			orderId = String.format("%04d", counter.incrementAndGet());
+			newOrder = new Order(orderId, tableId, Type.FOOD, foodItem, Status.NEW);
 
-			newOrder = new Order(orderId, orderRequest.getTableID(), Type.FOOD, foodItem, Status.NEW);
-			manager.addOrder(newOrder);
 			foodQueue.add(newOrder);
 		}
 
 		for (String beverageItem : orderRequest.getBeverageList()) {
 			orderId = String.format("%04d", counter.incrementAndGet());
+			newOrder = new Order(orderId, tableId, Type.BEVERAGE, beverageItem, Status.NEW);
 
-			newOrder = new Order(orderId, orderRequest.getTableID(), Type.BEVERAGE, beverageItem, Status.NEW);
-			manager.addOrder(newOrder);
 			beverageQueue.add(newOrder);
 		}
 
@@ -103,8 +106,17 @@ public class OrderResource {
 	public PublisherBuilder<String> sendFoodOrder() {
 		return ReactiveStreams.generate(() -> {
 			try {
-				return JsonbBuilder.create().toJson(foodQueue.take());
-			} catch (InterruptedException e) {
+				Order order = foodQueue.take();
+				manager.addOrder(order);
+
+				Jsonb jsonb = JsonbBuilder.create();
+				String orderString = jsonb.toJson(order);
+
+				logger.info("Sending Order " + order.getOrderID() + " with a status of " + order.getStatus() + " to Kitchen");
+				logger.info(orderString);
+
+				return orderString;
+			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}
@@ -115,8 +127,17 @@ public class OrderResource {
 	public PublisherBuilder<String> sendBeverageOrder() {
 		return ReactiveStreams.generate(() -> {
 			try {
-				return JsonbBuilder.create().toJson(beverageQueue.take());
-			} catch (InterruptedException e) {
+				Order order = beverageQueue.take();
+				manager.addOrder(order);
+
+				Jsonb jsonb = JsonbBuilder.create();
+				String orderString = jsonb.toJson(order);
+
+				logger.info("Sending Order " + order.getOrderID() + " with a status of " + order.getStatus() + " to Bar");
+				logger.info(orderString);
+
+				return orderString;
+			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}
@@ -161,7 +182,10 @@ public class OrderResource {
 	@Incoming("updateStatus")
 	public void updateStatus(String orderString)  {
 		Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
+
 		manager.updateStatus(order.getOrderID(), order.getStatus());
-		System.out.println("Updated Order " + order.getOrderID() + " status to " + order.getStatus());
+
+		logger.info("Order " + order.getOrderID() + " status updated to " + order.getStatus());
+		logger.info(orderString);
 	}
 }

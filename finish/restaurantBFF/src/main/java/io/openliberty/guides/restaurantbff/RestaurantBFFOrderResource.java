@@ -56,6 +56,7 @@ public class RestaurantBFFOrderResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
     public Response createOrder(OrderRequest orderRequest){
+        System.out.println("in here");
         return orderClient.createOrder(orderRequest);
     }
 }

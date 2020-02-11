@@ -19,6 +19,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
@@ -45,6 +46,9 @@ public class BarResource {
 	private Executor executor = Executors.newSingleThreadExecutor();
 	private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
 	private Random random = new Random();
+
+	private static Logger logger = Logger.getLogger(BarResource.class.getName());
+
 	Jsonb jsonb = JsonbBuilder.create();
 
 	@GET
@@ -57,18 +61,18 @@ public class BarResource {
 	@Incoming("bevOrderConsume")
 	@Outgoing("bevOrderPublishInter")
 	public CompletionStage<String> initBeverageOrder(String newOrder) {
-		System.out.println("\n New Beverage Order received ");
-		System.out.println( " Order : " + newOrder);
 		Order order = jsonb.fromJson(newOrder, Order.class);
+		logger.info("Order " + order.getOrderID() + " received as NEW");
+		logger.info(newOrder);
 		return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
 	}
 
 	private CompletionStage<Order> prepareOrder(Order order) {
 		return CompletableFuture.supplyAsync(() -> {
 			prepare();
-			System.out.println(" Beverage Order in Progress... ");
 			Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
-			System.out.println(  " Order : " + jsonb.toJson(inProgressOrder) );
+			logger.info("Order " + order.getOrderID() + " is IN PROGRESS");
+			logger.info(jsonb.toJson(order));
 			inProgress.add(inProgressOrder);
 			return inProgressOrder;
 		}, executor);
@@ -89,9 +93,10 @@ public class BarResource {
 				Order order = inProgress.take();
 				prepare();
 				order.setStatus(Status.READY);
-				System.out.println(" Beverage Order Ready... ");
-				System.out.println(  " Order : " + jsonb.toJson(order) );
-				return jsonb.toJson(order);
+				String orderString = jsonb.toJson(order);
+				logger.info("Order " + order.getOrderID() + " is READY");
+				logger.info(orderString);
+				return orderString;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				return null;
