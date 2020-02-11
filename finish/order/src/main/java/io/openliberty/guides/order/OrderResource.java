@@ -59,6 +59,7 @@ public class OrderResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
+    @Path("status")
     public Response getStatus() {
         return Response.ok().entity("The order service is running...\n"
                 + foodQueue.size() + " food orders in the queue.\n"
