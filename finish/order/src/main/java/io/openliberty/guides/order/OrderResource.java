@@ -62,7 +62,8 @@ public class OrderResource {
     @Path("/")
     public Response createOrder(OrderRequest orderRequest) {
         // validate OrderRequest
-        Set<ConstraintViolation<OrderRequest>> violations = validator.validate(orderRequest);
+		Set<ConstraintViolation<OrderRequest>> violations = 
+                validator.validate(orderRequest);
 
         if (violations.size() > 0) {
             JsonArrayBuilder messages = Json.createArrayBuilder();
@@ -84,14 +85,16 @@ public class OrderResource {
 
         for (String foodItem : orderRequest.getFoodList()) {
             orderId = String.format("%04d", counter.incrementAndGet());
-            newOrder = new Order(orderId, tableId, Type.FOOD, foodItem, Status.NEW);
+			newOrder = new Order(orderId, tableId,
+                    Type.FOOD, foodItem, Status.NEW);
 
             foodQueue.add(newOrder);
         }
 
         for (String beverageItem : orderRequest.getBeverageList()) {
             orderId = String.format("%04d", counter.incrementAndGet());
-            newOrder = new Order(orderId, tableId, Type.BEVERAGE, beverageItem, Status.NEW);
+			newOrder = new Order(orderId, tableId,
+                    Type.BEVERAGE, beverageItem, Status.NEW);
 
             beverageQueue.add(newOrder);
         }
@@ -102,6 +105,7 @@ public class OrderResource {
                 .build();
     }
 
+    // tag::OutgoingFood[]
     @Outgoing("food")
     public PublisherBuilder<String> sendFoodOrder() {
         return ReactiveStreams.generate(() -> {
@@ -121,8 +125,10 @@ public class OrderResource {
                 return null;
             }
         });
-    }
+	}
+    // end::OutgoingFood[]
 
+    // tag::OutgoingBev[]
     @Outgoing("beverage")
     public PublisherBuilder<String> sendBeverageOrder() {
         return ReactiveStreams.generate(() -> {
@@ -142,7 +148,8 @@ public class OrderResource {
                 return null;
             }
         });
-    }
+	}
+    // tag::OutgoingBev[]
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -179,6 +186,7 @@ public class OrderResource {
                 .build();
     }
 
+    // tag::IncomingStatus[]
     @Incoming("updateStatus")
     public void updateStatus(String orderString)  {
         Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
@@ -188,4 +196,5 @@ public class OrderResource {
         logger.info("Order " + order.getOrderID() + " status updated to " + order.getStatus());
         logger.info(orderString);
     }
+    // end::IncomingStatus[]
 }
