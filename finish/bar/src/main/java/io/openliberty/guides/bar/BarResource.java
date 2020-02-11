@@ -53,9 +53,9 @@ public class BarResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getProperties() {
-        return Response.ok().entity(" In bar service ")
-                .build();
+    public Response getStatus() {
+        return Response.ok().entity("The bar service is running...\n" 
+                 + inProgress.size() + " orders in the queue.").build();
     }
 
     @Incoming("bevOrderConsume")
@@ -65,6 +65,24 @@ public class BarResource {
         logger.info("Order " + order.getOrderID() + " received as NEW");
         logger.info(newOrder);
         return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
+    }
+
+    @Outgoing("beverageOrderPublish")
+    public PublisherBuilder<String> sendReadyOrder() {
+        return ReactiveStreams.generate(() -> {
+            try {
+                Order order = inProgress.take();
+                prepare();
+                order.setStatus(Status.READY);
+                String orderString = jsonb.toJson(order);
+                logger.info("Order " + order.getOrderID() + " is READY");
+                logger.info(orderString);
+                return orderString;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
     }
 
     private CompletionStage<Order> prepareOrder(Order order) {
@@ -84,23 +102,5 @@ public class BarResource {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-    }
-
-    @Outgoing("beverageOrderPublish")
-    public PublisherBuilder<String> sendReadyOrder() {
-        return ReactiveStreams.generate(() -> {
-            try {
-                Order order = inProgress.take();
-                prepare();
-                order.setStatus(Status.READY);
-                String orderString = jsonb.toJson(order);
-                logger.info("Order " + order.getOrderID() + " is READY");
-                logger.info(orderString);
-                return orderString;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
     }
 }

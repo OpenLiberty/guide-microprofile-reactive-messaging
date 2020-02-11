@@ -15,7 +15,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- Plugins -->
-		<version.liberty-maven-plugin>3.1</version.liberty-maven-plugin>
+		<version.liberty-maven-plugin>3.2</version.liberty-maven-plugin>
 		<version.maven-war-plugin>3.2.3</version.maven-war-plugin>
 		<version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
 		<version.maven-failsafe-plugin>2.22.2</version.maven-failsafe-plugin>
@@ -33,15 +33,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.enterprise.concurrent</groupId>
-			<artifactId>javax.enterprise.concurrent-api</artifactId>
-			<version>1.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.eclipse.microprofile</groupId>
 			<artifactId>microprofile</artifactId>
-			<version>3.0</version>
+			<version>3.2</version>
 			<type>pom</type>
 			<scope>provided</scope>
 		</dependency>
@@ -84,13 +78,13 @@
 		<dependency>
 			<groupId>org.microshed</groupId>
 			<artifactId>microshed-testing-liberty</artifactId>
-			<version>0.5</version>
+			<version>0.7.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>kafka</artifactId>
-			<version>1.12.4</version>
+			<version>1.12.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -102,7 +96,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.29</version>
+			<version>1.7.30</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
