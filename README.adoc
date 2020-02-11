@@ -10,62 +10,57 @@
 :page-layout: guide-multipane
 :page-duration: 30 minutes
 :page-releasedate: 2020-01-15
-:page-guide-category: microprofile
-:page-essential: true
-:page-essential-order: 1
-:page-description: Learn how to create a microservice with MP-reactive messaging and Open Liberty.
+:page-guide-category: MicroProfile
+:page-description: Learn how to use MicroProfile Reactive Messaging to implement reactive architecture application
 :guide-author: Open Liberty
-:page-tags: ['MicroProfile', 'Java EE', 'Jakarta EE']
+:page-tags: ['MicroProfile', 'Jakarta EE', 'Microservices']
 :page-related-guides: []
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
-:page-seo-title: Creating a MP-reactive messaging REST service 
-:page-seo-description: A tutorial on how to create a microservices in Open Liberty using MP-reactive messaging
+:page-seo-title: Creating a MicroProfile Reactive Messaging REST service
+:page-seo-description: A tutorial on how to create a microservices in Open Liberty using MicroProfile Reactive Messaging
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :source-highlighter: prettify
-= Creating asynchronous reactive microservices using MP-reactive messaging
+= Creating asynchronous reactive microservices using MicroProfile Reactive Messaging
 
 [.hidden]
-NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].
+NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].   
 
-Learn how to create a REST microservices with MP-reactive messaging, and Open Liberty.
+Learn how to use MicroProfile Reactive Messaging to implement reactive architecture application.
 
 == What you'll learn
 
-You will learn how to build microservices using MicroProfile reactive messaging. You'll also learn how to send messages between these microservices using Kafka broker. 
+You will learn how to build reactive microservices using MicroProfile Reactive Messaging. You'll also learn how to send messages between these microservices using Kafka broker. 
 
-=== What is MP-reactive messaging?
+=== What is MicroProfile Reactive Messaging?
 
 Asynchronous communication allows temporal decoupling of services in a microservice-based architecture. MicroProfile Reactive Messaging delivers a way to build systems of microservices promoting responsive, non-blocking, location transparency, elastic, resiliency to failure and temporal decoupling, enforcing asynchronous message passing between the different parts of the system.
+https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html#_microprofile_reactive_messaging[View the MicroProfile Reactive Messaging Specification^]
 
 === What is Kafka?
 
-https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages.
+https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages. Kafka Producer is a client or a program, which produces the message and pushes it to the Topic. Whereas Kafka Consumer is a client or a program, which consumes the published messages from the Producer.
 
 === What is asynchronous programming?
-Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
+Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your Order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-The Reactive Restaurant application mentioned below is designed on Microservices architecture. The application has five microservices and uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+The Restaurant application is designed with Reactive Architecture. The application that you'll be working with consists of five microservices namely `order`, `kitchen`, `bar`, `servingWindow` and `restaurantBFF`. And uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
-You'll update the `order`, `kitchen, `bar`, and `servingWindow` microservices to use MP-microprofile reactive messaging for message passing. These microservices run on Open Liberty servers.
+You'll update the `order`, `kitchen`, `bar`, and `servingWindow` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
-The Restaurant application that you'll be working with consists of five microservices namely `restaurantBFF`, `order`, `servingWindow`, `kitchen` and `bar`.
-
-The `restaurantBFF` service is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
+The `restaurantBFF` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend microservices on the caller's behalf.
 
-The waiter places a request using the `restaurantBFF` service.
+The waiter places a request using the `restaurantBFF` microservice.
 
-The `order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
+The `order` microservice consumes the request, produces Order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
 
-An order begins with a NEW status. The `kitchen` and `bar` microservices consume and processes the order and updates the status to IN_PROGRESS and READY consecutively. There’s a sleep operation in between each status to represent the cooking time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
+An Order begins with a `NEW` status. The `kitchen` and `bar` microservices consume and process the Order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the Order processing time, and the status updates are reported back to the `order` microservice via reactive messages on Kafka.
 
-The `servingWindow` microservice contains a list of all ready to serve food and beverages. It consumes these statuses from kitchen and bar microservices.
-Once the order is served, it’s marked as COMPLETED and the status is sent back to the `order` microservice as a message.
-
-
+The `servingWindow` microservice contains a list of all ready to serve food and beverages. It consumes these statuses from `kitchen` and `bar` microservices.
+Once the Order is served, it’s marked as `COMPLETED` and the status is sent back to the `order` microservice as a message.
 
 // =================================================================================================
 // Prerequisites
@@ -76,10 +71,9 @@ You will build and run the  microservices in Docker containers. You can learn mo
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
-//add kafka data
-
-// Getting Started
-
+// =================================================================================================
+// Getting started
+// =================================================================================================
 [role='command']
 include::{common-includes}/gitclone.adoc[]
 
@@ -87,164 +81,308 @@ USE this Github Link for the time being:
 
 `https://github.com/ankitagrawa/foodOrderRestaurantApp`
 
-=== Try what you'll build
-The `finish` directory in the root of this guide contains the finished application. Give it a try before you proceed.
+== Creating a Reactive Messaging application
 
-To try out the application, first go to the `finish` directory and run the following Maven 
-goal to build the application and deploy it to Open Liberty:
-[role='command']
-```
-mvn liberty:run
-```
+=== Key Concepts
 
-== Creating a reactive messaging application
+==== @Outgoing
+Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute.
 
-This section will describe the following topics and explain the required code:
+==== @Incoming
+Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute.
 
-=== @Outgoing
-Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute:
+==== Channel
+A channel is a name indicating which source or destination of messages is used. Channels are opaque Strings.
 
-=== @Incoming
-Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute
-
-=== channel
-A channel is a name indicating which source or destination of messages is used. Channels are opaque Strings
-
-=== Connector
+==== Connector
 Reactive messaging uses Connectors to attach one end of a channel  and are configured using MicroProfile Config.
 Open Liberty includes the liberty-kafka connector for sending and receiving messages from an Apache Kafka broker.
 
-Navigate to the `start` directory to begin.
+*Navigate to the `start` directory to begin. Most of the code is already provided for use.*
 
- Start Open Liberty in development mode, which starts the Open Liberty server and listens 
- for file changes:
+[role=command]
+include::{common-includes}/devmode-start.adoc[]
 
- [role="command"]
- ```
- mvn liberty:dev
- ```
+=== Building the order microservice
 
+The `order` microservice uses MicroProfile reactive messaging to send messages to `kitchen` and `bar` microservices over kafka.
 
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `OrderResource` class.#
+`order/src/main/java/io/openliberty/guides/order/OrderResource.java`
+----
+OrderResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.java[]
+----
 
-// [role="code_command hotspot" ,subs="quotes"]
-// ----
-// #Replace the `SystemApplication` class.#
-// `src/main/java/io/openliberty/guides/rest/SystemApplication.java`
-// ----
+`order` microservice creates an Order and sends it to the kafka topic on [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channel.
+The [hotspot=IncomingStatus file=0]`@Incoming("updateStatus")` channel receives an updated Order status from the kafka.
 
-// The [hotspot=systemApplication]`SystemApplication` class extends the `Application` class, which in turn associates all JAX-RS
-// resource classes in the WAR file with this JAX-RS application, making them available under the common
-// path specified in the [hotspot=systemApplication]`SystemApplication` class. The [hotspot=applicationPath]`@ApplicationPath` annotation has a
-// value that indicates the path within the WAR that the JAX-RS application accepts requests from.
+=== Building the kitchen microservice
 
-// SystemApplication.java
-// [source, Java, linenums, role='code_column hide_tags=comment']
-// ----
-// include::finish/src/main/java/io/openliberty/guides/rest/SystemApplication.java[]
-// ----
+If the order is a food, `kitchen` service receives an Order, processes it and sends back all the statuses to kafka on MicroProfile Reactive Messaging channels.
 
-//            //== Creating the JAX-RS resource
+//Kitchen
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `KitchenResource` class.#
+`kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResource.java`
+----
+KitchenResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResource.java[]
+----
 
-// In JAX-RS, a single class should represent a single resource, or a group of resources of the same type.
-// In this application, a resource might be a system property, or a set of system properties. It is easy
-// to have a single class handle multiple different resources, but keeping a clean separation between types
-// of resources helps with maintainability in the long run.
+=== Building the bar microservice
 
-// [role="code_command hotspot", subs="quotes"]
-// ----
-// #Create the `PropertiesResource` class.#
-// `src/main/java/io/openliberty/guides/rest/PropertiesResource.java`
-// ----
+If the Order is a drink, `bar` service receives an Order, processes it and sends back all the statuses to kafka on MicroProfile Reactive Messaging channels.
 
-// This resource class has quite a bit of code in it, so let's break it down into manageable chunks.
+//bar
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `BarResource` class.#
+`bar/src/main/java/io/openliberty/guides/bar/BarResource.java`
+----
+BarResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/bar/src/main/java/io/openliberty/guides/bar/BarResource.java[]
+----
 
-// The [hotspot=path file=0]`@Path` annotation on the class indicates that this resource responds to the `properties` path
-// in the JAX-RS application. The [hotspot=applicationPath file=1]`@ApplicationPath` annotation in the [hotspot=systemApplication file=1]`SystemApplication` class together with
-// the [hotspot=path file=0]`@Path` annotation in this class indicates that the resource is available at the `System/properties`
-// path.
+=== Building the servingWindow microservice
 
-// JAX-RS maps the HTTP methods on the URL to the methods on the class. The method to call is determined
-// by the annotations that are specified on the methods. In the application you are building, an HTTP `GET` request
-// to the `System/properties` path results in the system properties being returned.
+`servingWindow` microservice receives the `Ready` Order from the `bar` and `kitchen` microservices over kafka topics.
+Once the Order is served, it's marked as `COMPLETED` and the status is sent across to `order` microservice using the MicroProfile Reactive Messaging.
 
-// The [hotspot=get file=0]`@GET` annotation on the method indicates that this method is to be called for the HTTP `GET`
-// method. The [hotspot=produces file=0]`@Produces` annotation indicates the format of the content that will be returned. The
-// value of the [hotspot=produces file=0]`@Produces` annotation will be specified in the HTTP `Content-Type` response header.
-// For this application, a JSON structure is to be returned. The desired `Content-Type` for a JSON
-// response is `application/json` with `MediaType.APPLICATION_JSON` instead of the `String` content type. Using a constant such as `MediaType.APPLICATION_JSON` is better because if there's a spelling error, a compile failure occurs.
+//ServingWindow
+[role="code_command hotspot", subs="quotes"]
+----
+#Replace the `ServingWindowResource` class.#
+`servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java`
+----
+ServingWindowResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java[]
+----
 
-// JAX-RS supports a number of ways to marshal JSON. The JAX-RS 2.1 specification mandates JSON-Binding
-// (JSON-B) and JAX-B. 
+=== Configuring the MicroProfile Reactive Messaging
 
-// The method body returns the result of `System.getProperties()` that is of type `java.util.Properties`. Since the method 
-// is annotated with `@Produces(MediaType.APPLICATION_JSON)`, JAX-RS uses JSON-B to automatically convert the returned object
-// to JSON data in the HTTP response.
+Each of the four microservices `order`, `kitchen`, `bar` and `servingWindow` contains `microprofile-config.properties`
+file, which configures kafka connector with the MicroProfile Reactive Messaging channels.
 
-// PropertiesResource.java
-// [source,java,linenums,role='code_column hide_tags=comment']
-// ----
-// include::finish/src/main/java/io/openliberty/guides/rest/PropertiesResource.java[]
-// ----
+[role="code_command hotspot", subs="quotes"]
+----
+#microprofile-config.properties example from the kitchen microservice.#
+`finish/kitchen/src/main/resources/META-INF/microprofile-config.properties`
+----
+microprofile-config.properties
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/kitchen/src/main/resources/META-INF/microprofile-config.properties[]
+----
 
-// SystemApplication.java
-// [source,java,linenums,role='code_column hide_tags=comment']
-// ----
-// include::finish/src/main/java/io/openliberty/guides/rest/SystemApplication.java[]
-// ----
+Rest all the microservices use similar `microprofile-config.properties` configuration.
 
 == Configuring the server
 
-This section will enlist the server.xml configuration
+To get the service running, the Open Liberty server needs to be correctly configured.
 
+Replace the `bar` `server.xml` to include [hotspot=featureMP file=0]`mpReactiveMessaging-1.0` `feature` element.
 
-To get the service running, the Liberty server needs to be correctly configured.
+[role="code_command hotspot file=0", subs="quotes"]
+----
+ #Replace the bar server configuration file.#
+ `bar/src/main/liberty/config/server.xml`
+----
+server.xml
+[source,xml,linenums,role="code_column"]
+----
+include::finish/bar/src/main/liberty/config/server.xml[]
+----
 
- [role="code_command hotspot", subs="quotes"]
- ----
- #Replace the server configuration file.#
- `src/main/liberty/config/server.xml`
- ----
+Rest all the microservices have `server.xml` already configured.
 
- server.xml
- [source,xml,linenums,role="code_column"]
- ----
- include::finish/src/main/liberty/config/server.xml[]
- ----
+.The configuration does the following actions:
+- Configures the server to enable MicroProfile Reactive Messaging.
+ 
+[role="code_command hotspot file=1", subs="quotes"]
+----
+ #pom.xml configuration#
+ `bar/pom.xml`
+---- 
+pom.xml
+[source, XML ,linenums,role="code_column"]
+----
+include::finish/bar/pom.xml[]
+----
 
- The configuration does the following actions:
+- MicroProfile Reactive Messaging dependency is included in the Maven `pom.xml` file. This is specified in the [hotspot=reactiveMessaging file=1]`<dependency>` element.
 
- . Configures the server to enable MP-reactive messaging. This is specified in the [hotspot=featureManager file=0]`featureManager` element.
- `<feature>mpReactiveMessaging-1.0</feature>`
-// . Configures the server to resolve the HTTP port numbers from variables, which are then specified in
-// the Maven [hotspot=defaultHttpPort hotspot=defaultHttpsPort file=1]`pom.xml` file. This is specified in the [hotspot=httpEndpoint file=0]`<httpEndpoint/>` element. Variables use the `${variableName}` syntax.
-// . Configures the server to run the produced web application on a context root specified in the 
-// [hotspot=appContextRoot file=1]`pom.xml` file. This is specified in the [hotspot=webApplication file=0]`<webApplication/>` element.
+== Building the application
 
-// pom.xml
-// [source,xml,linenums,role="code_column"]
-// ----
-// include::finish/pom.xml[]
-// ----
+You will build and run the `order`, `kitchen`, `bar`, `servingWindow` and `restaurantBFF` microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
-// The variables that are being used in the [hotspot=httpEndpoint hotspot=webApplication file=0]`server.xml` file are provided by the properties set in the Maven [hotspot=defaultHttpPort hotspot=defaultHttpsPort hotspot=appContextRoot file=1]`pom.xml` file. The properties must be formatted as `liberty.var.variableName`.
+Start your Docker environment.
 
-== Building and running the application
+To build the application, run the Maven `install` goal from the command line in the `start` directory:
 
-// How to build and run the application
+[role='command']
+```
+mvn -pl models install
+mvn package
+```
 
-// add name of the micro services
-Instructions on how to build and run the application. This will enlist various steps required.
+*Run the following commands to containerize the application:*
 
-// The Open Liberty server was started in development mode at the beginning of the guide and all the 
-// changes were automatically picked up.
+[role='command']
+```
+docker build -t order:1.0-SNAPSHOT order/.
+docker build -t kitchen:1.0-SNAPSHOT kitchen/.
+docker build -t bar:1.0-SNAPSHOT bar/.
+docker build -t servingWindow:1.0-SNAPSHOT servingWindow/.
+docker build -t restaurantBFF:1.0-SNAPSHOT restaurantBFF/.
+```
 
-// Check out the service that you created at the
-// http://localhost:9080/LibertyProject/System/properties[^] URL. 
+Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
 
+include::{common-includes}/os-tabs.adoc[]
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/startContainers.sh
+```
+--
+
+[.tab_content.windows_section]
+--
+[role='command']
+```
+.\scripts\startContainers.bat
+```
+--
+
+== Trying the application
+
+You can access the application by making requests to the `restaurantBFF` endpoint using OpenAPI.
+
+The services take some time to become available. Check out the service that you created at the
+http://localhost:9080/openapi/ui[^] URL.
+
+=== Place Orders
+
+Expand the `/api/orders` `POST` request to post an Order and click *Try it out*. Copy the following example input
+into the text box:
+ 
+[source, role='command']
+----
+{
+  "tableID": "1",
+  "foodList": [
+    "burger"
+  ],
+  "beverageList": [
+    "coke"
+  ]
+}
+----
+
+Click `Execute` and you will receive the 200 response.
+
+=== Check IN_PROGRESS Order Status
+
+Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
+
+Click `Execute` and you will see the response with `IN_PROGRESS` status. 
+
+[source, role='command']
+----
+[
+  {
+    "item": "burger",
+    "orderID": "0001",
+    "status": "IN_PROGRESS",
+    "tableID": "1",
+    "type": "FOOD"
+  },
+  {
+    "item": "coke",
+    "orderID": "0002",
+    "status": "IN_PROGRESS",
+    "tableID": "1",
+    "type": "BEVERAGE"
+  }
+]
+----
+
+=== Check READY Order Status
+
+Click `Execute` again and you will see the response with `READY` status. 
+
+[source, role='command']
+----
+[
+  {
+    "item": "burger",
+    "orderID": "0001",
+    "status": "READY",
+    "tableID": "1",
+    "type": "FOOD"
+  },
+  {
+    "item": "coke",
+    "orderID": "0002",
+    "status": "READY",
+    "tableID": "1",
+    "type": "BEVERAGE"
+  }
+]
+----
+
+=== Complete an Order
+
+Expand the `/api/servingWindow/complete/{orderID}` `POST` request to complete an Order and click *Try it out*. Copy the following example input
+into the text box:
+ 
+[source, role='command']
+----
+
+0002
+----
+
+Click `Execute` and you will receive the 200 response.
+
+Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
+
+Click `Execute` and you will see the response with `COMPLETED` status for `orderID 0002`. This updated status is cascaded to the `order` microservice.
+
+[source, role='command']
+----
+[
+  {
+    "item": "burger",
+    "orderID": "0001",
+    "status": "IN_PROGRESS",
+    "tableID": "1",
+    "type": "FOOD"
+  },
+  {
+    "item": "coke",
+    "orderID": "0002",
+    "status": "COMPLETED",
+    "tableID": "1",
+    "type": "BEVERAGE"
+  }
+]
+----
 
 == Testing the service
-
-Test development
 
 You will create an unit tests to test the basic functionality of the microservices. If a test failure occurs, then you may have introduced a bug into the code.
 
@@ -303,7 +441,7 @@ You will create an unit tests to test the basic functionality of the microservic
 
 Run tests
 
-Navigate to the directory, then verify that the tests pass by using the Maven `verify` goal:
+Navigate to the `restaurantBFF` directory, then verify that the tests pass by using the Maven `verify` goal:
 
 [role='command']
 ```
@@ -333,10 +471,33 @@ When the tests succeed, you see output similar to the following example:
 // When you are done checking out the service, exit development mode by typing `q` in the shell session where
 // you ran the server and then pressing the `enter/return` key.
 
+== Tearing down the environment
+
+Navigate back to the `start` directory.
+
+Finally, use the following script to stop the application:
+
+include::{common-includes}/os-tabs.adoc[]
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/stopContainers.sh
+```
+--
+
+[.tab_content.windows_section]
+--
+[role='command']
+```
+.\scripts\stopContainers.sh
+```
+--
 
 == Great work! You're done!
 
-You have just developed an application using MP-reactive messaging, Open Liberty and Kakfa.
+You have just developed an application using MicroProfile Reactive Messaging, Open Liberty and Kakfa.
 
 == Related Links
 
@@ -346,5 +507,6 @@ https://microprofile.io/[See the MicroProfile specs^]
 
 https://openliberty.io/docs/ref/microprofile[View the MicroProfile API^]
 
+https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html#_microprofile_reactive_messaging[View the MicroProfile Reactive Messaging Specification^]
 
 include::{common-includes}/attribution.adoc[subs="attributes"]

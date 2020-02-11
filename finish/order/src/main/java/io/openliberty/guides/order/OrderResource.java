@@ -22,11 +22,13 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
+import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -42,126 +44,154 @@ import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 @ApplicationScoped
 @Path("/orders")
 public class OrderResource {
-	@Inject
-	private OrderManager manager;
+    @Inject
+    private OrderManager manager;
 
-	@Inject
-	private Validator validator;
+    @Inject
+    private Validator validator;
 
-	private BlockingQueue<Order> foodQueue = new LinkedBlockingQueue<>();
-	private BlockingQueue<Order> beverageQueue = new LinkedBlockingQueue<>();
+    private static Logger logger = Logger.getLogger(OrderResource.class.getName());
 
-	private AtomicInteger counter = new AtomicInteger();
+    private BlockingQueue<Order> foodQueue = new LinkedBlockingQueue<>();
+    private BlockingQueue<Order> beverageQueue = new LinkedBlockingQueue<>();
 
-	@POST
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/")
-	public Response createOrder(OrderRequest orderRequest) {
-		// validate OrderRequest
-		Set<ConstraintViolation<OrderRequest>> violations = validator.validate(orderRequest);
+    private AtomicInteger counter = new AtomicInteger();
 
-		if (violations.size() > 0) {
-			JsonArrayBuilder messages = Json.createArrayBuilder();
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/")
+    public Response createOrder(OrderRequest orderRequest) {
+        // validate OrderRequest
+        Set<ConstraintViolation<OrderRequest>> violations = 
+                validator.validate(orderRequest);
 
-			for (ConstraintViolation<OrderRequest> v : violations) {
-				messages.add(v.getMessage());
-			}
+        if (violations.size() > 0) {
+            JsonArrayBuilder messages = Json.createArrayBuilder();
 
-			return Response
-					.status(Response.Status.BAD_REQUEST)
-					.entity(messages.build().toString())
-					.build();
-		}
+            for (ConstraintViolation<OrderRequest> v : violations) {
+                messages.add(v.getMessage());
+            }
 
-		// Create invdividual Orders from OrderRequest
-		String orderId;
-		Order newOrder;
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(messages.build().toString())
+                    .build();
+        }
 
-		for (String foodItem : orderRequest.getFoodList()) {
-			orderId = String.format("%04d", counter.incrementAndGet());
+        // Create individual Orders from OrderRequest
+        Order newOrder;
+        String orderId;
+        String tableId = orderRequest.getTableID();
 
-			newOrder = new Order(orderId, orderRequest.getTableID(), Type.FOOD, foodItem, Status.NEW);
-			manager.addOrder(newOrder);
-			foodQueue.add(newOrder);
-		}
+        for (String foodItem : orderRequest.getFoodList()) {
+            orderId = String.format("%04d", counter.incrementAndGet());
+            newOrder = new Order(orderId, tableId,
+                    Type.FOOD, foodItem, Status.NEW);
 
-		for (String beverageItem : orderRequest.getBeverageList()) {
-			orderId = String.format("%04d", counter.incrementAndGet());
+            foodQueue.add(newOrder);
+        }
 
-			newOrder = new Order(orderId, orderRequest.getTableID(), Type.BEVERAGE, beverageItem, Status.NEW);
-			manager.addOrder(newOrder);
-			beverageQueue.add(newOrder);
-		}
+        for (String beverageItem : orderRequest.getBeverageList()) {
+            orderId = String.format("%04d", counter.incrementAndGet());
+            newOrder = new Order(orderId, tableId,
+                    Type.BEVERAGE, beverageItem, Status.NEW);
 
-		return Response
-				.status(Response.Status.OK)
-				.entity(orderRequest)
-				.build();
-	}
+            beverageQueue.add(newOrder);
+        }
 
-	@Outgoing("food")
-	public PublisherBuilder<String> sendFoodOrder() {
-		return ReactiveStreams.generate(() -> {
-			try {
-				return JsonbBuilder.create().toJson(foodQueue.take());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				return null;
-			}
-		});
-	}
+        return Response
+                .status(Response.Status.OK)
+                .entity(orderRequest)
+                .build();
+    }
 
-	@Outgoing("beverage")
-	public PublisherBuilder<String> sendBeverageOrder() {
-		return ReactiveStreams.generate(() -> {
-			try {
-				return JsonbBuilder.create().toJson(beverageQueue.take());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				return null;
-			}
-		});
-	}
+    // tag::OutgoingFood[]
+    @Outgoing("food")
+    public PublisherBuilder<String> sendFoodOrder() {
+        return ReactiveStreams.generate(() -> {
+            try {
+                Order order = foodQueue.take();
+                manager.addOrder(order);
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{orderId}")
-	public Response getOrder(@PathParam("orderId") String orderId) {
-		Order order = manager.getOrder(orderId);
+                Jsonb jsonb = JsonbBuilder.create();
+                String orderString = jsonb.toJson(order);
 
-		if (order == null) {
-			return Response
-					.status(Response.Status.BAD_REQUEST)
-					.entity("Order id does not exist.")
-					.build();
-		}
+                logger.info("Sending Order " + order.getOrderID() + " with a status of " + order.getStatus() + " to Kitchen: " + orderString);
 
-		return Response
-				.status(Response.Status.OK)
-				.entity(order)
-				.build();
-	}
+                return orderString;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
+    }
+    // end::OutgoingFood[]
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/")
-	public Response getOrdersList(@QueryParam("tableId") String tableId) {
-		List<Order> ordersList = manager.getOrders()
-				.values()
-				.stream()
-				.filter(order -> (tableId == null) || order.getTableID().equals(tableId))
-				.collect(Collectors.toList());
+    // tag::OutgoingBev[]
+    @Outgoing("beverage")
+    public PublisherBuilder<String> sendBeverageOrder() {
+        return ReactiveStreams.generate(() -> {
+            try {
+                Order order = beverageQueue.take();
+                manager.addOrder(order);
 
-		return Response
-				.status(Response.Status.OK)
-				.entity(ordersList)
-				.build();
-	}
+                Jsonb jsonb = JsonbBuilder.create();
+                String orderString = jsonb.toJson(order);
 
-	@Incoming("updateStatus")
-	public void updateStatus(String orderString)  {
-		Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
-		manager.updateStatus(order.getOrderID(), order.getStatus());
-		System.out.println("Updated Order " + order.getOrderID() + " status to " + order.getStatus());
-	}
+                logger.info("Sending Order " + order.getOrderID() + " with a status of " + order.getStatus() + " to Bar: " + orderString);
+
+                return orderString;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
+    }
+    // tag::OutgoingBev[]
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("{orderId}")
+    public Response getOrder(@PathParam("orderId") String orderId) {
+        Order order = manager.getOrder(orderId);
+
+        if (order == null) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("Order id does not exist.")
+                    .build();
+        }
+
+        return Response
+                .status(Response.Status.OK)
+                .entity(order)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/")
+    public Response getOrdersList(@QueryParam("tableId") String tableId) {
+        List<Order> ordersList = manager.getOrders()
+                .values()
+                .stream()
+                .filter(order -> (tableId == null) || order.getTableID().equals(tableId))
+                .collect(Collectors.toList());
+
+        return Response
+                .status(Response.Status.OK)
+                .entity(ordersList)
+                .build();
+    }
+
+    // tag::IncomingStatus[]
+    @Incoming("updateStatus")
+    public void updateStatus(String orderString)  {
+        Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
+
+        manager.updateStatus(order.getOrderID(), order.getStatus());
+
+        logger.info("Order " + order.getOrderID() + " status updated to " + order.getStatus() + ": " + orderString);
+    }
+    // end::IncomingStatus[]
 }
