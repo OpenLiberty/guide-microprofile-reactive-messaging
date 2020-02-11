@@ -62,7 +62,7 @@ public class OrderResource {
     @Path("/")
     public Response createOrder(OrderRequest orderRequest) {
         // validate OrderRequest
-		Set<ConstraintViolation<OrderRequest>> violations = 
+        Set<ConstraintViolation<OrderRequest>> violations = 
                 validator.validate(orderRequest);
 
         if (violations.size() > 0) {
@@ -85,7 +85,7 @@ public class OrderResource {
 
         for (String foodItem : orderRequest.getFoodList()) {
             orderId = String.format("%04d", counter.incrementAndGet());
-			newOrder = new Order(orderId, tableId,
+            newOrder = new Order(orderId, tableId,
                     Type.FOOD, foodItem, Status.NEW);
 
             foodQueue.add(newOrder);
@@ -93,7 +93,7 @@ public class OrderResource {
 
         for (String beverageItem : orderRequest.getBeverageList()) {
             orderId = String.format("%04d", counter.incrementAndGet());
-			newOrder = new Order(orderId, tableId,
+            newOrder = new Order(orderId, tableId,
                     Type.BEVERAGE, beverageItem, Status.NEW);
 
             beverageQueue.add(newOrder);
@@ -125,7 +125,7 @@ public class OrderResource {
                 return null;
             }
         });
-	}
+    }
     // end::OutgoingFood[]
 
     // tag::OutgoingBev[]
@@ -148,7 +148,7 @@ public class OrderResource {
                 return null;
             }
         });
-	}
+    }
     // tag::OutgoingBev[]
 
     @GET
