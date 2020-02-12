@@ -57,8 +57,18 @@ public class OrderResource {
 
     private AtomicInteger counter = new AtomicInteger();
 
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("status")
+    public Response getStatus() {
+        return Response.ok().entity("The order service is running...\n"
+                + foodQueue.size() + " food orders in the queue.\n"
+                + beverageQueue.size() + " beverage orders in the queue.").build();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
     public Response createOrder(OrderRequest orderRequest) {
         // validate OrderRequest

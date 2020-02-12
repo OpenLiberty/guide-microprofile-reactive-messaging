@@ -53,8 +53,9 @@ public class KitchenResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getProperties() {
-        return Response.ok().entity(" In food service ").build();
+    public Response getStatus() {
+        return Response.ok().entity("The kitchen service is running...\n"
+                + inProgress.size() + " orders in the queue.").build();
     }
 
     @Incoming("foodOrderConsume")
