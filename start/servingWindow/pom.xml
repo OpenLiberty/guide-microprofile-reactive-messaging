@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.openliberty.guides</groupId>
-    <artifactId>restaurantBFF</artifactId>
+    <artifactId>servingWindow</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -18,10 +18,10 @@
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
         <version.maven-failsafe-plugin>2.22.2</version.maven-failsafe-plugin>
         <!-- Liberty configuration -->
-        <liberty.var.default.http.port>9080</liberty.var.default.http.port>
-        <liberty.var.default.https.port>9443</liberty.var.default.https.port>
+        <liberty.var.default.http.port>9082</liberty.var.default.http.port>
+        <liberty.var.default.https.port>9445</liberty.var.default.https.port>
     </properties>
-
+    
     <dependencies>
         <!-- Provided dependencies -->
         <dependency>
@@ -30,20 +30,23 @@
             <version>8.0.0</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>javax.enterprise.concurrent</groupId>
             <artifactId>javax.enterprise.concurrent-api</artifactId>
             <version>1.1</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.eclipse.microprofile</groupId>
             <artifactId>microprofile</artifactId>
             <version>3.2</version>
             <type>pom</type>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.microprofile.reactive.messaging</groupId>
+          <artifactId>microprofile-reactive-messaging-api</artifactId>
+          <version>1.0</version>
         </dependency>
 
         <!--  Required dependencies -->
@@ -52,24 +55,26 @@
            <artifactId>models</artifactId>
            <version>1.0-SNAPSHOT</version>
         </dependency>
-
-        <!-- JSON-B -->
         <dependency>
-            <groupId>javax.json.bind</groupId>
-            <artifactId>javax.json.bind-api</artifactId>
-            <version>1.0</version>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.12</artifactId>
+            <version>2.3.0</version>
         </dependency>
-
+        
         <dependency>
-            <groupId>org.eclipse</groupId>
-            <artifactId>yasson</artifactId>
-            <version>1.0</version>
+          <groupId>javax.json.bind</groupId>
+          <artifactId>javax.json.bind-api</artifactId>
+          <version>1.0</version>
         </dependency>
-
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
-            <version>1.1</version>
+          <groupId>org.eclipse</groupId>
+          <artifactId>yasson</artifactId>
+          <version>1.0</version>
+        </dependency>
+        <dependency>
+          <groupId>org.glassfish</groupId>
+          <artifactId>javax.json</artifactId>
+          <version>1.1</version>
         </dependency>
 
         <!-- For tests -->
@@ -79,28 +84,18 @@
             <version>0.7.1</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>mockserver</artifactId>
+            <artifactId>kafka</artifactId>
             <version>1.12.5</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-client-java</artifactId>
-            <version>5.5.4</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.5.2</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
@@ -143,8 +138,17 @@
                 <version>${version.maven-failsafe-plugin}</version>
                 <executions>
                     <execution>
+                        <id>integration-test</id>
                         <goals>
                             <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <trimStackTrace>false</trimStackTrace>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <goals>
                             <goal>verify</goal>
                         </goals>
                     </execution>
