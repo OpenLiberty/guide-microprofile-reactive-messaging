@@ -41,12 +41,11 @@ import io.openliberty.guides.models.Status;
 @Path("/servingWindow")
 public class ServingWindowResource {
 
+    private static Logger logger = Logger.getLogger(ServingWindowResource.class.getName());
+    private static Jsonb jsonb = JsonbBuilder.create();
+
     private List<Order> readyList = new ArrayList<Order>();
     private BlockingQueue<String> completedQueue = new LinkedBlockingQueue<>();
-
-    private static Logger logger = Logger.getLogger(ServingWindowResource.class.getName());
-
-    Jsonb jsonb = JsonbBuilder.create();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
