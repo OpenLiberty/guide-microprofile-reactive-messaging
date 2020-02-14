@@ -54,7 +54,7 @@ public class ServingWindowEndpointIT {
     private static KafkaConsumer<String, String> consumer;
 
     private static io.openliberty.guides.models.Order order;
-    private static Jsonb jsonb;
+    private static Jsonb jsonb = JsonbBuilder.create();
     
     @BeforeAll
     public static void setup() throws InterruptedException {
@@ -75,8 +75,6 @@ public class ServingWindowEndpointIT {
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_RESET);
         consumer = new KafkaConsumer<>(properties);
         consumer.subscribe(Arrays.asList("statusTopic"));
-        
-        jsonb = JsonbBuilder.create();
     }
 
     @Test
@@ -85,7 +83,7 @@ public class ServingWindowEndpointIT {
     	order = new io.openliberty.guides.models.Order("0001", "1", Type.FOOD, "burger", Status.READY);
     	String jOrder = JsonbBuilder.create().toJson(order);
         producer.send(new ProducerRecord<String, String>("statusTopic", jOrder));
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         Assertions.assertEquals(1, getReadyListSize(), "No ready order was added.");
         verify(Status.READY);
     }
@@ -94,6 +92,7 @@ public class ServingWindowEndpointIT {
     @Order(2)
     public void testMarkOrderComplete() throws InterruptedException {
     	servingWindowResource.markOrderComplete("0001");
+    	Thread.sleep(5000);
         Assertions.assertEquals(0, getReadyListSize(), "The order was not removed.");
         verify(Status.COMPLETED);
     }
