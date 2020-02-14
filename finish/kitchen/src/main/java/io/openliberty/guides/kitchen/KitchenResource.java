@@ -25,7 +25,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.GET;
-// JAX-RS
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -43,13 +42,12 @@ import io.openliberty.guides.models.Status;
 @Path("/foodMessaging")
 public class KitchenResource {
 
+    private static Logger logger = Logger.getLogger(KitchenResource.class.getName());
+    private static Jsonb jsonb = JsonbBuilder.create();
+
     private Executor executor = Executors.newSingleThreadExecutor();
     private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
     private Random random = new Random();
-
-    private static Logger logger = Logger.getLogger(KitchenResource.class.getName());
-
-    Jsonb jsonb = JsonbBuilder.create();
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -67,31 +65,12 @@ public class KitchenResource {
         return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
     }
 
-    private CompletionStage<Order> prepareOrder(Order order) {
-        return CompletableFuture.supplyAsync(() -> {
-            prepare();
-            Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
-            logger.info("Order " + order.getOrderID() + " is IN PROGRESS");
-            logger.info(jsonb.toJson(order));
-            inProgress.add(inProgressOrder);
-            return inProgressOrder;
-        }, executor);
-    }
-
-    private void prepare() {
-        try {
-            Thread.sleep((random.nextInt(3)+4) * 1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
     @Outgoing("foodOrderPublish")
     public PublisherBuilder<String> sendReadyOrder() {
         return ReactiveStreams.generate(() -> {
             try {
                 Order order = inProgress.take();
-                prepare();
+                prepare(5);
                 order.setStatus(Status.READY);
                 String orderString = jsonb.toJson(order);
                 logger.info("Order " + order.getOrderID() + " is READY");
@@ -102,5 +81,24 @@ public class KitchenResource {
                 return null;
             }
         });
+    }
+    
+    private CompletionStage<Order> prepareOrder(Order order) {
+        return CompletableFuture.supplyAsync(() -> {
+            prepare(10);
+            Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
+            logger.info("Order " + order.getOrderID() + " is IN PROGRESS");
+            logger.info(jsonb.toJson(order));
+            inProgress.add(inProgressOrder);
+            return inProgressOrder;
+        }, executor);
+    }
+
+    private void prepare(int sleepTime) {
+        try {
+            Thread.sleep((random.nextInt(5)+sleepTime) * 1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
