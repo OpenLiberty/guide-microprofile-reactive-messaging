@@ -39,9 +39,6 @@ import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 import io.openliberty.guides.bar.BarResource;
 import io.openliberty.guides.models.Status;
 import io.openliberty.guides.models.Type;
@@ -93,7 +90,7 @@ public class BarEndpointIT {
 
     @Test
     @Order(2)
-    public void testInitBeverageOrder() throws JsonParseException, JsonMappingException, IOException, InterruptedException {
+    public void testInitBeverageOrder() throws IOException, InterruptedException {
     	order = new io.openliberty.guides.models.Order("0001", "1", Type.BEVERAGE, "Coke", Status.NEW);
     	String jOrder = JsonbBuilder.create().toJson(order);
         producer.send(new ProducerRecord<String, String>("beverageTopic", jOrder));
@@ -102,8 +99,8 @@ public class BarEndpointIT {
 
     @Test
     @Order(3)
-    public void testFoodOrderReady() throws JsonParseException, JsonMappingException, IOException, InterruptedException {
-    	Thread.sleep(7000);
+    public void testFoodOrderReady() throws IOException, InterruptedException {
+    	Thread.sleep(10000);
     	verify(Status.READY);
     }
     

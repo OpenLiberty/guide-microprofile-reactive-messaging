@@ -37,9 +37,6 @@ import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.models.Status;
 import io.openliberty.guides.order.OrderResource;
@@ -91,7 +88,7 @@ public class OrderEndpointIT {
 
     @Test
     @Order(2)
-    public void testInitFoodOrder() throws JsonParseException, JsonMappingException, IOException, InterruptedException {
+    public void testInitFoodOrder() throws IOException, InterruptedException {
 
     	ArrayList<String> beverageList = new ArrayList<String>();
         beverageList.add("Coke");
