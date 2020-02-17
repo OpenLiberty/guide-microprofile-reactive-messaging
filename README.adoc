@@ -6,11 +6,12 @@
 // Contributors:
 //     IBM Corporation
 //
-:projectid: foodOrderRestaurantApp
+:projectid: microprofile-reactive-messaging
 :page-layout: guide-multipane
 :page-duration: 30 minutes
 :page-releasedate: 2020-01-15
-:page-guide-category: MicroProfile
+:page-guide-category: microprofile
+:page-essential: false
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement reactive architecture application
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile', 'Jakarta EE', 'Microservices']
@@ -35,7 +36,7 @@ You will learn how to build reactive microservices using MicroProfile Reactive M
 === What is MicroProfile Reactive Messaging?
 
 Asynchronous communication allows temporal decoupling of services in a microservice-based architecture. MicroProfile Reactive Messaging delivers a way to build systems of microservices promoting responsive, non-blocking, location transparency, elastic, resiliency to failure and temporal decoupling, enforcing asynchronous message passing between the different parts of the system.
-https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html#_microprofile_reactive_messaging[View the MicroProfile Reactive Messaging Specification^]
+https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html#_microprofile_reactive_messaging[MicroProfile Reactive Messaging Specification^]
 
 === What is Kafka?
 
@@ -76,10 +77,6 @@ Install Docker by following the instructions on the official https://docs.docker
 // =================================================================================================
 [role='command']
 include::{common-includes}/gitclone.adoc[]
-
-USE this Github Link for the time being:
-
-`https://github.com/ankitagrawa/foodOrderRestaurantApp`
 
 == Creating a Reactive Messaging application
 
@@ -229,7 +226,7 @@ You will build and run the `order`, `kitchen`, `bar`, `servingWindow` and `resta
 
 Start your Docker environment.
 
-To build the application, run the Maven `install` goal from the command line in the `start` directory:
+To build the application, run the Maven `install` and `package` goals from the command line in the `start` directory:
 
 [role='command']
 ```
@@ -237,7 +234,7 @@ mvn -pl models install
 mvn package
 ```
 
-*Run the following commands to containerize the application:*
+Run the following commands to containerize the application:
 
 [role='command']
 ```
@@ -275,7 +272,7 @@ You can access the application by making requests to the `restaurantBFF` endpoin
 The services take some time to become available. Check out the service that you created at the
 http://localhost:9080/openapi/ui[^] URL.
 
-=== Place Orders
+*Place Orders*
 
 Expand the `/api/orders` `POST` request to post an Order and click *Try it out*. Copy the following example input
 into the text box:
@@ -295,7 +292,7 @@ into the text box:
 
 Click `Execute` and you will receive the 200 response.
 
-=== Check IN_PROGRESS Order Status
+*Check IN_PROGRESS Order Status*
 
 Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
 
@@ -321,7 +318,7 @@ Click `Execute` and you will see the response with `IN_PROGRESS` status.
 ]
 ----
 
-=== Check READY Order Status
+*Check READY Order Status*
 
 Click `Execute` again and you will see the response with `READY` status. 
 
@@ -345,7 +342,7 @@ Click `Execute` again and you will see the response with `READY` status.
 ]
 ----
 
-=== Complete an Order
+*Complete an Order*
 
 Expand the `/api/servingWindow/complete/{orderID}` `POST` request to complete an Order and click *Try it out*. Copy the following example input
 into the text box:
@@ -381,95 +378,6 @@ Click `Execute` and you will see the response with `COMPLETED` status for `order
   }
 ]
 ----
-
-== Testing the service
-
-You will create an unit tests to test the basic functionality of the microservices. If a test failure occurs, then you may have introduced a bug into the code.
-
-// You can test this service manually by starting a server and pointing a web browser at the
-// http://localhost:9080/LibertyProject/System/properties[^] URL. Automated tests are a much better
-// approach because they trigger a failure if a change introduces a bug. JUnit and the JAX-RS Client
-// API provide a simple environment to test the application.
-
-// You can write tests for the individual units of code outside of a running application server, or they
-// can be written to call the application server directly. In this example, you will create a test that
-// does the latter.
-
-// [role="code_command hotspot", subs="quotes"]
-// ----
-// #Create the `EndpointIT` class.#
-// `src/test/java/it/io/openliberty/guides/rest/EndpointIT.java`
-// ----
-
-// EndpointIT.java
-// [source, Java, linenums, role="code_column hide_tags=comment"]
-// ----
-// include::finish/src/test/java/it/io/openliberty/guides/rest/EndpointIT.java[]
-// ----
-
-// This test class has more lines of code than the resource implementation. This situation is common.
-// The test method is indicated with the [hotspot=test file=0]`@Test` annotation.
-
-// pom.xml
-// [source , xml, linenums,role="code_column"]
-// ----
-// include::finish/pom.xml[]
-// ----
-
-// The test code needs to know some information about the application to make requests. The server port and the application context root are key, and are dictated by the server configuration. While this information can be hardcoded, it is better to specify it in a single place like the Maven [hotspot=defaultHttpPort hotspot=defaultHttpsPort hotspot=appContextRoot file=1]`pom.xml` file. Refer to the [hotspot file=1]`pom.xml` file to see how the application information such as the [hotspot=defaultHttpPort file=1]`default.http.port`, [hotspot=defaultHttpsPort file=1]`default.https.port` and [hotspot=appContextRoot file=1]`app.context.root` elements are provided in the file.
-
-
-// These Maven properties are then passed to the Java test program as the [hotspot=testsysprops file=1]`<systemPropertyVariables/>` element in the [hotspot file=1]`pom.xml` file.
-
-// Getting the values to create a representation of the URL is simple. The test class uses the [hotspot=systemProperties file=0]`getProperty` method
-// to get the application details.
-
-// To call the JAX-RS service using the JAX-RS client, first create a `WebTarget` object by calling
-// the [hotspot=target file=0]`target` method that provides the URL. To cause the HTTP request to occur, the [hotspot=requestget file=0]`request().get()` method
-// is called on the `WebTarget` object. The [hotspot=requestget file=0]`get` method
-// call is a synchronous call that blocks until a response is received. This call returns a [hotspot=requestget file=0]`Response`
-// object, which can be inspected to determine whether the request was successful.
-
-// The first thing to check is that a `200` response was received. The JUnit [hotspot=assertequals file=0]`assertEquals` method can be used for this check.
-
-// Check the response body to ensure it returned the right information. Since the client and the server
-// are running on the same machine, it is reasonable to expect that the system properties for the local
-// and remote JVM would be the same. In this case, an [hotspot=assertosname file=0]`assertEquals` assertion is made so that the `os.name` system property
-// for both JVMs is the same. You can write additional assertions to check for more values.
-
-=== Running the tests
-
-Run tests
-
-Navigate to the `restaurantBFF` directory, then verify that the tests pass by using the Maven `verify` goal:
-
-[role='command']
-```
-mvn verify
-```
-
-When the tests succeed, you see output similar to the following example:
-// Since you started Open Liberty in development mode at the start of the guide, press
-// `enter/return` key to run the tests. You will see the following output:
-
-// [source,role="no_copy"]
-// ----
-// -------------------------------------------------------
-//  T E S T S
-// -------------------------------------------------------
-// Running it.io.openliberty.guides.rest.EndpointIT
-// Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.884 sec - in it.io.openliberty.guides.rest.EndpointIT
-
-// Results :
-
-// Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
-// ----
-
-// To see whether the tests detect a failure, add an assertion that you know fails, or change the existing
-// assertion to a constant value that doesn't match the `os.name` system property.
-
-// When you are done checking out the service, exit development mode by typing `q` in the shell session where
-// you ran the server and then pressing the `enter/return` key.
 
 == Tearing down the environment
 
