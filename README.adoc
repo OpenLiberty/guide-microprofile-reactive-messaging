@@ -101,6 +101,13 @@ Open Liberty includes the liberty-kafka connector for sending and receiving me
 
 === Configuring the MicroProfile Reactive Messaging
 
+//File 0
+microprofile-config.properties
+[source, Text, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
+----
+
 Navigate to the `start` directory to begin. Most of the code is already provided for use.
 
 Each of the four microservices `order`, `kitchen`, `bar` and `servingWindow` contains `microprofile-config.properties`
@@ -113,14 +120,9 @@ file, which configures kafka connector with the MicroProfile Reactive Messaging 
 #microprofile-config.properties example from the order microservice.#
 `finish/order/src/main/resources/META-INF/microprofile-config.properties`
 ----
-microprofile-config.properties
-[source, Java, linenums, role='code_column hide_tags=copyright']
-----
-include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
-----
 
-`connector` is a special property in Reactive Messaging, which defines [hotspot=kafkaConfig]`liberty-kafka.bootstrap`. `bootstrap.servers`, `group.id`, `key.deserializer`, and `value.deserializer` are properties understood by the Kafka client API.
-Using these properties [hotspot=foodStream]`@Outgoing food` stream sends food as a String to the `foodTopic`. Similarly, [hotspot=bevStream]`@Outgoing beverage` sends it to the `beverageTopic`. [hotspot=updateStatus]`@Incoming updateStatus` reads the statuses from `statusTopic`.
+`connector` is a special property in Reactive Messaging, which defines [hotspot=kafkaConfig file=0]`liberty-kafka.bootstrap`. `bootstrap.servers`, `group.id`, `key.deserializer`, and `value.deserializer` are properties understood by the Kafka client API.
+Using these properties [hotspot=foodStream file=0]`@Outgoing food` stream sends food as a String to the `foodTopic`. Similarly, [hotspot=bevStream file=0]`@Outgoing beverage` sends it to the `beverageTopic`. [hotspot=updateStatus file=0]`@Incoming updateStatus` reads the statuses from `statusTopic`.
 
 Rest all the microservices use similar `microprofile-config.properties` configuration.
 
