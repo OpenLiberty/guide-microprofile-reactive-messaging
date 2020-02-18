@@ -66,6 +66,7 @@ public class OrderResource {
                 + beverageQueue.size() + " beverage orders in the queue.").build();
     }
 
+ // tag::postOrder[]
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -95,18 +96,24 @@ public class OrderResource {
 
         for (String foodItem : orderRequest.getFoodList()) {
             orderId = String.format("%04d", counter.incrementAndGet());
+         // tag::foodOrder[]
             newOrder = new Order(orderId, tableId,
                     Type.FOOD, foodItem, Status.NEW);
-
+         // end::foodOrder[]
+         // tag::orderQueue[]
             foodQueue.add(newOrder);
+         // end::orderQueue[]
         }
 
         for (String beverageItem : orderRequest.getBeverageList()) {
             orderId = String.format("%04d", counter.incrementAndGet());
+         // tag::beverageOrder[]
             newOrder = new Order(orderId, tableId,
                     Type.BEVERAGE, beverageItem, Status.NEW);
-
+         // end::beverageOrder[]
+         // tag::orderQueue[]
             beverageQueue.add(newOrder);
+         // end::orderQueue[]
         }
 
         return Response
@@ -114,6 +121,7 @@ public class OrderResource {
                 .entity(orderRequest)
                 .build();
     }
+ // end::postOrder[]
 
     // tag::OutgoingFood[]
     @Outgoing("food")
@@ -157,7 +165,7 @@ public class OrderResource {
             }
         });
     }
-    // tag::OutgoingBev[]
+    // end::OutgoingBev[]
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
