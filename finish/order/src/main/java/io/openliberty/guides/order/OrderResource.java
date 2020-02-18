@@ -100,9 +100,9 @@ public class OrderResource {
             newOrder = new Order(orderId, tableId,
                     Type.FOOD, foodItem, Status.NEW);
          // end::foodOrder[]
-         // tag::orderQueue[]
+         // tag::fOrderQueue[]
             foodQueue.add(newOrder);
-         // end::orderQueue[]
+         // end::fOrderQueue[]
         }
 
         for (String beverageItem : orderRequest.getBeverageList()) {
@@ -111,9 +111,9 @@ public class OrderResource {
             newOrder = new Order(orderId, tableId,
                     Type.BEVERAGE, beverageItem, Status.NEW);
          // end::beverageOrder[]
-         // tag::orderQueue[]
+         // tag::bOrderQueue[]
             beverageQueue.add(newOrder);
-         // end::orderQueue[]
+         // end::bOrderQueue[]
         }
 
         return Response

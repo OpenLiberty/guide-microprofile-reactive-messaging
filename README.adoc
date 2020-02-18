@@ -140,7 +140,7 @@ OrderResource.java
 include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.java[]
 ----
 
-`order` microservice creates an Order when the `POST` of the endpoint [hotspot=postOrder file=0]`/orders` is called. The [hotspot=postOrder file=0]`createOrder()` method creates an [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` Order and adds it to the respective [hotspot=orderQueue file=0]`Queue`. As soon as an Order is added to the Queue, the ReactiveMessaging implementation invokes [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` annotated methods and sends an Order to the `kafka` over the respective channel stream which we configured previously in `microprofile-config.properties`.
+`order` microservice creates an Order when the `POST` of the endpoint [hotspot=postOrder file=0]`/orders` is called. The [hotspot=postOrder file=0]`createOrder()` method creates an [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` Order and adds it to the respective [hotspot=fOrderQueue bOrderQueue file=0]`Queue`. As soon as an Order is added to the Queue, the ReactiveMessaging implementation invokes [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` annotated methods and sends an Order to the `kafka` over the respective channel stream which we configured previously in `microprofile-config.properties`.
 
 The [hotspot=IncomingStatus file=0]`@Incoming("updateStatus")` channel receives an updated Order statuses from the `kafka` which is being sent by `kitchen` or `bar` microservices.
 
