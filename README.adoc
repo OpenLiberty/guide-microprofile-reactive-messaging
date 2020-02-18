@@ -155,7 +155,7 @@ pom.xml
 include::finish/order/pom.xml[]
 ----
 
-- In order to develop the MicroProfile Reactive Messaging application using maven, the [hotspot=reactiveMessaging file=1]`microprofile-reactive-messaging-api` and [hotspot=kafka file=1]`kafka-clients` dependencies needs to be added in the pom.xml
+- In order to develop the MicroProfile Reactive Messaging application using maven, the [hotspot=reactiveMessaging file=1]`microprofile-reactive-messaging-api` and [hotspot=kafka file=1]`kafka-clients` dependencies needs to be added to the pom.xml
 
 === Building the Other microservices
 
