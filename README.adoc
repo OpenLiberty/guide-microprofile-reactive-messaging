@@ -121,7 +121,7 @@ include::finish/order/src/main/resources/META-INF/microprofile-config.properties
 
 `connector` is a special property in Reactive Messaging which defines which connector to use. `bootstrap.servers`, `group.id`, `key.deserializer`, and `value.deserializer` are properties understood by the Kafka client API.
 
-Here we define [hotspot=kafkaConfig]`liberty-kafka.bootstrap` to use local kafka. [hotspot=foodStream file=0]`@Outgoing food` stream sends food as a String to the `foodTopic`. Similarly [hotspot=bevStream file=0]`@Outgoing beverage` is sent to the `beverageTopic`. [hotspot=updateStatus file=0]`@Incoming updateStatus` reads the statuses from `statusTopic`.
+Here we define [hotspot=kafkaConfig]`liberty-kafka.bootstrap` to use local kafka. [hotspot=foodStream]`@Outgoing food` stream sends food as a String to the `foodTopic`. Similarly [hotspot=bevStream]`@Outgoing beverage` is sent to the `beverageTopic`. [hotspot=updateStatus]`@Incoming updateStatus` reads the statuses from `statusTopic`.
 
 Rest all the microservices use similar `microprofile-config.properties` configuration.
 
