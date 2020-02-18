@@ -83,7 +83,6 @@ include::{common-includes}/gitclone.adoc[]
 === Key Concepts
 
 *@Outgoing*
-
 Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute.
 
 *@Incoming*
