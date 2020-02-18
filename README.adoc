@@ -83,15 +83,19 @@ include::{common-includes}/gitclone.adoc[]
 === Key Concepts
 
 *@Outgoing*
+
 Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute.
 
 *@Incoming*
+
 Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute.
 
 *Channel*
+
 A channel is a name indicating which source or destination of messages is used. Channels are opaque Strings.
 
 *Connector*
+
 Reactive messaging uses Connectors to attach one end of a channel  and are configured using MicroProfile Config.
 Open Liberty includes the liberty-kafka connector for sending and receiving messages from an Apache Kafka broker.
 
