@@ -15,21 +15,57 @@ package io.openliberty.guides.restaurantbff;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.openliberty.guides.models.OrderRequest;
+import io.openliberty.guides.models.Type;
 import io.openliberty.guides.restaurantbff.client.OrderClient;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Set;
 
 @ApplicationScoped
 @Path("/orders")
 public class RestaurantBFFOrderResource {
 
     @Inject
-    private OrderClient orderClient;
+    private Validator validator;
+
+    @Inject
+    @ConfigProperty(name = "ORDER_SERVICE_HOSTNAME", defaultValue = "localhost")
+    private String hostname;
+
+    @Inject
+    @ConfigProperty(name = "ORDER_SERVICE_PORT", defaultValue = "9081")
+    private String port;
+
+    public static URI apiUri;
+    public static OrderClient orderClient;
+
+    public RestaurantBFFOrderResource(){
+        if (apiUri == null){
+            try {
+                apiUri = new URI("http://" + hostname + ":" + port);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+            orderClient = RestClientBuilder
+                    .newBuilder()
+                    .baseUri(apiUri)
+                    .build(OrderClient.class);
+        }
+    }
 
     @GET 
     @Produces(MediaType.APPLICATION_JSON)
@@ -56,6 +92,36 @@ public class RestaurantBFFOrderResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
     public Response createOrder(OrderRequest orderRequest){
-        return orderClient.createOrder(orderRequest);
+        //Validate OrderRequest object
+        Set<ConstraintViolation<OrderRequest>> violations =
+                validator.validate(orderRequest);
+
+        if (violations.size() > 0) {
+            JsonArrayBuilder messages = Json.createArrayBuilder();
+
+            for (ConstraintViolation<OrderRequest> v : violations) {
+                messages.add(v.getMessage());
+            }
+
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(messages.build().toString())
+                    .build();
+        }
+
+        String tableId = orderRequest.getTableID();
+
+        //Send individual order requests to the Order service through the client
+        for (String foodItem : orderRequest.getFoodList()) {
+            orderClient.createOrder(tableId, foodItem, Type.FOOD);
+        }
+
+        for (String beverageItem : orderRequest.getBeverageList()) {
+            orderClient.createOrder(tableId, beverageItem, Type.BEVERAGE);
+        }
+
+        return Response
+                .status(Response.Status.OK)
+                .build();
     }
 }
