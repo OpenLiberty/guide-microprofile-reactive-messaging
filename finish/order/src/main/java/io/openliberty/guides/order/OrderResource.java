@@ -13,12 +13,10 @@
 package io.openliberty.guides.order;
 
 import io.openliberty.guides.models.Order;
-import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.models.Status;
 import io.openliberty.guides.models.Type;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,12 +24,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -46,9 +40,6 @@ import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 public class OrderResource {
     @Inject
     private OrderManager manager;
-
-    @Inject
-    private Validator validator;
 
     private static Logger logger = Logger.getLogger(OrderResource.class.getName());
 
@@ -66,62 +57,31 @@ public class OrderResource {
                 + beverageQueue.size() + " beverage orders in the queue.").build();
     }
 
- // tag::postOrder[]
+    // tag::postOrder[]
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
-    public Response createOrder(OrderRequest orderRequest) {
-        // validate OrderRequest
-        Set<ConstraintViolation<OrderRequest>> violations = 
-                validator.validate(orderRequest);
+    public Response createOrder(String tableId, String item, Type type) {
+        //Create new Order object from request and filling missing fields
+        Order order = new Order(
+                String.format("%04d", counter.incrementAndGet()),
+                tableId,
+                type,
+                item,
+                Status.NEW);
 
-        if (violations.size() > 0) {
-            JsonArrayBuilder messages = Json.createArrayBuilder();
-
-            for (ConstraintViolation<OrderRequest> v : violations) {
-                messages.add(v.getMessage());
-            }
-
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(messages.build().toString())
-                    .build();
-        }
-
-        // Create individual Orders from OrderRequest
-        Order newOrder;
-        String orderId;
-        String tableId = orderRequest.getTableID();
-
-        for (String foodItem : orderRequest.getFoodList()) {
-            orderId = String.format("%04d", counter.incrementAndGet());
-         // tag::foodOrder[]
-            newOrder = new Order(orderId, tableId,
-                    Type.FOOD, foodItem, Status.NEW);
-         // end::foodOrder[]
-         // tag::fOrderQueue[]
-            foodQueue.add(newOrder);
-         // end::fOrderQueue[]
-        }
-
-        for (String beverageItem : orderRequest.getBeverageList()) {
-            orderId = String.format("%04d", counter.incrementAndGet());
-         // tag::beverageOrder[]
-            newOrder = new Order(orderId, tableId,
-                    Type.BEVERAGE, beverageItem, Status.NEW);
-         // end::beverageOrder[]
-         // tag::bOrderQueue[]
-            beverageQueue.add(newOrder);
-         // end::bOrderQueue[]
+        if(type == Type.FOOD){
+            foodQueue.add(order);
+        }else{
+            beverageQueue.add(order);
         }
 
         return Response
                 .status(Response.Status.OK)
-                .entity(orderRequest)
                 .build();
     }
- // end::postOrder[]
+    // end::postOrder[]
 
     // tag::OutgoingFood[]
     @Outgoing("food")
@@ -134,7 +94,7 @@ public class OrderResource {
                 Jsonb jsonb = JsonbBuilder.create();
                 String orderString = jsonb.toJson(order);
 
-                logger.info("Sending Order " + order.getOrderID() + " with a status of " 
+                logger.info("Sending Order " + order.getOrderId() + " with a status of "
                 + order.getStatus() + " to Kitchen: " + orderString);
 
                 return orderString;
@@ -157,7 +117,7 @@ public class OrderResource {
                 Jsonb jsonb = JsonbBuilder.create();
                 String orderString = jsonb.toJson(order);
 
-                logger.info("Sending Order " + order.getOrderID() + " with a status of " 
+                logger.info("Sending Order " + order.getOrderId() + " with a status of "
                 + order.getStatus() + " to Bar: " + orderString);
 
                 return orderString;
@@ -196,7 +156,7 @@ public class OrderResource {
                 .values()
                 .stream()
                 .filter(order -> (tableId == null) 
-                		|| order.getTableID().equals(tableId))
+                		|| order.getTableId().equals(tableId))
                 .collect(Collectors.toList());
 
         return Response
@@ -210,9 +170,9 @@ public class OrderResource {
     public void updateStatus(String orderString)  {
         Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
 
-        manager.updateStatus(order.getOrderID(), order.getStatus());
+        manager.updateStatus(order.getOrderId(), order.getStatus());
 
-        logger.info("Order " + order.getOrderID() + " status updated to "
+        logger.info("Order " + order.getOrderId() + " status updated to "
         + order.getStatus() + ": " + orderString);
     }
     // end::IncomingStatus[]
