@@ -130,7 +130,7 @@ Rest all the microservices use similar `microprofile-config.properties` configur
 
 The `order` microservice uses MicroProfile reactive messaging to send messages to `kitchen` and `bar` microservices over kafka.
 
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=0", subs="quotes"]
 ----
 #Replace the `OrderResource` class.#
 `order/src/main/java/io/openliberty/guides/order/OrderResource.java`
@@ -141,11 +141,17 @@ OrderResource.java
 include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.java[]
 ----
 
-`order` microservice creates an Order when the `POST` of the endpoint [hotspot=postOrder file=0]`/orders` is called. The [hotspot=postOrder file=0]`createOrder()` method creates an [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` Order and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`Queue`. As soon as an Order is added to the Queue, the ReactiveMessaging implementation invokes [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` annotated methods and sends an Order to the `kafka` over the respective channel stream, which we configured previously in `microprofile-config.properties`.
+microprofile-config.properties
+[source, Text, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
+----
+
+`order` microservice creates an Order when the `POST` of the endpoint [hotspot=postOrder file=0]`/orders` is called. The [hotspot=postOrder file=0]`createOrder()` method creates an [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` Order and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`Queue`. As soon as an Order is added to the Queue, the ReactiveMessaging implementation invokes [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` annotated methods and sends an Order to the `kafka` over the respective channel stream, which we configured previously in `microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` stream.
 
 The [hotspot=IncomingStatus file=0]`@Incoming("updateStatus")` channel receives an updated Order statuses from the `kafka` which is being sent by `kitchen` or `bar` microservices.
 
-[role="code_command hotspot file=1", subs="quotes"]
+[role="code_command hotspot file=2", subs="quotes"]
 ----
  #pom.xml configuration#
  `order/pom.xml`
@@ -156,7 +162,7 @@ pom.xml
 include::finish/order/pom.xml[]
 ----
 
-- In order to develop the MicroProfile Reactive Messaging application using maven, the [hotspot=reactiveMessaging file=1]`microprofile-reactive-messaging-api` and [hotspot=kafka file=1]`kafka-clients` dependencies needs to be added to the pom.xml
+- In order to develop the MicroProfile Reactive Messaging application using maven, the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api` and [hotspot=kafka file=2]`kafka-clients` dependencies needs to be added to the pom.xml
 
 === Building the Other microservices
 
