@@ -106,11 +106,11 @@ Navigate to the `start` directory to begin. Most of the code is already provided
 Each of the four microservices `order`, `kitchen`, `bar` and `servingWindow` contains `microprofile-config.properties`
 file, which configures kafka connector with the MicroProfile Reactive Messaging channels.
 
-Open Liberty includes the liberty-kafka connector for sending and receiving messages from an Apache Kafka broker.
+`Open Liberty` includes the `liberty-kafka` connector for sending and receiving messages from an Apache Kafka broker.
 
 [role="code_command hotspot", subs="quotes"]
 ----
-#microprofile-config.properties example from the kitchen microservice.#
+#microprofile-config.properties example from the order microservice.#
 `finish/order/src/main/resources/META-INF/microprofile-config.properties`
 ----
 microprofile-config.properties
@@ -121,7 +121,7 @@ include::finish/order/src/main/resources/META-INF/microprofile-config.properties
 
 `connector` is a special property in Reactive Messaging which defines which connector to use. `bootstrap.servers`, `group.id`, `key.deserializer`, and `value.deserializer` are properties understood by the Kafka client API.
 
-Here we define [hotspot=kafkaConfig file=0]`liberty-kafka.bootstrap` to use local kafka. [hotspot=foodStream file=0]`@Outgoing food` stream sends food as a String to the `foodTopic`. Similarly [hotspot=bevStream file=0]`@Outgoing beverage` is sent to the `beverageTopic`. [hotspot=updateStatus file=0]`@Incoming updateStatus` reads the statuses from `statusTopic`.
+Here we define [hotspot=kafkaConfig]`liberty-kafka.bootstrap` to use local kafka. [hotspot=foodStream file=0]`@Outgoing food` stream sends food as a String to the `foodTopic`. Similarly [hotspot=bevStream file=0]`@Outgoing beverage` is sent to the `beverageTopic`. [hotspot=updateStatus file=0]`@Incoming updateStatus` reads the statuses from `statusTopic`.
 
 Rest all the microservices use similar `microprofile-config.properties` configuration.
 
