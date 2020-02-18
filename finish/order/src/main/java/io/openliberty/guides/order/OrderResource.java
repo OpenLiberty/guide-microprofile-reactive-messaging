@@ -134,7 +134,8 @@ public class OrderResource {
                 Jsonb jsonb = JsonbBuilder.create();
                 String orderString = jsonb.toJson(order);
 
-                logger.info("Sending Order " + order.getOrderID() + " with a status of " + order.getStatus() + " to Kitchen: " + orderString);
+                logger.info("Sending Order " + order.getOrderID() + " with a status of " 
+                + order.getStatus() + " to Kitchen: " + orderString);
 
                 return orderString;
             } catch (Exception e) {
@@ -156,7 +157,8 @@ public class OrderResource {
                 Jsonb jsonb = JsonbBuilder.create();
                 String orderString = jsonb.toJson(order);
 
-                logger.info("Sending Order " + order.getOrderID() + " with a status of " + order.getStatus() + " to Bar: " + orderString);
+                logger.info("Sending Order " + order.getOrderID() + " with a status of " 
+                + order.getStatus() + " to Bar: " + orderString);
 
                 return orderString;
             } catch (Exception e) {
@@ -193,7 +195,8 @@ public class OrderResource {
         List<Order> ordersList = manager.getOrders()
                 .values()
                 .stream()
-                .filter(order -> (tableId == null) || order.getTableID().equals(tableId))
+                .filter(order -> (tableId == null) 
+                		|| order.getTableID().equals(tableId))
                 .collect(Collectors.toList());
 
         return Response
@@ -209,7 +212,8 @@ public class OrderResource {
 
         manager.updateStatus(order.getOrderID(), order.getStatus());
 
-        logger.info("Order " + order.getOrderID() + " status updated to " + order.getStatus() + ": " + orderString);
+        logger.info("Order " + order.getOrderID() + " status updated to "
+        + order.getStatus() + ": " + orderString);
     }
     // end::IncomingStatus[]
 }
