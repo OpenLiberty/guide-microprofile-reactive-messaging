@@ -33,6 +33,7 @@ public interface OrderClient {
     //Get list of Order objects, processed from the new order JSON by the Order API
     @GET
     @Tag(name = "Order")
+    @Produces(MediaType.APPLICATION_JSON)
     Response getOrders();
 
     //Get single order by orderId

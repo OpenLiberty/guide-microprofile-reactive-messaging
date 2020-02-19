@@ -113,7 +113,7 @@ public class RestaurantBFFOrderResource {
                     .build();
         }
 
-        String tableId = orderRequest.getTableID();
+        String tableId = orderRequest.getTableId();
 
         //Send individual order requests to the Order service through the client
         for (String foodItem : orderRequest.getFoodList()) {
