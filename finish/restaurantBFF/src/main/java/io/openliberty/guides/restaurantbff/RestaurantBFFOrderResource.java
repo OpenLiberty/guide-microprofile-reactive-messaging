@@ -23,6 +23,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.models.Type;
 import io.openliberty.guides.restaurantbff.client.OrderClient;
@@ -53,7 +54,7 @@ public class RestaurantBFFOrderResource {
     public static URI apiUri;
     public static OrderClient orderClient;
 
-    public RestaurantBFFOrderResource(){
+    private void buildUri(){
         if (apiUri == null){
             try {
                 apiUri = new URI("http://" + hostname + ":" + port);
@@ -76,6 +77,7 @@ public class RestaurantBFFOrderResource {
     @Tag(name = "Order",
             description = "Submitting and listing Orders")
     public Response getOrders(){ //TODO Return list of all orders, still have to figure out how to store orders
+        buildUri();
         return orderClient.getOrders();
     }
 
@@ -84,6 +86,7 @@ public class RestaurantBFFOrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
     public Response getSingleOrder(@PathParam("orderId") String orderId){
+        buildUri();
         return orderClient.getSingleOrder(orderId);
     }
 
@@ -92,6 +95,7 @@ public class RestaurantBFFOrderResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
     public Response createOrder(OrderRequest orderRequest){
+        buildUri();
         //Validate OrderRequest object
         Set<ConstraintViolation<OrderRequest>> violations =
                 validator.validate(orderRequest);
@@ -113,11 +117,13 @@ public class RestaurantBFFOrderResource {
 
         //Send individual order requests to the Order service through the client
         for (String foodItem : orderRequest.getFoodList()) {
-            orderClient.createOrder(tableId, foodItem, Type.FOOD);
+            Order order = new Order().setTableId(tableId).setItem(foodItem).setType(Type.FOOD);
+            orderClient.createOrder(order);
         }
 
         for (String beverageItem : orderRequest.getBeverageList()) {
-            orderClient.createOrder(tableId, beverageItem, Type.BEVERAGE);
+            Order order = new Order().setTableId(tableId).setItem(beverageItem).setType(Type.BEVERAGE);
+            orderClient.createOrder(order);
         }
 
         return Response

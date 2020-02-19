@@ -12,7 +12,8 @@
 // end::copyright[]
 package io.openliberty.guides.restaurantbff.client;
 
-import io.openliberty.guides.models.Type;
+import io.openliberty.guides.models.Order;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -25,15 +26,19 @@ public interface OrderClient {
 
     //Sends each order to Order API for processing
     @POST
-    Response createOrder(String tableId, String item, Type type);
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Tag(name = "Order")
+    Response createOrder(Order order);
 
     //Get list of Order objects, processed from the new order JSON by the Order API
     @GET
+    @Tag(name = "Order")
     Response getOrders();
 
     //Get single order by orderId
     @GET
     @Path("/{orderId}")
+    @Tag(name = "Order")
     Response getSingleOrder(@PathParam("orderId") String orderId);
 
 }

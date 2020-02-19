@@ -14,7 +14,6 @@ package io.openliberty.guides.order;
 
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
-import io.openliberty.guides.models.Type;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -62,19 +61,14 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
-    public Response createOrder(String tableId, String item, Type type) {
-        //Create new Order object from request and filling missing fields
-        Order order = new Order(
-                String.format("%04d", counter.incrementAndGet()),
-                tableId,
-                type,
-                item,
-                Status.NEW);
+    public Response createOrder(Order order) {
+        order.setOrderId(String.format("%04d", counter.incrementAndGet())).setStatus(Status.NEW);
 
-        if(type == Type.FOOD){
-            foodQueue.add(order);
-        }else{
-            beverageQueue.add(order);
+        switch(order.getType()){
+            case FOOD:
+                foodQueue.add(order);
+            case BEVERAGE:
+                beverageQueue.add(order);
         }
 
         return Response
