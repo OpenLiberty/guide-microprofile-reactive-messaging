@@ -56,6 +56,7 @@ public class KitchenResource {
                 + inProgress.size() + " orders in the queue.").build();
     }
 
+    // tag::initFoodOrder[]
     @Incoming("foodOrderConsume")
     @Outgoing("foodOrderPublishIntermediate")
     public CompletionStage<String> initFoodOrder(String newOrder) {
@@ -64,7 +65,9 @@ public class KitchenResource {
         logger.info(newOrder);
         return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
     }
+    // end::initFoodOrder[]
 
+    // tag::foodOrder[]
     @Outgoing("foodOrderPublish")
     public PublisherBuilder<String> sendReadyOrder() {
         return ReactiveStreams.generate(() -> {
@@ -82,6 +85,7 @@ public class KitchenResource {
             }
         });
     }
+    // end::foodOrder[]
     
     private CompletionStage<Order> prepareOrder(Order order) {
         return CompletableFuture.supplyAsync(() -> {
