@@ -42,10 +42,10 @@ public class RestaurantBFFServingWindowResource {
 
     //Completes a ready order of a particular orderId
     @POST
-    @Path("/{orderID}")
+    @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Serving Window")
-    public Response serveOrder(@PathParam("orderID") String orderID){
-        return servingWindowClient.serveOrder(orderID);
+    public Response serveOrder(@PathParam("orderId") String orderId){
+        return servingWindowClient.serveOrder(orderId);
     }
 }

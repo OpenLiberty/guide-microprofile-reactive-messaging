@@ -15,10 +15,7 @@ package io.openliberty.guides.restaurantbff.client;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -32,9 +29,9 @@ public interface ServingWindowClient {
     Response getReady2Serve();
 
     @POST
-    @Path("/{orderID}")
+    @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Serving Window")
-    Response serveOrder(String orderID);
+    Response serveOrder(@PathParam("orderId") String orderId);
 
 }
