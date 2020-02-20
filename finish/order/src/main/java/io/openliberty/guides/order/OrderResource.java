@@ -62,7 +62,8 @@ public class OrderResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
     public Response createOrder(Order order) {
-        order.setOrderId(String.format("%04d", counter.incrementAndGet())).setStatus(Status.NEW);
+        order.setOrderId(String.format("%04d", counter.incrementAndGet()))
+                .setStatus(Status.NEW);
 
         switch(order.getType()){
             case FOOD:
@@ -73,6 +74,7 @@ public class OrderResource {
 
         return Response
                 .status(Response.Status.OK)
+                .entity(order)
                 .build();
     }
     // end::postOrder[]

@@ -35,6 +35,7 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
+import java.util.concurrent.CompletionStage;
 
 @ApplicationScoped
 @Path("/orders")
@@ -76,7 +77,7 @@ public class RestaurantBFFOrderResource {
                     "and order details from the order database")
     @Tag(name = "Order",
             description = "Submitting and listing Orders")
-    public Response getOrders(){ //TODO Return list of all orders, still have to figure out how to store orders
+    public CompletionStage<Response> getOrders(){ //TODO Return list of all orders, still have to figure out how to store orders
         buildUri();
         return orderClient.getOrders();
     }
@@ -85,7 +86,7 @@ public class RestaurantBFFOrderResource {
     @Path("{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    public Response getSingleOrder(@PathParam("orderId") String orderId){
+    public CompletionStage<Response> getSingleOrder(@PathParam("orderId") String orderId){
         buildUri();
         return orderClient.getSingleOrder(orderId);
     }
@@ -94,7 +95,7 @@ public class RestaurantBFFOrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    public Response createOrder(OrderRequest orderRequest){
+    public CompletionStage<Response> createOrder(OrderRequest orderRequest){
         buildUri();
         //Validate OrderRequest object
         Set<ConstraintViolation<OrderRequest>> violations =
@@ -107,7 +108,7 @@ public class RestaurantBFFOrderResource {
                 messages.add(v.getMessage());
             }
 
-            return Response
+            return (CompletionStage<Response>) Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity(messages.build().toString())
                     .build();
@@ -126,8 +127,6 @@ public class RestaurantBFFOrderResource {
             orderClient.createOrder(order);
         }
 
-        return Response
-                .status(Response.Status.OK)
-                .build();
+        return orderClient.getOrders();
     }
 }
