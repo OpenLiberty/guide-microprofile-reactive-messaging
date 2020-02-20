@@ -256,8 +256,8 @@ Run the following commands to containerize the microservices:
 docker build -t order:1.0-SNAPSHOT order/.
 docker build -t kitchen:1.0-SNAPSHOT kitchen/.
 docker build -t bar:1.0-SNAPSHOT bar/.
-docker build -t servingWindow:1.0-SNAPSHOT servingWindow/.
-docker build -t restaurantBFF:1.0-SNAPSHOT restaurantBFF/.
+docker build -t servingwindow:1.0-SNAPSHOT servingWindow/.
+docker build -t restaurantbff:1.0-SNAPSHOT restaurantBFF/.
 ```
 
 Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
