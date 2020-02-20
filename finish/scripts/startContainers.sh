@@ -1,7 +1,10 @@
 #!/bin/bash
 
-KAFKA_SERVER=kafka:9092
+KAFKA_SERVER=kafka:9093
 NETWORK=reactive-app
+
+ORDER_SERVICE_URL="http://order:9081"
+SERVINGWINDOW_SERVICE_URL="http://servingwindow:9082"
 
 docker network create $NETWORK
 
@@ -15,7 +18,7 @@ docker run -d \
 docker run -d \
   -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 \
   -e ALLOW_PLAINTEXT_LISTENER=yes \
-  -e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
+  -e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9093 \
   --hostname=kafka \
   --network=$NETWORK \
   --name=kafka \
@@ -51,8 +54,8 @@ docker run -d \
   order:1.0-SNAPSHOT &
 
 docker run -d \
-  -e ORDER_SERVICE_URI="http://order:9081" \
-  -e SERVINGWINDOW_SERVICE_URI="http://servingwindow:9082" \
+  -e OrderClient_mp_rest_url=$ORDER_SERVICE_URL \
+  -e ServingWindow_mp_rest_url=$SERVINGWINDOW_SERVICE_URL \
   -p 9080:9080 \
   --network=$NETWORK \
   --name=restaurantbff \
