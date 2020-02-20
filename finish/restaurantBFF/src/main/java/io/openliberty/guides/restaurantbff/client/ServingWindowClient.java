@@ -12,62 +12,29 @@
 // end::copyright[]
 package io.openliberty.guides.restaurantbff.client;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@RequestScoped
-public class ServingWindowClient {
+@Path("/servingWindow")
+@RegisterRestClient(configKey = "SERVINGWINDOW_SERVICE_URI", baseUri = "http://localhost:9082")
+public interface ServingWindowClient {
 
-    @Inject
-    @ConfigProperty(name = "SERVINGWINDOW_SERVICE_HOSTNAME", defaultValue = "localhost")
-    private String hostname;
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Tag(name = "Serving Window")
+    Response getReady2Serve();
 
-    @Inject
-    @ConfigProperty(name = "SERVINGWINDOW_SERVICE_PORT", defaultValue = "9082")
-    private String port;
+    @POST
+    @Path("/{orderID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Tag(name = "Serving Window")
+    Response serveOrder(String orderID);
 
-    private WebTarget target;
-    private String baseUri;
-
-    public ServingWindowClient() {
-        this.target = null;
-    }
-
-    public Response getReady2Serve(){
-        return iBuilder(webTarget())
-                .get();
-    }
-
-    public Response serveOrder(String orderID){
-        return iBuilder(webTarget().path("complete/" + orderID))
-                .post(null);
-    }
-
-    private Invocation.Builder iBuilder(WebTarget target) {
-        return target
-                .request()
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-    }
-
-    //Sets target to endpoint provided by Order API
-    private WebTarget webTarget() {
-        if (this.target == null) {
-            baseUri = "http://" + hostname + ":" + port;
-
-            this.target = ClientBuilder
-                    .newClient()
-                    .target(baseUri)
-                    .path("/servingWindow");
-        }
-        return this.target;
-    }
 }

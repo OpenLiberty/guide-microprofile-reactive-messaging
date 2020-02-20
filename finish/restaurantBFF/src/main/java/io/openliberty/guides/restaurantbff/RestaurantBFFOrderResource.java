@@ -40,7 +40,7 @@ public class RestaurantBFFOrderResource {
     @Inject
     private Validator validator;
 
-    public static OrderClient orderClient;
+    private static OrderClient orderClient;
 
     @GET 
     @Produces(MediaType.APPLICATION_JSON)

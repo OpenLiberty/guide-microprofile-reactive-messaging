@@ -26,8 +26,7 @@ import javax.ws.rs.core.Response;
 @Path("/servingWindow")
 public class RestaurantBFFServingWindowResource {
 
-    @Inject
-    private ServingWindowClient servingWindowClient;
+    private static ServingWindowClient servingWindowClient;
 
     //Returns list of all ready orders
     @GET
@@ -40,7 +39,7 @@ public class RestaurantBFFServingWindowResource {
 
     //Completes a ready order of a particular orderId
     @POST
-    @Path("complete/{orderID}")
+    @Path("/{orderID}")
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Serving Window")
     public Response serveOrder(@PathParam("orderID") String orderID){

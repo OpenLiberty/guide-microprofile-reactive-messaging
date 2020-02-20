@@ -57,7 +57,7 @@ public class ServingWindowResource {
     }
 
     @POST
-    @Path("/complete/{orderId}")
+    @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response markOrderComplete(@PathParam("orderId") String orderId) {
         for (Order order : readyList ) {
