@@ -12,6 +12,8 @@
 // end::copyright[]
 package io.openliberty.guides.models;
 
+import java.util.Objects;
+
 public class Order {
     private String orderId;
     private String tableId;
@@ -78,6 +80,23 @@ public class Order {
     public Order setStatus(Status status) {
         this.status = status;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order)) return false;
+        Order order = (Order) o;
+        return Objects.equals(orderId, order.getOrderId())
+                && Objects.equals(tableId, order.getTableId())
+                && Objects.equals(type, order.getType())
+                && Objects.equals(item, order.getItem())
+                && Objects.equals(status, order.getStatus());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(orderId, tableId, type, item, status);
     }
     
 }

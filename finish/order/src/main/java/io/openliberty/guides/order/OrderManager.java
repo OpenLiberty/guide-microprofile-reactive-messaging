@@ -17,6 +17,7 @@ import io.openliberty.guides.models.Status;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -30,15 +31,16 @@ public class OrderManager {
     }
 
     public void updateStatus(String orderId, Status status) {
-        Order order = orders.get(orderId);
-        if (order != null) order.setStatus(status);
+        Optional<Order> order = getOrder(orderId);
+        if (order.isPresent()) order.get().setStatus(status);
     }
 
-    public Order getOrder(String orderId) {
-        return orders.get(orderId);
+    public Optional<Order> getOrder(String orderId) {
+        Order order = orders.get(orderId);
+        return Optional.ofNullable(order);
     }
 
     public Map<String, Order> getOrders() {
         return new TreeMap<>(orders);
     }
- }
+}

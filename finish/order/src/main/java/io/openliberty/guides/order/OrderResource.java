@@ -16,6 +16,7 @@ import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,9 +52,12 @@ public class OrderResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("status")
     public Response getStatus() {
-        return Response.ok().entity("The order service is running...\n"
-                + foodQueue.size() + " food orders in the queue.\n"
-                + beverageQueue.size() + " beverage orders in the queue.").build();
+        return Response
+                .status(Response.Status.OK)
+                .entity("The order service is running...\n"
+                    + foodQueue.size() + " food orders in the queue.\n"
+                    + beverageQueue.size() + " beverage orders in the queue.")
+                .build();
     }
 
     // tag::postOrder[]
@@ -65,11 +69,13 @@ public class OrderResource {
         order.setOrderId(String.format("%04d", counter.incrementAndGet()))
                 .setStatus(Status.NEW);
 
-        switch(order.getType()){
+        switch(order.getType()) {
             case FOOD:
                 foodQueue.add(order);
+                break;
             case BEVERAGE:
                 beverageQueue.add(order);
+                break;
         }
 
         return Response
@@ -129,18 +135,18 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{orderId}")
     public Response getOrder(@PathParam("orderId") String orderId) {
-        Order order = manager.getOrder(orderId);
+        Optional<Order> order = manager.getOrder(orderId);
 
-        if (order == null) {
+        if (order.isPresent()) {
             return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity("Order id does not exist.")
+                    .status(Response.Status.OK)
+                    .entity(order)
                     .build();
         }
 
         return Response
-                .status(Response.Status.OK)
-                .entity(order)
+                .status(Response.Status.NOT_FOUND)
+                .entity("Order id does not exist.")
                 .build();
     }
 
