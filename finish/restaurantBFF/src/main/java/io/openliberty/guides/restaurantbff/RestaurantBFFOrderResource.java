@@ -95,7 +95,7 @@ public class RestaurantBFFOrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    public CompletionStage<Response> createOrder(OrderRequest orderRequest){
+    public Response createOrder(OrderRequest orderRequest){
         buildUri();
         //Validate OrderRequest object
         Set<ConstraintViolation<OrderRequest>> violations =
@@ -108,7 +108,7 @@ public class RestaurantBFFOrderResource {
                 messages.add(v.getMessage());
             }
 
-            return (CompletionStage<Response>) Response
+            return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity(messages.build().toString())
                     .build();
@@ -127,6 +127,8 @@ public class RestaurantBFFOrderResource {
             orderClient.createOrder(order);
         }
 
-        return orderClient.getOrders();
+        return Response
+                .status(Response.Status.OK)
+                .build();
     }
 }
