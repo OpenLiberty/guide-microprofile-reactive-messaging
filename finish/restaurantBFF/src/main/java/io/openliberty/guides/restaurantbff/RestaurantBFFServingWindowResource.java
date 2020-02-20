@@ -14,6 +14,7 @@ package io.openliberty.guides.restaurantbff;
 
 import io.openliberty.guides.restaurantbff.client.ServingWindowClient;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,7 +27,9 @@ import javax.ws.rs.core.Response;
 @Path("/servingWindow")
 public class RestaurantBFFServingWindowResource {
 
-    private static ServingWindowClient servingWindowClient;
+    @Inject
+    @RestClient
+    private ServingWindowClient servingWindowClient;
 
     //Returns list of all ready orders
     @GET

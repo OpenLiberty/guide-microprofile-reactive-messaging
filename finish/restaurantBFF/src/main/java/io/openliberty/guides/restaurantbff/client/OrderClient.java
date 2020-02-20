@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 import java.util.concurrent.CompletionStage;
 
 @Path("/orders")
-@RegisterRestClient(configKey = "ORDER_SERVICE_URI", baseUri = "http://localhost:9081")
+@RegisterRestClient(configKey = "OrderClient", baseUri = "http://localhost:9081")
 public interface OrderClient {
 
     //Sends each order to Order API for processing

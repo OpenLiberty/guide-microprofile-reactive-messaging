@@ -23,7 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/servingWindow")
-@RegisterRestClient(configKey = "SERVINGWINDOW_SERVICE_URI", baseUri = "http://localhost:9082")
+@RegisterRestClient(configKey = "ServingWindowClient", baseUri = "http://localhost:9082")
 public interface ServingWindowClient {
 
     @GET

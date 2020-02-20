@@ -29,6 +29,7 @@ import io.openliberty.guides.models.Type;
 import io.openliberty.guides.restaurantbff.client.OrderClient;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
@@ -40,7 +41,9 @@ public class RestaurantBFFOrderResource {
     @Inject
     private Validator validator;
 
-    private static OrderClient orderClient;
+    @Inject
+    @RestClient
+    private OrderClient orderClient;
 
     @GET 
     @Produces(MediaType.APPLICATION_JSON)
@@ -50,7 +53,7 @@ public class RestaurantBFFOrderResource {
                     "and order details from the order database")
     @Tag(name = "Order",
             description = "Submitting and listing Orders")
-    public CompletionStage<Response> getOrders(){ //TODO Return list of all orders, still have to figure out how to store orders
+    public CompletionStage<Response> getOrders(){
         return orderClient.getOrders();
     }
 
