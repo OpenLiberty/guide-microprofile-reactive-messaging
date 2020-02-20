@@ -27,13 +27,9 @@ import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.models.Type;
 import io.openliberty.guides.restaurantbff.client.OrderClient;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 
@@ -44,30 +40,7 @@ public class RestaurantBFFOrderResource {
     @Inject
     private Validator validator;
 
-    @Inject
-    @ConfigProperty(name = "ORDER_SERVICE_HOSTNAME", defaultValue = "localhost")
-    private String hostname;
-
-    @Inject
-    @ConfigProperty(name = "ORDER_SERVICE_PORT", defaultValue = "9081")
-    private String port;
-
-    public static URI apiUri;
     public static OrderClient orderClient;
-
-    private void buildUri(){
-        if (apiUri == null){
-            try {
-                apiUri = new URI("http://" + hostname + ":" + port);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-            orderClient = RestClientBuilder
-                    .newBuilder()
-                    .baseUri(apiUri)
-                    .build(OrderClient.class);
-        }
-    }
 
     @GET 
     @Produces(MediaType.APPLICATION_JSON)
@@ -78,7 +51,6 @@ public class RestaurantBFFOrderResource {
     @Tag(name = "Order",
             description = "Submitting and listing Orders")
     public CompletionStage<Response> getOrders(){ //TODO Return list of all orders, still have to figure out how to store orders
-        buildUri();
         return orderClient.getOrders();
     }
 
@@ -87,17 +59,11 @@ public class RestaurantBFFOrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
     public CompletionStage<Response> getSingleOrder(@PathParam("orderId") String orderId){
-        buildUri();
         return orderClient.getSingleOrder(orderId);
     }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Tag(name = "Order")
-    public Response createOrder(OrderRequest orderRequest){
-        buildUri();
-        //Validate OrderRequest object
+    //OrderRequest object validator
+    private Response validate(OrderRequest orderRequest){
         Set<ConstraintViolation<OrderRequest>> violations =
                 validator.validate(orderRequest);
 
@@ -112,6 +78,20 @@ public class RestaurantBFFOrderResource {
                     .status(Response.Status.BAD_REQUEST)
                     .entity(messages.build().toString())
                     .build();
+        }
+        return null;
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Tag(name = "Order")
+    public Response createOrder(OrderRequest orderRequest){
+
+        //Validate OrderRequest object
+        Response validateResponse = validate(orderRequest);
+        if (validateResponse != null){
+            return validateResponse;
         }
 
         String tableId = orderRequest.getTableId();
