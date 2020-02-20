@@ -15,6 +15,7 @@ package io.openliberty.guides.restaurantbff.client;
 import io.openliberty.guides.models.Order;
 import org.eclipse.microprofile.faulttolerance.Asynchronous;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -22,6 +23,7 @@ import javax.ws.rs.core.Response;
 import java.util.concurrent.CompletionStage;
 
 @Path("/orders")
+@RegisterRestClient(configKey = "ORDER_SERVICE_URI", baseUri = "http://localhost:9081")
 public interface OrderClient {
 
     //Sends each order to Order API for processing

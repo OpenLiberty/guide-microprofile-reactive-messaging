@@ -3,9 +3,6 @@
 KAFKA_SERVER=kafka:9092
 NETWORK=reactive-app
 
-ORDER_SERVICE_PORT=9081
-SERVINGWINDOW_SERVICE_PORT=9082
-
 docker network create $NETWORK
 
 docker run -d \
@@ -54,10 +51,8 @@ docker run -d \
   order:1.0-SNAPSHOT &
 
 docker run -d \
-  -e ORDER_SERVICE_HOSTNAME="order" \
-  -e ORDER_SERVICE_PORT=$ORDER_SERVICE_PORT \
-  -e SERVINGWINDOW_SERVICE_HOSTNAME="servingwindow" \
-  -e SERVINGWINDOW_SERVICE_PORT=$SERVINGWINDOW_SERVICE_PORT \
+  -e ORDER_SERVICE_URI="http://order:9081" \
+  -e SERVINGWINDOW_SERVICE_URI="http://servingwindow:9082" \
   -p 9080:9080 \
   --network=$NETWORK \
   --name=restaurantbff \
