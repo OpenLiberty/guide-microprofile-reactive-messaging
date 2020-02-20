@@ -224,7 +224,7 @@ To get the service running, the Open Liberty server needs to be correctly config
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
- #Replace the bar server configuration file.#
+ #Replace the bar server.xml configuration file.#
  `bar/src/main/liberty/config/server.xml`
 ----
 server.xml
