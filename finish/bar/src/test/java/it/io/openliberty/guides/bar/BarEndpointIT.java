@@ -115,7 +115,7 @@ public class BarEndpointIT {
             for (ConsumerRecord<String, String> record : records) {
             	System.out.println(record.value());
 				order = jsonb.fromJson(record.value(), io.openliberty.guides.models.Order.class);
-				assertEquals("0001",order.getOrderID());
+				assertEquals("0001",order.getOrderId());
 				assertEquals(expectedStatus,order.getStatus());
 				recordsProcessed++;
             }

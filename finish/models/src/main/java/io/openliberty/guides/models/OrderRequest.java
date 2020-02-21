@@ -23,18 +23,18 @@ public class OrderRequest {
 
     @NotNull(message="Table ID is not specified!")
     @Pattern(regexp="^\\d+$", message="Table ID must be a non-negative number!")
-    private String tableID;
+    private String tableId;
 
     private ArrayList<@NotBlank(message="Food item name cannot be an empty string!") String> foodList = new ArrayList<>();
 
     private ArrayList<@NotBlank(message="Beverage item name cannot be an empty string!") String> beverageList = new ArrayList<>();
 
-    public String getTableID() {
-        return tableID;
+    public String getTableId() {
+        return tableId;
     }
 
-    public void setTableID(String tableID) {
-        this.tableID = tableID;
+    public void setTableId(String tableId) {
+        this.tableId = tableId;
     }
 
     public ArrayList<String> getFoodList() {

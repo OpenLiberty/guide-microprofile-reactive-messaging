@@ -26,7 +26,7 @@ public class OrderManager {
     private Map<String, Order> orders = Collections.synchronizedMap(new TreeMap<String, Order>());
 
     public void addOrder(Order order) {
-        orders.put(order.getOrderID(), order);
+        orders.put(order.getOrderId(), order);
     }
 
     public void updateStatus(String orderId, Status status) {

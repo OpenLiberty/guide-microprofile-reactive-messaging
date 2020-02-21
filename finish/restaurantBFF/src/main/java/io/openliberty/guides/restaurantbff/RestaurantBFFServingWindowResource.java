@@ -14,6 +14,7 @@ package io.openliberty.guides.restaurantbff;
 
 import io.openliberty.guides.restaurantbff.client.ServingWindowClient;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -27,6 +28,7 @@ import javax.ws.rs.core.Response;
 public class RestaurantBFFServingWindowResource {
 
     @Inject
+    @RestClient
     private ServingWindowClient servingWindowClient;
 
     //Returns list of all ready orders
@@ -40,10 +42,10 @@ public class RestaurantBFFServingWindowResource {
 
     //Completes a ready order of a particular orderId
     @POST
-    @Path("complete/{orderID}")
+    @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Serving Window")
-    public Response serveOrder(@PathParam("orderID") String orderID){
-        return servingWindowClient.serveOrder(orderID);
+    public Response serveOrder(@PathParam("orderId") String orderId){
+        return servingWindowClient.serveOrder(orderId);
     }
 }
