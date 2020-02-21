@@ -33,9 +33,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.util.Set;
 
-import java.util.Set;
-import java.util.concurrent.CompletionStage;
-
 @ApplicationScoped
 @Path("/orders")
 public class RestaurantBFFOrderResource {
@@ -63,7 +60,7 @@ public class RestaurantBFFOrderResource {
     @Path("{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    public CompletionStage<Response> getSingleOrder(@PathParam("orderId") String orderId){
+    public Response getSingleOrder(@PathParam("orderId") String orderId){
         return orderClient.getSingleOrder(orderId);
     }
 
