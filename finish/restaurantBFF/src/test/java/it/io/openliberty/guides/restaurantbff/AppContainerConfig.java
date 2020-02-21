@@ -47,11 +47,7 @@ public class AppContainerConfig implements SharedContainerConfiguration {
             .withReadinessPath("/api/servingWindow")
             .withNetwork(network)
             .withMpRestClient(OrderClient.class, "http://mock-server:" + MockServerContainer.PORT)
-            .withEnv("ORDER_SERVICE_HOSTNAME", "mock-server")
-            .withEnv("ORDER_SERVICE_PORT", String.valueOf(MockServerContainer.PORT))
-            .withMpRestClient(ServingWindowClient.class, "http://mock-server:" + MockServerContainer.PORT)
-            .withEnv("SERVINGWINDOW_SERVICE_HOSTNAME", "mock-server")
-            .withEnv("SERVINGWINDOW_SERVICE_PORT", String.valueOf(MockServerContainer.PORT));
+            .withMpRestClient(ServingWindowClient.class, "http://mock-server:" + MockServerContainer.PORT);
 
     @Override
     public void startContainers() {
