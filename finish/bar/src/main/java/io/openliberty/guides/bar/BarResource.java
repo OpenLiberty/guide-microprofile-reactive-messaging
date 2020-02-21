@@ -56,16 +56,24 @@ public class BarResource {
                  + inProgress.size() + " orders in the queue.").build();
     }
 
+    // tag::bevOrderConsume[]    
     @Incoming("bevOrderConsume")
+    // end::bevOrderConsume[]
+    // tag::bevOrderPublishInter[]
     @Outgoing("bevOrderPublishInter")
+    // end::bevOrderPublishInter[]
+    // tag::initBevOrder[]
     public CompletionStage<String> initBeverageOrder(String newOrder) {
         Order order = jsonb.fromJson(newOrder, Order.class);
         logger.info("Order " + order.getOrderId() + " received as NEW");
         logger.info(newOrder);
         return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
     }
+    // end::initBevOrder[]
 
+    // tag::bevOrder[]
     @Outgoing("beverageOrderPublish")
+    // end::bevOrder[]
     public PublisherBuilder<String> sendReadyOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -82,6 +90,7 @@ public class BarResource {
             }
         });
     }
+    
 
     private CompletionStage<Order> prepareOrder(Order order) {
         return CompletableFuture.supplyAsync(() -> {

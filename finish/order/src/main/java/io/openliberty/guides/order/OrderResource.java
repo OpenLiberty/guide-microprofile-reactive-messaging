@@ -90,7 +90,9 @@ public class OrderResource {
     public PublisherBuilder<String> sendFoodOrder() {
         return ReactiveStreams.generate(() -> {
             try {
+            	// tag::takeF[]
                 Order order = foodQueue.take();
+                // end::takeF[]
                 manager.addOrder(order);
 
                 Jsonb jsonb = JsonbBuilder.create();
@@ -113,7 +115,9 @@ public class OrderResource {
     public PublisherBuilder<String> sendBeverageOrder() {
         return ReactiveStreams.generate(() -> {
             try {
+            	// tag::takeB[]
                 Order order = beverageQueue.take();
+                // end::takeB[]
                 manager.addOrder(order);
 
                 Jsonb jsonb = JsonbBuilder.create();

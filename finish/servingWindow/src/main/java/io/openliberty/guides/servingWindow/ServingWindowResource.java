@@ -79,7 +79,9 @@ public class ServingWindowResource {
                 .build();
     }
 
+    // tag::addReadyOrder[]
     @Incoming("orderReady")
+    // end::addReadyOrder[]
     public void addReadyOrder(String readyOrder)  {
         Order order = JsonbBuilder.create().fromJson(readyOrder, Order.class);
         if (order.getStatus().equals(Status.READY)) {
@@ -88,8 +90,11 @@ public class ServingWindowResource {
             readyList.add(order);
         }
     }
-
+    
+    
+    // tag::sendCompletedOrder[]
     @Outgoing("completedOrder")
+    // end::sendCompletedOrder[]
     public PublisherBuilder<String> sendCompletedOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -100,5 +105,6 @@ public class ServingWindowResource {
             }
         });
     }
+    
 
 }
