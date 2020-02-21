@@ -93,7 +93,8 @@ public class OrderEndpointIT {
     public void testGetStatus() {
         Response response = orderResource.getStatus();
 
-        Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals(200, response.getStatus(),
+                "Response should be 200");
     }
 
     @Test
@@ -102,18 +103,25 @@ public class OrderEndpointIT {
         for (int i = 0; i < orderList.size(); i++) {
             Response res = orderResource.createOrder(orderList.get(i));
 
-            Assertions.assertEquals(200, res.getStatus());
+            Assertions.assertEquals(200, res.getStatus(),
+                    "Response should be 200");
 
             Order order = orderList.get(i);
             Order orderRes = res.readEntity(Order.class);
 
-            Assertions.assertEquals(order.getTableId(), orderRes.getTableId());
-            Assertions.assertEquals(order.getItem(), orderRes.getItem());
-            Assertions.assertEquals(order.getType(), orderRes.getType());
+            Assertions.assertEquals(order.getTableId(), orderRes.getTableId(),
+                    "Table Id from response does not match");
+            Assertions.assertEquals(order.getItem(), orderRes.getItem(),
+                    "Item from response does not match");
+            Assertions.assertEquals(order.getType(), orderRes.getType(),
+                    "Type from response does not match");
 
-            Assertions.assertTrue(orderRes.getOrderId() != null);
-            Assertions.assertTrue(orderRes.getStatus().equals(Status.NEW));
+            Assertions.assertTrue(orderRes.getOrderId() != null,
+                    "Order Id from response is null");
+            Assertions.assertEquals(orderRes.getStatus(), Status.NEW,
+                    "Status from response should be NEW");
 
+            // replace input order with response order (includes orderId and status)
             orderList.set(i, orderRes);
         }
 
@@ -127,10 +135,12 @@ public class OrderEndpointIT {
         Response response = orderResource.getOrdersList(null);
         ArrayList<Order> orders = response.readEntity(new GenericType<ArrayList<Order>>() {});
 
-        Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals(200, response.getStatus(),
+                "Response should be 200");
 
         for (Order order : orderList) {
-            Assertions.assertTrue(orders.contains(order));
+            Assertions.assertTrue(orders.contains(order),
+                    "Order " + order.getOrderId() + " not found in response");
         }
     }
 
@@ -142,11 +152,13 @@ public class OrderEndpointIT {
         Response response = orderResource.getOrdersList(tableId);
         ArrayList<Order> orders = response.readEntity(new GenericType<ArrayList<Order>>() {});
 
-        Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals(200, response.getStatus(),
+                "Response should be 200");
 
         for (Order order : orderList) {
             if (order.getTableId().equals(tableId))
-                Assertions.assertTrue(orders.contains(order));
+                Assertions.assertTrue(orders.contains(order),
+                        "Order " + order.getOrderId() + " not in found response");
         }
     }
 
@@ -157,15 +169,16 @@ public class OrderEndpointIT {
 
         Response response = orderResource.getOrder(order.getOrderId());
 
-        Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals(200, response.getStatus(),
+                "Response should be 200");
 
-        Assertions.assertTrue(order.equals(response.readEntity(Order.class)));
+        Assertions.assertEquals(order, response.readEntity(Order.class),
+                "Order " + order.getOrderId() + " from response does not match");
     }
 
     @Test
     @org.junit.jupiter.api.Order(6)
     public void testUpdateOrder() {
-        System.out.println("start6");
         Order order = orderList.get(0);
         order.setStatus(Status.IN_PROGRESS);
 
@@ -179,7 +192,8 @@ public class OrderEndpointIT {
 
         Response response = orderResource.getOrder(order.getOrderId());
 
-        Assertions.assertTrue(order.equals(response.readEntity(Order.class)));
+        Assertions.assertEquals(order, response.readEntity(Order.class),
+                "Order " + order.getOrderId() + " from response does not match");
     }
 
     @Test
@@ -187,7 +201,8 @@ public class OrderEndpointIT {
     public void testOrderDNE() {
         Response res = orderResource.getOrder("openliberty");
 
-        Assertions.assertEquals(404, res.getStatus());
+        Assertions.assertEquals(404, res.getStatus(),
+                "Response should be 404");
     }
 
     private void verify() {
@@ -208,6 +223,7 @@ public class OrderEndpointIT {
             elapsedTime = System.currentTimeMillis() - startTime;
         }
 
-        Assertions.assertTrue(recordsMatched == expectedRecords, "Unexpected records processed");
+        Assertions.assertTrue(recordsMatched == expectedRecords,
+                "Kafka did not receive orders correctly");
     }
 }
