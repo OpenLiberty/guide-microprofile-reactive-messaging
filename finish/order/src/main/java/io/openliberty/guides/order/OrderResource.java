@@ -66,9 +66,13 @@ public class OrderResource {
                 .setStatus(Status.NEW);
 
         switch(order.getType()){
+        	// tag::foodOrder[]
             case FOOD:
+           	// end::foodOrder[]
                 foodQueue.add(order);
+            // tag::beverageOrder[]
             case BEVERAGE:
+           	// end::beverageOrder[]
                 beverageQueue.add(order);
         }
 
