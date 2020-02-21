@@ -38,15 +38,13 @@ public interface OrderClient {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    @Asynchronous
-    CompletionStage<Response> getOrders();
+    Response getOrders();
 
     //Get single order by orderId
     @GET
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    @Asynchronous
-    CompletionStage<Response> getSingleOrder(@PathParam("orderId") String orderId);
+    Response getSingleOrder(@PathParam("orderId") String orderId);
 
 }

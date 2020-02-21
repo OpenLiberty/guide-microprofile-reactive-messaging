@@ -33,7 +33,7 @@ public class RestaurantBFFOrderEndpointIT {
     @Test
     @Order(1)
     public void testGetOrders() {
-        Response response = (Response) orderResource.getOrders();
+        Response response = orderResource.getOrders();
         assertEquals(response.getStatus(), 200);
         assertEquals(response.getHeaderString("Content-Type"), "application/json");
     }
@@ -41,7 +41,7 @@ public class RestaurantBFFOrderEndpointIT {
     @Test
     @Order(2)
     public void testGetSingleOrder() {
-        Response response = (Response) orderResource.getSingleOrder("0001");
+        Response response = orderResource.getSingleOrder("0001");
         assertEquals(response.getStatus(), 200);
         assertEquals(response.getHeaderString("Content-Type"), "application/json");
     }
