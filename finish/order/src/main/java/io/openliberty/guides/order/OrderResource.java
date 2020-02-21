@@ -78,7 +78,8 @@ public class OrderResource {
             case BEVERAGE:
                 beverageQueue.add(order);
                 break;
-
+        }
+        
         return Response
                 .status(Response.Status.OK)
                 .entity(order)
