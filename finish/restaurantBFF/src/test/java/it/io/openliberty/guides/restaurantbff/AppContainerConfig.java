@@ -81,7 +81,7 @@ public class AppContainerConfig implements SharedContainerConfiguration {
         if(foodList.isEmpty()){
             foodList.add("Pho");
             beverageList.add("Iced Tea");
-            orderRequest.setTableID("10");
+            orderRequest.setTableId("10");
             orderRequest.setFoodList(foodList);
             orderRequest.setBeverageList(beverageList);
         }

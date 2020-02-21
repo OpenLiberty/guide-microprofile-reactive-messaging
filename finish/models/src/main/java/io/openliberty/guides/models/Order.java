@@ -13,19 +13,19 @@
 package io.openliberty.guides.models;
 
 public class Order {
-    private String orderID;
-    private String tableID;
+    private String orderId;
+    private String tableId;
     private Type type;
     private String item;
     private Status status;
 
-    public Order(String orderID,
-                 String tableID,
+    public Order(String orderId,
+                 String tableId,
                  Type type,
                  String item,
                  Status status){
-        this.orderID = orderID;
-        this.tableID = tableID;
+        this.orderId = orderId;
+        this.tableId = tableId;
         this.type = type;
         this.item = item;
         this.status = status;
@@ -35,12 +35,12 @@ public class Order {
 
     }
 
-    public String getTableID() {
-        return tableID;
+    public String getTableId() {
+        return tableId;
     }
 
-    public Order setTableID(String tableID) {
-        this.tableID = tableID;
+    public Order setTableId(String tableId) {
+        this.tableId = tableId;
         return this;
     }
 
@@ -62,12 +62,12 @@ public class Order {
         return this;
     }
 
-    public String getOrderID() {
-        return orderID;
+    public String getOrderId() {
+        return orderId;
     }
 
-    public Order setOrderID(String orderID) {
-        this.orderID = orderID;
+    public Order setOrderId(String orderId) {
+        this.orderId = orderId;
         return this;
     }
 
