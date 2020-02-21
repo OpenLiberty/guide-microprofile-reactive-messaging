@@ -19,7 +19,12 @@ import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -65,7 +70,7 @@ public class RestaurantBFFOrderResource {
     }
 
     //OrderRequest object validator
-    private Response validate(OrderRequest orderRequest){
+    private Response validate(OrderRequest orderRequest) {
         Set<ConstraintViolation<OrderRequest>> violations =
                 validator.validate(orderRequest);
 
@@ -88,7 +93,7 @@ public class RestaurantBFFOrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    public Response createOrder(OrderRequest orderRequest){
+    public Response createOrder(OrderRequest orderRequest) {
 
         //Validate OrderRequest object
         Response validateResponse = validate(orderRequest);

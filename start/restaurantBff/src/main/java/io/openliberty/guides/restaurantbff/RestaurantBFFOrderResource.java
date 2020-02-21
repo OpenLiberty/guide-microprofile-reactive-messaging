@@ -15,20 +15,38 @@ package io.openliberty.guides.restaurantbff;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import javax.ws.rs.*;
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.OrderRequest;
+import io.openliberty.guides.models.Type;
 import io.openliberty.guides.restaurantbff.client.OrderClient;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+
+import java.util.Set;
 
 @ApplicationScoped
 @Path("/orders")
 public class RestaurantBFFOrderResource {
 
     @Inject
+    private Validator validator;
+
+    @Inject
+    @RestClient
     private OrderClient orderClient;
 
     @GET 
@@ -39,7 +57,7 @@ public class RestaurantBFFOrderResource {
                     "and order details from the order database")
     @Tag(name = "Order",
             description = "Submitting and listing Orders")
-    public Response getOrders(){ //TODO Return list of all orders, still have to figure out how to store orders
+    public Response getOrders(){
         return orderClient.getOrders();
     }
 
@@ -51,11 +69,53 @@ public class RestaurantBFFOrderResource {
         return orderClient.getSingleOrder(orderId);
     }
 
+    //OrderRequest object validator
+    private Response validate(OrderRequest orderRequest) {
+        Set<ConstraintViolation<OrderRequest>> violations =
+                validator.validate(orderRequest);
+
+        if (violations.size() > 0) {
+            JsonArrayBuilder messages = Json.createArrayBuilder();
+
+            for (ConstraintViolation<OrderRequest> v : violations) {
+                messages.add(v.getMessage());
+            }
+
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(messages.build().toString())
+                    .build();
+        }
+        return null;
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    public Response createOrder(OrderRequest orderRequest){
-        return orderClient.createOrder(orderRequest);
+    public Response createOrder(OrderRequest orderRequest) {
+
+        //Validate OrderRequest object
+        Response validateResponse = validate(orderRequest);
+        if (validateResponse != null){
+            return validateResponse;
+        }
+
+        String tableId = orderRequest.getTableId();
+
+        //Send individual order requests to the Order service through the client
+        for (String foodItem : orderRequest.getFoodList()) {
+            Order order = new Order().setTableId(tableId).setItem(foodItem).setType(Type.FOOD);
+            orderClient.createOrder(order);
+        }
+
+        for (String beverageItem : orderRequest.getBeverageList()) {
+            Order order = new Order().setTableId(tableId).setItem(beverageItem).setType(Type.BEVERAGE);
+            orderClient.createOrder(order);
+        }
+
+        return Response
+                .status(Response.Status.OK)
+                .build();
     }
 }

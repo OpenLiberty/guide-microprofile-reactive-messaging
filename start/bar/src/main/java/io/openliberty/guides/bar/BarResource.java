@@ -56,16 +56,13 @@ public class BarResource {
                  + inProgress.size() + " orders in the queue.").build();
     }
 
-    @Incoming("bevOrderConsume")
-    @Outgoing("bevOrderPublishInter")
     public CompletionStage<String> initBeverageOrder(String newOrder) {
         Order order = jsonb.fromJson(newOrder, Order.class);
-        logger.info("Order " + order.getOrderID() + " received as NEW");
+        logger.info("Order " + order.getOrderId() + " received as NEW");
         logger.info(newOrder);
         return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
     }
 
-    @Outgoing("beverageOrderPublish")
     public PublisherBuilder<String> sendReadyOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -73,7 +70,7 @@ public class BarResource {
                 prepare(5);
                 order.setStatus(Status.READY);
                 String orderString = jsonb.toJson(order);
-                logger.info("Order " + order.getOrderID() + " is READY");
+                logger.info("Order " + order.getOrderId() + " is READY");
                 logger.info(orderString);
                 return orderString;
             } catch (InterruptedException e) {
@@ -82,12 +79,13 @@ public class BarResource {
             }
         });
     }
+    
 
     private CompletionStage<Order> prepareOrder(Order order) {
         return CompletableFuture.supplyAsync(() -> {
             prepare(10);
             Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
-            logger.info("Order " + order.getOrderID() + " is IN PROGRESS");
+            logger.info("Order " + order.getOrderId() + " is IN PROGRESS");
             logger.info(jsonb.toJson(order));
             inProgress.add(inProgressOrder);
             return inProgressOrder;

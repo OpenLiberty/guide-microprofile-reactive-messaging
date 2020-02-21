@@ -28,7 +28,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -40,10 +46,11 @@ import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 @ApplicationScoped
 @Path("/orders")
 public class OrderResource {
-    @Inject
-    private OrderManager manager;
 
     private static Logger logger = Logger.getLogger(OrderResource.class.getName());
+
+    @Inject
+    private OrderManager manager;
 
     private BlockingQueue<Order> foodQueue = new LinkedBlockingQueue<>();
     private BlockingQueue<Order> beverageQueue = new LinkedBlockingQueue<>();
@@ -72,17 +79,17 @@ public class OrderResource {
                 .setStatus(Status.NEW);
 
         switch(order.getType()){
-        	  // tag::foodOrder[]
+            // tag::foodOrder[]
             case FOOD:
-           	// end::foodOrder[]
+            // end::foodOrder[]
                 // tag::fOrderQueue[]
                 foodQueue.add(order);
                 break;
                 // end::fOrderQueue[]
             // tag::beverageOrder[]
             case BEVERAGE:
-           	// end::beverageOrder[]
-            	  // tag::bOrderQueue[]
+            // end::beverageOrder[]
+                // tag::bOrderQueue[]
                 beverageQueue.add(order);
                 break;
                 // end::bOrderQueue[]
@@ -100,7 +107,7 @@ public class OrderResource {
     public PublisherBuilder<String> sendFoodOrder() {
         return ReactiveStreams.generate(() -> {
             try {
-            	// tag::takeF[]
+                // tag::takeF[]
                 Order order = foodQueue.take();
                 // end::takeF[]
                 manager.addOrder(order);
@@ -125,7 +132,7 @@ public class OrderResource {
     public PublisherBuilder<String> sendBeverageOrder() {
         return ReactiveStreams.generate(() -> {
             try {
-            	// tag::takeB[]
+                // tag::takeB[]
                 Order order = beverageQueue.take();
                 // end::takeB[]
                 manager.addOrder(order);
@@ -172,7 +179,7 @@ public class OrderResource {
                 .values()
                 .stream()
                 .filter(order -> (tableId == null) 
-                		|| order.getTableId().equals(tableId))
+                        || order.getTableId().equals(tableId))
                 .collect(Collectors.toList());
 
         return Response

@@ -6,9 +6,6 @@
     <feature>concurrent-1.0</feature>
     <feature>jsonb-1.0</feature>
     <feature>mpConfig-1.3</feature>
-    <!-- tag::featureMP[] -->
-    <feature>mpReactiveMessaging-1.0</feature>
-    <!-- end::featureMP[] -->
   </featureManager>
 
   <variable name="default.http.port" defaultValue="9084"/>

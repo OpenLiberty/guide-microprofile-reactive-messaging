@@ -34,16 +34,16 @@ public class RestaurantBFFServingWindowEndpointIT {
     @Order(1)
     public void testGetReady2Serve() {
         Response response = servingWindowResource.getReady2Serve();
-        assertEquals(response.getStatus(), 200);
-        assertEquals(response.getHeaderString("Content-Type"), "application/json");
+        assertEquals(200, response.getStatus());
+        assertEquals("application/json", response.getHeaderString("Content-Type"));
     }
 
     @Test
     @Order(2)
     public void testGetSingleOrder() {
         Response response = servingWindowResource.serveOrder("0001");
-        assertEquals(response.getStatus(), 200);
-        assertEquals(response.getHeaderString("Content-Type"), "application/json");
+        assertEquals(200, response.getStatus());
+        assertEquals("application/json", response.getHeaderString("Content-Type"));
     }
 
 }

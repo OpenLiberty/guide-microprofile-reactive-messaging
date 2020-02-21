@@ -14,6 +14,7 @@ package it.io.openliberty.guides.restaurantbff;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.restaurantbff.RestaurantBFFOrderResource;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -33,25 +34,31 @@ public class RestaurantBFFOrderEndpointIT {
     @Test
     @Order(1)
     public void testGetOrders() {
-        Response response = orderResource.getOrders();
-        assertEquals(response.getStatus(), 200);
-        assertEquals(response.getHeaderString("Content-Type"), "application/json");
+        Response response = (Response) orderResource.getOrders();
+        assertEquals(200, response.getStatus());
+        assertEquals("application/json", response.getHeaderString("Content-Type"));
     }
 
     @Test
     @Order(2)
     public void testGetSingleOrder() {
-        Response response = orderResource.getSingleOrder("0001");
-        assertEquals(response.getStatus(), 200);
-        assertEquals(response.getHeaderString("Content-Type"), "application/json");
+        Response response = (Response) orderResource.getSingleOrder("0001");
+        assertEquals(200, response.getStatus());
+        assertEquals("application/json", response.getHeaderString("Content-Type"));
     }
 
     @Test
     @Order(3)
     public void testCreateOrder() {
         Response response = orderResource.createOrder(AppContainerConfig.orderRequest);
-        assertEquals(response.getStatus(), 200);
-        assertEquals(response.getHeaderString("Content-Type"), "application/json");
+        assertEquals(200, response.getStatus());
+    }
+    
+    @Test
+    @Order(4)
+    public void testCreateInvalidOrder() {
+        Response response = orderResource.createOrder(new OrderRequest());
+        assertEquals(400, response.getStatus());
     }
 
 }

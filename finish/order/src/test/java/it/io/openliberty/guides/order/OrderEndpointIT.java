@@ -92,7 +92,6 @@ public class OrderEndpointIT {
     @org.junit.jupiter.api.Order(1)
     public void testGetStatus() {
         Response response = orderResource.getStatus();
-
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
     }
@@ -134,10 +133,8 @@ public class OrderEndpointIT {
     public void testGetOrderList() {
         Response response = orderResource.getOrdersList(null);
         ArrayList<Order> orders = response.readEntity(new GenericType<ArrayList<Order>>() {});
-
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
-
         for (Order order : orderList) {
             Assertions.assertTrue(orders.contains(order),
                     "Order " + order.getOrderId() + " not found in response");
@@ -148,13 +145,10 @@ public class OrderEndpointIT {
     @org.junit.jupiter.api.Order(4)
     public void testGetOrderListByTableId() {
         final String tableId = "0001";
-
         Response response = orderResource.getOrdersList(tableId);
         ArrayList<Order> orders = response.readEntity(new GenericType<ArrayList<Order>>() {});
-
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
-
         for (Order order : orderList) {
             if (order.getTableId().equals(tableId))
                 Assertions.assertTrue(orders.contains(order),
@@ -166,32 +160,22 @@ public class OrderEndpointIT {
     @org.junit.jupiter.api.Order(5)
     public void testGetOrder() {
         Order order = orderList.get(0);
-
         Response response = orderResource.getOrder(order.getOrderId());
-
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
-
         Assertions.assertEquals(order, response.readEntity(Order.class),
                 "Order " + order.getOrderId() + " from response does not match");
     }
 
     @Test
     @org.junit.jupiter.api.Order(6)
-    public void testUpdateOrder() {
+    public void testUpdateOrder() throws InterruptedException {
         Order order = orderList.get(0);
         order.setStatus(Status.IN_PROGRESS);
 
         producer.send(new ProducerRecord<>("statusTopic", jsonb.toJson(order)));
-
-        try {
-            Thread.sleep(1000);
-        } catch (Exception e) {
-
-        }
-
+        Thread.sleep(1000);
         Response response = orderResource.getOrder(order.getOrderId());
-
         Assertions.assertEquals(order, response.readEntity(Order.class),
                 "Order " + order.getOrderId() + " from response does not match");
     }
@@ -200,7 +184,6 @@ public class OrderEndpointIT {
     @org.junit.jupiter.api.Order(7)
     public void testOrderDNE() {
         Response res = orderResource.getOrder("openliberty");
-
         Assertions.assertEquals(404, res.getStatus(),
                 "Response should be 404");
     }
