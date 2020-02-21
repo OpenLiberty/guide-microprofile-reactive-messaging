@@ -16,7 +16,9 @@ import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
 
 import java.util.List;
+
 import java.util.Optional;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -76,7 +78,6 @@ public class OrderResource {
             case BEVERAGE:
                 beverageQueue.add(order);
                 break;
-        }
 
         return Response
                 .status(Response.Status.OK)

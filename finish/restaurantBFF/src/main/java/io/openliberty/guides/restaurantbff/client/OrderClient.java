@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 import java.util.concurrent.CompletionStage;
 
 @Path("/orders")
-@RegisterRestClient(configKey = "ORDER_SERVICE_URI", baseUri = "http://localhost:9081")
+@RegisterRestClient(configKey = "OrderClient", baseUri = "http://localhost:9081")
 public interface OrderClient {
 
     //Sends each order to Order API for processing
@@ -38,15 +38,13 @@ public interface OrderClient {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    @Asynchronous
-    CompletionStage<Response> getOrders();
+    Response getOrders();
 
     //Get single order by orderId
     @GET
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
-    @Asynchronous
-    CompletionStage<Response> getSingleOrder(@PathParam("orderId") String orderId);
+    Response getSingleOrder(@PathParam("orderId") String orderId);
 
 }
