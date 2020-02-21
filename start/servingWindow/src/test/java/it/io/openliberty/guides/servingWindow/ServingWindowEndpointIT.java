@@ -97,6 +97,13 @@ public class ServingWindowEndpointIT {
         verify(Status.COMPLETED);
     }
     
+    @Test
+    @Order(3)
+    public void testMarkOrderCompleteNotFound() throws InterruptedException {
+    	Response response = servingWindowResource.markOrderComplete("unknown");
+        Assertions.assertEquals(404, response.getStatus());
+    }
+    
     private int getReadyListSize() {
     	Response response = servingWindowResource.listContents();
     	return response.readEntity(ArrayList.class).size();

@@ -57,11 +57,11 @@ public class ServingWindowResource {
     }
 
     @POST
-    @Path("/complete/{orderId}")
+    @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response markOrderComplete(@PathParam("orderId") String orderId) {
         for (Order order : readyList ) {
-            if (order.getOrderID().equals(orderId)) {
+            if (order.getOrderId().equals(orderId)) {
                 order.setStatus(Status.COMPLETED);
                 logger.info("Order " + orderId + " is now COMPLETE");
                 logger.info(jsonb.toJson(order));
@@ -79,17 +79,15 @@ public class ServingWindowResource {
                 .build();
     }
 
-    @Incoming("orderReady")
     public void addReadyOrder(String readyOrder)  {
         Order order = JsonbBuilder.create().fromJson(readyOrder, Order.class);
         if (order.getStatus().equals(Status.READY)) {
-            logger.info("Order " + order.getOrderID() + " is READY to be completed");
+            logger.info("Order " + order.getOrderId() + " is READY to be completed");
             logger.info(readyOrder);
             readyList.add(order);
         }
     }
 
-    @Outgoing("completedOrder")
     public PublisherBuilder<String> sendCompletedOrder() {
         return ReactiveStreams.generate(() -> {
             try {

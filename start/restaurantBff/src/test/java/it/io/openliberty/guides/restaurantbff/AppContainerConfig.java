@@ -81,7 +81,7 @@ public class AppContainerConfig implements SharedContainerConfiguration {
         if(foodList.isEmpty()){
             foodList.add("Pho");
             beverageList.add("Iced Tea");
-            orderRequest.setTableID("10");
+            orderRequest.setTableId("10");
             orderRequest.setFoodList(foodList);
             orderRequest.setBeverageList(beverageList);
         }
@@ -91,7 +91,7 @@ public class AppContainerConfig implements SharedContainerConfiguration {
                 .when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/orders")
-                        .withBody("{\"beverageList\":[\"Iced Tea\"],\"foodList\":[\"Pho\"],\"tableID\":\"10\"}"))
+                        .withBody("{\"beverageList\":[\"Iced Tea\"],\"foodList\":[\"Pho\"],\"tableId\":\"10\"}"))
                 .respond(HttpResponse.response()
                         .withStatusCode(200)
                         .withHeader("Content-Type", "application/json"));
@@ -109,7 +109,7 @@ public class AppContainerConfig implements SharedContainerConfiguration {
         mockClient
                 .when(HttpRequest.request()
                         .withMethod("POST")
-                        .withPath("/servingWindow/complete/0001"))
+                        .withPath("/servingWindow/0001"))
                 .respond(HttpResponse.response()
                         .withStatusCode(200)
                         .withHeader("Content-Type", "application/json"));

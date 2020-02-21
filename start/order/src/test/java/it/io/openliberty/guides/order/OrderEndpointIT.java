@@ -12,7 +12,6 @@
 // end::copyright[]
 package it.io.openliberty.guides.order;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,26 +19,29 @@ import java.util.Properties;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
+import io.openliberty.guides.models.Type;
+import io.openliberty.guides.order.OrderResource;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
 
-import io.openliberty.guides.models.OrderRequest;
+import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
-import io.openliberty.guides.order.OrderResource;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
@@ -50,21 +52,28 @@ public class OrderEndpointIT {
 
     @RESTClient
     public static OrderResource orderResource;
-    
+
     private static KafkaProducer<String, String> producer;
     private static KafkaConsumer<String, String> consumer;
 
-    private static io.openliberty.guides.models.Order order;
+    private static ArrayList<Order> orderList = new ArrayList<Order>();
+
     private static Jsonb jsonb;
-    
+
     @BeforeAll
-    public static void setup() throws InterruptedException {
+    public static void setup() {
+        // init test data
+        orderList.add(new Order().setItem("Pizza").setType(Type.FOOD).setTableId("0001"));
+        orderList.add(new Order().setItem("Burger").setType(Type.FOOD).setTableId("0001"));
+        orderList.add(new Order().setItem("Coke").setType(Type.BEVERAGE).setTableId("0002"));
+
+        // init kafka producer & consumer
         String KAFKA_SERVER = AppContainerConfig.kafka.getBootstrapServers();
-        
+
         Properties properties = new Properties();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
-        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producer = new KafkaProducer<>(properties);
 
         properties = new Properties();
@@ -75,54 +84,129 @@ public class OrderEndpointIT {
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_RESET);
         consumer = new KafkaConsumer<>(properties);
         consumer.subscribe(Arrays.asList("foodTopic", "beverageTopic"));
-        
+
         jsonb = JsonbBuilder.create();
     }
 
     @Test
-    @Order(1)
+    @org.junit.jupiter.api.Order(1)
     public void testGetStatus() {
-    	Response response = orderResource.getStatus();
-    	Assertions.assertEquals(200, response.getStatus());
+        Response response = orderResource.getStatus();
+        Assertions.assertEquals(200, response.getStatus(),
+                "Response should be 200");
     }
 
     @Test
-    @Order(2)
-    public void testInitFoodOrder() throws IOException, InterruptedException {
+    @org.junit.jupiter.api.Order(2)
+    public void testInitFoodOrder() {
+        for (int i = 0; i < orderList.size(); i++) {
+            Response res = orderResource.createOrder(orderList.get(i));
 
-    	ArrayList<String> beverageList = new ArrayList<String>();
-        beverageList.add("Coke");
-        ArrayList<String> foodList = new ArrayList<String>();
-        foodList.add("Burger");
-        
-        OrderRequest orderRequest = new OrderRequest();
-        orderRequest.setTableID("1");
-		orderRequest.setBeverageList(beverageList);
-		orderRequest.setFoodList(foodList);
-		orderResource.createOrder(orderRequest);
+            Assertions.assertEquals(200, res.getStatus(),
+                    "Response should be 200");
 
-        verify(Status.NEW, 2);
+            Order order = orderList.get(i);
+            Order orderRes = res.readEntity(Order.class);
+
+            Assertions.assertEquals(order.getTableId(), orderRes.getTableId(),
+                    "Table Id from response does not match");
+            Assertions.assertEquals(order.getItem(), orderRes.getItem(),
+                    "Item from response does not match");
+            Assertions.assertEquals(order.getType(), orderRes.getType(),
+                    "Type from response does not match");
+
+            Assertions.assertTrue(orderRes.getOrderId() != null,
+                    "Order Id from response is null");
+            Assertions.assertEquals(orderRes.getStatus(), Status.NEW,
+                    "Status from response should be NEW");
+
+            // replace input order with response order (includes orderId and status)
+            orderList.set(i, orderRes);
+        }
+
+        // verify the order is sent correctly to kafka
+        verify();
     }
 
-    private void verify(Status expectedStatus, int expectedRecords) {
-        int recordsProcessed = 0;
+    @Test
+    @org.junit.jupiter.api.Order(3)
+    public void testGetOrderList() {
+        Response response = orderResource.getOrdersList(null);
+        ArrayList<Order> orders = response.readEntity(new GenericType<ArrayList<Order>>() {});
+        Assertions.assertEquals(200, response.getStatus(),
+                "Response should be 200");
+        for (Order order : orderList) {
+            Assertions.assertTrue(orders.contains(order),
+                    "Order " + order.getOrderId() + " not found in response");
+        }
+    }
+
+    @Test
+    @org.junit.jupiter.api.Order(4)
+    public void testGetOrderListByTableId() {
+        final String tableId = "0001";
+        Response response = orderResource.getOrdersList(tableId);
+        ArrayList<Order> orders = response.readEntity(new GenericType<ArrayList<Order>>() {});
+        Assertions.assertEquals(200, response.getStatus(),
+                "Response should be 200");
+        for (Order order : orderList) {
+            if (order.getTableId().equals(tableId))
+                Assertions.assertTrue(orders.contains(order),
+                        "Order " + order.getOrderId() + " not in found response");
+        }
+    }
+
+    @Test
+    @org.junit.jupiter.api.Order(5)
+    public void testGetOrder() {
+        Order order = orderList.get(0);
+        Response response = orderResource.getOrder(order.getOrderId());
+        Assertions.assertEquals(200, response.getStatus(),
+                "Response should be 200");
+        Assertions.assertEquals(order, response.readEntity(Order.class),
+                "Order " + order.getOrderId() + " from response does not match");
+    }
+
+    @Test
+    @org.junit.jupiter.api.Order(6)
+    public void testUpdateOrder() throws InterruptedException {
+        Order order = orderList.get(0);
+        order.setStatus(Status.IN_PROGRESS);
+
+        producer.send(new ProducerRecord<>("statusTopic", jsonb.toJson(order)));
+        Thread.sleep(1000);
+        Response response = orderResource.getOrder(order.getOrderId());
+        Assertions.assertEquals(order, response.readEntity(Order.class),
+                "Order " + order.getOrderId() + " from response does not match");
+    }
+
+    @Test
+    @org.junit.jupiter.api.Order(7)
+    public void testOrderDNE() {
+        Response res = orderResource.getOrder("openliberty");
+        Assertions.assertEquals(404, res.getStatus(),
+                "Response should be 404");
+    }
+
+    private void verify() {
+        int expectedRecords = orderList.size();
+        int recordsMatched = 0;
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
+        Order order;
 
-        while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
+        while (recordsMatched < expectedRecords && elapsedTime < POLL_TIMEOUT) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
-            System.out.println("Polled " + records.count() + " records from Kafka:");
             for (ConsumerRecord<String, String> record : records) {
-            	System.out.println(record.value());
-				order = jsonb.fromJson(record.value(), io.openliberty.guides.models.Order.class);
-				Assertions.assertEquals(expectedStatus,order.getStatus());
-				recordsProcessed++;
+                order = jsonb.fromJson(record.value(), Order.class);
+                if (orderList.contains(order))
+                    recordsMatched++;
             }
             consumer.commitAsync();
-            if (recordsProcessed > 0)
-            	break;
             elapsedTime = System.currentTimeMillis() - startTime;
         }
-        Assertions.assertTrue(recordsProcessed >= expectedRecords, "Less records processed");
+
+        Assertions.assertTrue(recordsMatched == expectedRecords,
+                "Kafka did not receive orders correctly");
     }
 }

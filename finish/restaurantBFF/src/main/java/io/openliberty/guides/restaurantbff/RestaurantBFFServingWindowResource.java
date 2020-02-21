@@ -18,8 +18,11 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -45,7 +48,7 @@ public class RestaurantBFFServingWindowResource {
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Serving Window")
-    public Response serveOrder(@PathParam("orderId") String orderId){
+    public Response serveOrder(@PathParam("orderId") String orderId) {
         return servingWindowClient.serveOrder(orderId);
     }
 }

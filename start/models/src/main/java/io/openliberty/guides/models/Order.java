@@ -12,20 +12,22 @@
 // end::copyright[]
 package io.openliberty.guides.models;
 
+import java.util.Objects;
+
 public class Order {
-    private String orderID;
-    private String tableID;
+    private String orderId;
+    private String tableId;
     private Type type;
     private String item;
     private Status status;
 
-    public Order(String orderID,
-                 String tableID,
+    public Order(String orderId,
+                 String tableId,
                  Type type,
                  String item,
                  Status status){
-        this.orderID = orderID;
-        this.tableID = tableID;
+        this.orderId = orderId;
+        this.tableId = tableId;
         this.type = type;
         this.item = item;
         this.status = status;
@@ -35,12 +37,12 @@ public class Order {
 
     }
 
-    public String getTableID() {
-        return tableID;
+    public String getTableId() {
+        return tableId;
     }
 
-    public Order setTableID(String tableID) {
-        this.tableID = tableID;
+    public Order setTableId(String tableId) {
+        this.tableId = tableId;
         return this;
     }
 
@@ -62,12 +64,12 @@ public class Order {
         return this;
     }
 
-    public String getOrderID() {
-        return orderID;
+    public String getOrderId() {
+        return orderId;
     }
 
-    public Order setOrderID(String orderID) {
-        this.orderID = orderID;
+    public Order setOrderId(String orderId) {
+        this.orderId = orderId;
         return this;
     }
 
@@ -78,6 +80,23 @@ public class Order {
     public Order setStatus(Status status) {
         this.status = status;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order)) return false;
+        Order order = (Order) o;
+        return Objects.equals(orderId, order.getOrderId())
+                && Objects.equals(tableId, order.getTableId())
+                && Objects.equals(type, order.getType())
+                && Objects.equals(item, order.getItem())
+                && Objects.equals(status, order.getStatus());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(orderId, tableId, type, item, status);
     }
     
 }
