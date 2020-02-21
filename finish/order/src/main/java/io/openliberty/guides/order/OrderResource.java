@@ -69,11 +69,15 @@ public class OrderResource {
         	// tag::foodOrder[]
             case FOOD:
            	// end::foodOrder[]
+            	// tag::fOrderQueue[]
                 foodQueue.add(order);
+                // end::fOrderQueue[]
             // tag::beverageOrder[]
             case BEVERAGE:
            	// end::beverageOrder[]
+            	// tag::bOrderQueue[]
                 beverageQueue.add(order);
+                // end::bOrderQueue[]
         }
 
         return Response
