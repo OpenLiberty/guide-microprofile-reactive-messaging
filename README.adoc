@@ -295,7 +295,7 @@ into the text box:
 [source, role='command']
 ----
 {
-  "tableID": "1",
+  "tableId": "1",
   "foodList": [
     "burger"
   ],
@@ -318,16 +318,16 @@ Click `Execute` and you will see the response with `IN_PROGRESS` status.
 [
   {
     "item": "burger",
-    "orderID": "0001",
+    "orderId": "0001",
     "status": "IN_PROGRESS",
-    "tableID": "1",
+    "tableId": "1",
     "type": "FOOD"
   },
   {
     "item": "coke",
-    "orderID": "0002",
+    "orderId": "0002",
     "status": "IN_PROGRESS",
-    "tableID": "1",
+    "tableId": "1",
     "type": "BEVERAGE"
   }
 ]
@@ -342,16 +342,16 @@ Click `Execute` again and you will see the response with `READY` status.
 [
   {
     "item": "burger",
-    "orderID": "0001",
+    "orderId": "0001",
     "status": "READY",
-    "tableID": "1",
+    "tableId": "1",
     "type": "FOOD"
   },
   {
     "item": "coke",
-    "orderID": "0002",
+    "orderId": "0002",
     "status": "READY",
-    "tableID": "1",
+    "tableId": "1",
     "type": "BEVERAGE"
   }
 ]
@@ -359,7 +359,7 @@ Click `Execute` again and you will see the response with `READY` status.
 
 *Complete an Order*
 
-Expand the `/api/servingWindow/complete/{orderID}` `POST` request to complete an Order and click *Try it out*. Copy the following example input
+Expand the `/api/servingWindow/{orderId}` `POST` request to complete an Order and click *Try it out*. Copy the following example input
 into the text box:
  
 [source, role='command']
@@ -372,23 +372,23 @@ Click `Execute` and you will receive the 200 response.
 
 Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
 
-Click `Execute` and you will see the response with `COMPLETED` status for `orderID 0002`. This updated status is cascaded to the `order` microservice.
+Click `Execute` and you will see the response with `COMPLETED` status for `orderId 0002`. This updated status is cascaded to the `order` microservice.
 
 [source, role='command']
 ----
 [
   {
     "item": "burger",
-    "orderID": "0001",
+    "orderId": "0001",
     "status": "IN_PROGRESS",
-    "tableID": "1",
+    "tableId": "1",
     "type": "FOOD"
   },
   {
     "item": "coke",
-    "orderID": "0002",
+    "orderId": "0002",
     "status": "COMPLETED",
-    "tableID": "1",
+    "tableId": "1",
     "type": "BEVERAGE"
   }
 ]
