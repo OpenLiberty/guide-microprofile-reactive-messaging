@@ -1,4 +1,4 @@
-//  Copyright (c) 2017, 2019 IBM Corporation and others.
+//  Copyright (c) 2020 IBM Corporation and others.
 // Licensed under Creative Commons Attribution-NoDerivatives
 // 4.0 International (CC BY-ND 4.0)
 //   https://creativecommons.org/licenses/by-nd/4.0/
@@ -15,7 +15,7 @@
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement reactive architecture application
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile', 'Jakarta EE', 'Microservices']
-:page-related-guides: []
+:page-related-guides: ['containerize']
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
 :page-seo-title: Creating a MicroProfile Reactive Messaging REST service
