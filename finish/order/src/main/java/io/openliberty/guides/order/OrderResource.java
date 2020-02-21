@@ -71,13 +71,21 @@ public class OrderResource {
         order.setOrderId(String.format("%04d", counter.incrementAndGet()))
                 .setStatus(Status.NEW);
 
-        switch(order.getType()) {
+        switch(order.getType()){
+        	  // tag::foodOrder[]
             case FOOD:
+           	// end::foodOrder[]
+                // tag::fOrderQueue[]
                 foodQueue.add(order);
                 break;
+                // end::fOrderQueue[]
+            // tag::beverageOrder[]
             case BEVERAGE:
+           	// end::beverageOrder[]
+            	  // tag::bOrderQueue[]
                 beverageQueue.add(order);
                 break;
+                // end::bOrderQueue[]
         }
         
         return Response
