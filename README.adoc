@@ -414,7 +414,7 @@ include::{common-includes}/os-tabs.adoc[]
 --
 [role='command']
 ```
-.\scripts\stopContainers.sh
+.\scripts\stopContainers.bat
 ```
 --
 
