@@ -249,7 +249,7 @@ mvn -pl models install
 mvn package
 ```
 
-Run the following command to download/update the `open-liberty` docker image to latest.
+Run the following command to download or update the `open-liberty` docker image to latest.
 [role='command']
 ```
 docker pull open-liberty
