@@ -249,6 +249,12 @@ mvn -pl models install
 mvn package
 ```
 
+Run the following command to download/update the `open-liberty` docker image to latest.
+[role='command']
+```
+docker pull open-liberty
+```
+
 Run the following commands to containerize the microservices:
 
 [role='command']
@@ -282,7 +288,7 @@ include::{common-includes}/os-tabs.adoc[]
 
 == Trying the application
 
-After waiting a while to allow the application completely started, you can access the application by making requests to the `restaurantBFF` endpoint using OpenAPI.
+After, waiting for a while to get the application completely started, you can access the application by making requests to the `restaurantBFF` endpoint using OpenAPI.
 
 The services take some time to become available. Check out the service that you created at the
 http://localhost:9080/openapi/ui[^] URL.
