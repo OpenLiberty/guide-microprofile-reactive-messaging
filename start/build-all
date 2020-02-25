@@ -1,7 +1,0 @@
-#!/bin/bash
-
-docker build -t job:1.0-SNAPSHOT -f job/Dockerfile job/
-docker build -t system:1.0-SNAPSHOT -f system/Dockerfile system/
-docker build -t inventory:1.0-SNAPSHOT -f inventory/Dockerfile inventory/
-docker build -t gateway:1.0-SNAPSHOT -f gateway/Dockerfile gateway/
-

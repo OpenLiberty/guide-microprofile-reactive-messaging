@@ -52,8 +52,8 @@ public class BarResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getStatus() {
-        return Response.ok().entity("The bar service is running...\n" 
-                 + inProgress.size() + " orders in the queue.").build();
+        return Response.ok().entity("The bar service is running...\n"
+                + inProgress.size() + " orders in the queue.").build();
     }
 
     // tag::bevOrderConsume[]    
@@ -90,7 +90,6 @@ public class BarResource {
             }
         });
     }
-    
 
     private CompletionStage<Order> prepareOrder(Order order) {
         return CompletableFuture.supplyAsync(() -> {

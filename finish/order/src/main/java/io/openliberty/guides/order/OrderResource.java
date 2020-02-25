@@ -74,6 +74,7 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
+    // tag::createOrder[]
     public Response createOrder(Order order) {
         order.setOrderId(String.format("%04d", counter.incrementAndGet()))
                 .setStatus(Status.NEW);
@@ -84,15 +85,15 @@ public class OrderResource {
             // end::foodOrder[]
                 // tag::fOrderQueue[]
                 foodQueue.add(order);
-                break;
                 // end::fOrderQueue[]
+                break;
             // tag::beverageOrder[]
             case BEVERAGE:
             // end::beverageOrder[]
                 // tag::bOrderQueue[]
                 beverageQueue.add(order);
-                break;
                 // end::bOrderQueue[]
+                break;
         }
         
         return Response
@@ -100,6 +101,7 @@ public class OrderResource {
                 .entity(order)
                 .build();
     }
+    // end::createOrder[]
     // end::postOrder[]
 
     // tag::OutgoingFood[]
