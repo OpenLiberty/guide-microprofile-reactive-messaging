@@ -191,7 +191,13 @@ public class OrderResource {
                 .entity(ordersList)
                 .build();
     }
-
+    
+    @POST
+    @Path("/reset")
+    public void reset() {
+        manager.resetOrder();
+    }
+    
     // tag::IncomingStatus[]
     @Incoming("updateStatus")
     public void updateStatus(String orderString)  {

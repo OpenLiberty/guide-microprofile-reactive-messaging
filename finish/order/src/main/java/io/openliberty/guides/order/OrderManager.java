@@ -24,23 +24,27 @@ import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class OrderManager {
-    private Map<String, Order> orders = Collections.synchronizedMap(new TreeMap<String, Order>());
+	private Map<String, Order> orders = Collections.synchronizedMap(new TreeMap<String, Order>());
 
-    public void addOrder(Order order) {
-        orders.put(order.getOrderId(), order);
-    }
+	public void addOrder(Order order) {
+		orders.put(order.getOrderId(), order);
+	}
 
-    public void updateStatus(String orderId, Status status) {
-        Optional<Order> order = getOrder(orderId);
-        if (order.isPresent()) order.get().setStatus(status);
-    }
+	public void updateStatus(String orderId, Status status) {
+		Optional<Order> order = getOrder(orderId);
+		if (order.isPresent()) order.get().setStatus(status);
+	}
 
-    public Optional<Order> getOrder(String orderId) {
-        Order order = orders.get(orderId);
-        return Optional.ofNullable(order);
-    }
+	public Optional<Order> getOrder(String orderId) {
+		Order order = orders.get(orderId);
+		return Optional.ofNullable(order);
+	}
 
-    public Map<String, Order> getOrders() {
-        return new TreeMap<>(orders);
-    }
+	public Map<String, Order> getOrders() {
+		return new TreeMap<>(orders);
+	}
+
+	public void resetOrder() {
+		orders.clear();
+	}
 }
