@@ -293,9 +293,8 @@ http://localhost:9080/openapi/ui[^] URL.
 
 *Place Orders*
 
-Expand the `/api/orders` `POST` request to post an Order and click *Try it out*. Copy the following example input
-into the text box:
- 
+Make a `POST` request to the `/api/orders` endpoint. To make this request, expand the `POST` endpoint on the UI, click the *Try it out button*. Copy the following example input into the text box, and then click the `Execute` button. The `POST` request adds a new `food` and `beverage` Order.
+
 [source, role='command']
 ----
 {
@@ -309,15 +308,11 @@ into the text box:
 }
 ----
 
-Click `Execute` and you will receive the 200 response.
-
 *Check IN_PROGRESS Order Status*
 
-Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
+Next, make a `GET` request to the `/api/orders` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response shows that the Orders have an `IN_PROGRESS` status.
 
-Click `Execute` and you will see the response with `IN_PROGRESS` status. 
-
-[source, role='command']
+[source, role="no_copy"]
 ----
 [
   {
@@ -339,9 +334,9 @@ Click `Execute` and you will see the response with `IN_PROGRESS` status.
 
 *Check READY Order Status*
 
-Click `Execute` again and you will see the response with `READY` status. 
+Click `Execute` again and you will see the response with a `READY` status. 
 
-[source, role='command']
+[source, role="no_copy"]
 ----
 [
   {
@@ -363,8 +358,7 @@ Click `Execute` again and you will see the response with `READY` status.
 
 *Complete an Order*
 
-Expand the `/api/servingWindow/{orderId}` `POST` request to complete an Order and click *Try it out*. Copy the following example input
-into the text box:
+Make a `POST` request to the `/api/servingWindow/{orderId}` endpoint to complete an Order. Expand the `POST` endpoint on the UI, click the *Try it out* button. Copy the following orderId into the text box, and then click the `Execute` button. The status for the `orderId 0002` is changed from `READY` to `COMPLETED` and the updated status is cascaded to the `order` microservice.
  
 [source, role='command']
 ----
@@ -372,13 +366,9 @@ into the text box:
 0002
 ----
 
-Click `Execute` and you will receive the 200 response.
+Then, make a `GET` request to the `/api/orders` endpoint again and verify that the status for the order with an `orderId` of `0002` is now labelled as `COMPLETED`.
 
-Now Expand the `/api/orders` `GET` request to get the Order status and click *Try it out*.
-
-Click `Execute` and you will see the response with `COMPLETED` status for `orderId 0002`. This updated status is cascaded to the `order` microservice.
-
-[source, role='command']
+[source, role="no_copy"]
 ----
 [
   {
