@@ -106,6 +106,7 @@ public class OrderResource {
 
     // tag::OutgoingFood[]
     @Outgoing("food")
+    // end::OutgoingFood[]
     public PublisherBuilder<String> sendFoodOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -127,10 +128,11 @@ public class OrderResource {
             }
         });
     }
-    // end::OutgoingFood[]
+
 
     // tag::OutgoingBev[]
     @Outgoing("beverage")
+    // end::OutgoingBev[]
     public PublisherBuilder<String> sendBeverageOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -152,7 +154,7 @@ public class OrderResource {
             }
         });
     }
-    // end::OutgoingBev[]
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
