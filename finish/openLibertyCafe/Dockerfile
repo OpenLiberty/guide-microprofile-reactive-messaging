@@ -8,13 +8,13 @@ LABEL \
   org.opencontainers.image.version="$VERSION" \
   org.opencontainers.image.revision="$REVISION" \
   vendor="Open Liberty" \
-  name="restaurantBFF" \
-  version="$VERSION=-$REVISION" \
-  summary="The restaurantBFF microservice from the MicroProfile Reactive Messaging guide" \
-  description="This image contains the restaurantBFF microservice running with the Open Liberty runtime."
+  name="openLibertyCafe" \
+  version="$VERSION-$REVISION" \
+  summary="The openLibertyCafe microservice from the MicroProfile Reactive Messaging guide" \
+  description="This image contains the openLibertyCafe microservice running with the Open Liberty runtime."
 
 COPY --chown=1001:0 src/main/liberty/config /config/
-COPY --chown=1001:0 target/restaurantBFF.war /config/apps
+COPY --chown=1001:0 target/openLibertyCafe.war /config/apps
 
 # It is recommended to run the configure.sh when build image for production.
 # RUN configure.sh
