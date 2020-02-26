@@ -10,6 +10,13 @@ set -euxo pipefail
 cd ../finish/
 
 ./scripts/packageApps.sh
+
+mvn -pl order verify
+mvn -pl bar verify
+mvn -pl kitchen verify
+mvn -pl servingWindow verify
+mvn -pl restaurantBFF verify
+
 ./scripts/buildImages.sh
 ./scripts/startContainers.sh
 
