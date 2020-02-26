@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.restaurantbff;
+package io.openliberty.guides.openlibertycafe;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -31,7 +31,7 @@ import javax.ws.rs.core.Response;
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.models.Type;
-import io.openliberty.guides.restaurantbff.client.OrderClient;
+import io.openliberty.guides.openlibertycafe.client.OrderClient;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -40,7 +40,7 @@ import java.util.Set;
 
 @ApplicationScoped
 @Path("/orders")
-public class RestaurantBFFOrderResource {
+public class OpenLibertyCafeOrderResource {
 
     @Inject
     private Validator validator;

@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.restaurantbff.client;
+package io.openliberty.guides.openlibertycafe.client;
 
 import io.openliberty.guides.models.Order;
 import org.eclipse.microprofile.faulttolerance.Asynchronous;

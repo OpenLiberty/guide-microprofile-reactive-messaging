@@ -10,9 +10,9 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.restaurantbff;
+package io.openliberty.guides.openlibertycafe;
 
-import io.openliberty.guides.restaurantbff.client.ServingWindowClient;
+import io.openliberty.guides.openlibertycafe.client.ServingWindowClient;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 
 @ApplicationScoped
 @Path("/servingWindow")
-public class RestaurantBFFServingWindowResource {
+public class OpenLibertyCafeServingWindowResource {
 
     @Inject
     @RestClient

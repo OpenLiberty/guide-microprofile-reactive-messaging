@@ -15,6 +15,6 @@
         <module>bar</module>
         <module>servingWindow</module>
         <module>order</module>
-        <module>restaurantBFF</module>
+        <module>openLibertyCafe</module>
     </modules>
 </project>

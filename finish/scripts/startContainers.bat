@@ -9,7 +9,7 @@ start /b scripts\startContainersBatScripts\kitchen.bat
 start /b scripts\startContainersBatScripts\bar.bat
 start /b scripts\startContainersBatScripts\servingWindow.bat
 start /b scripts\startContainersBatScripts\order.bat
-start /b scripts\startContainersBatScripts\restaurantBFF.bat
+start /b scripts\startContainersBatScripts\openLibertyCafe.bat
 
 TIMEOUT /t 1 /nobreak > NUL
 

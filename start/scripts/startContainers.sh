@@ -58,8 +58,8 @@ docker run -d \
   -e ServingWindowClient_mp_rest_url=$SERVINGWINDOW_SERVICE_URL \
   -p 9080:9080 \
   --network=$NETWORK \
-  --name=restaurantbff \
+  --name=openlibertycafe \
   --rm \
-  restaurantbff:1.0-SNAPSHOT &
+  openlibertycafe:1.0-SNAPSHOT &
   
 wait

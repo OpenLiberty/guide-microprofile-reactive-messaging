@@ -10,13 +10,13 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.restaurantbff;
+package io.openliberty.guides.openlibertycafe;
 
 // JAX-RS
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 @ApplicationPath("api")
-public class RestaurantBFFApplication extends Application {
+public class OpenLibertyCafeApplication extends Application {
 
 }
