@@ -7,8 +7,6 @@ set -euxo pipefail
 ##
 ##############################################################################
 
-cd ../finish/
-
 ./scripts/packageApps.sh
 
 mvn -pl order verify
