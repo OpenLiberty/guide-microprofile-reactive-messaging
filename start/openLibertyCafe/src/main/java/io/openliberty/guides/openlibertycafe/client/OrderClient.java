@@ -10,28 +10,41 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.restaurantbff.client;
+package io.openliberty.guides.openlibertycafe.client;
 
+import io.openliberty.guides.models.Order;
+import org.eclipse.microprofile.faulttolerance.Asynchronous;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.concurrent.CompletionStage;
 
-@Path("/servingWindow")
-@RegisterRestClient(configKey = "ServingWindowClient", baseUri = "http://localhost:9082")
-public interface ServingWindowClient {
+@Path("/orders")
+@RegisterRestClient(configKey = "OrderClient", baseUri = "http://localhost:9081")
+public interface OrderClient {
 
+    //Sends each order to Order API for processing
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Tag(name = "Order")
+    @Asynchronous
+    CompletionStage<Response> createOrder(Order order);
+
+    //Get list of Order objects, processed from the new order JSON by the Order API
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Tag(name = "Serving Window")
-    Response getReady2Serve();
+    @Tag(name = "Order")
+    Response getOrders();
 
-    @POST
+    //Get single order by orderId
+    @GET
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Tag(name = "Serving Window")
-    Response serveOrder(@PathParam("orderId") String orderId);
+    @Tag(name = "Order")
+    Response getSingleOrder(@PathParam("orderId") String orderId);
 
 }

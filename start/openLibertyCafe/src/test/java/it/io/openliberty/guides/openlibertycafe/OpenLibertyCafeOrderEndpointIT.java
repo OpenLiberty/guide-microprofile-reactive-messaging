@@ -10,12 +10,12 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package it.io.openliberty.guides.restaurantbff;
+package it.io.openliberty.guides.openlibertycafe;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.openliberty.guides.models.OrderRequest;
-import io.openliberty.guides.restaurantbff.RestaurantBFFOrderResource;
+import io.openliberty.guides.openlibertycafe.OpenLibertyCafeOrderResource;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.microshed.testing.SharedContainerConfig;
@@ -26,10 +26,10 @@ import javax.ws.rs.core.Response;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
-public class RestaurantBFFOrderEndpointIT {
+public class OpenLibertyCafeOrderEndpointIT {
 
     @RESTClient
-    public static RestaurantBFFOrderResource orderResource;
+    public static OpenLibertyCafeOrderResource orderResource;
 
     @Test
     @Order(1)

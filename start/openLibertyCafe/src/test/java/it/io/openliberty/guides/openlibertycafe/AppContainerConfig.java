@@ -10,11 +10,11 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package it.io.openliberty.guides.restaurantbff;
+package it.io.openliberty.guides.openlibertycafe;
 
 import io.openliberty.guides.models.OrderRequest;
-import io.openliberty.guides.restaurantbff.client.OrderClient;
-import io.openliberty.guides.restaurantbff.client.ServingWindowClient;
+import io.openliberty.guides.openlibertycafe.client.OrderClient;
+import io.openliberty.guides.openlibertycafe.client.ServingWindowClient;
 import org.microshed.testing.SharedContainerConfiguration;
 import org.microshed.testing.testcontainers.ApplicationContainer;
 import org.mockserver.client.MockServerClient;
