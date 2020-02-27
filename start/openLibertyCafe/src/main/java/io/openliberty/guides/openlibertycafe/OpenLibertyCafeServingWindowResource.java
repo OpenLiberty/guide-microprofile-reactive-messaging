@@ -51,8 +51,8 @@ public class OpenLibertyCafeServingWindowResource {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Tag
-    public Response reset(){
-        servingWindowClient.resetApp();
+    public Response resetServingWindow(){
+        servingWindowClient.resetServingWindow();
         return Response
                 .status(Response.Status.OK)
                 .build();

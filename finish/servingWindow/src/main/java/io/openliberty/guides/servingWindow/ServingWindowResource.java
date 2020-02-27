@@ -87,7 +87,6 @@ public class ServingWindowResource {
         }
     }
     
-    
     // tag::sendCompletedOrder[]
     @Outgoing("completedOrder")
     // end::sendCompletedOrder[]
@@ -103,12 +102,11 @@ public class ServingWindowResource {
     }
 
     @DELETE
-    public Response resetApp() {
+    public Response resetServingWindow() {
         readyList.clear();
         return Response
                 .status(Response.Status.OK)
                 .build();
     }
-    
 
 }

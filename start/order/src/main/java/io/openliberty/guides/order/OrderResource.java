@@ -189,7 +189,7 @@ public class OrderResource {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/")
-    public Response resetApp() {
+    public Response resetOrder() {
         return manager.resetOrder();
     }
 

@@ -58,8 +58,8 @@ public class OrderResource {
         return Response
                 .status(Response.Status.OK)
                 .entity("The order service is running...\n"
-                    + foodQueue.size() + " food orders in the queue.\n"
-                    + beverageQueue.size() + " beverage orders in the queue.")
+                        + foodQueue.size() + " food orders in the queue.\n"
+                        + beverageQueue.size() + " beverage orders in the queue.")
                 .build();
     }
 
@@ -76,20 +76,20 @@ public class OrderResource {
         switch(order.getType()){
             // tag::foodOrder[]
             case FOOD:
-            // end::foodOrder[]
+                // end::foodOrder[]
                 // tag::fOrderQueue[]
                 foodQueue.add(order);
                 // end::fOrderQueue[]
                 break;
             // tag::beverageOrder[]
             case BEVERAGE:
-            // end::beverageOrder[]
+                // end::beverageOrder[]
                 // tag::bOrderQueue[]
                 beverageQueue.add(order);
                 // end::bOrderQueue[]
                 break;
         }
-        
+
         return Response
                 .status(Response.Status.OK)
                 .entity(order)
@@ -113,7 +113,7 @@ public class OrderResource {
                 String orderString = jsonb.toJson(order);
 
                 logger.info("Sending Order " + order.getOrderId() + " with a status of "
-                + order.getStatus() + " to Kitchen: " + orderString);
+                        + order.getStatus() + " to Kitchen: " + orderString);
 
                 return orderString;
             } catch (Exception e) {
@@ -139,7 +139,7 @@ public class OrderResource {
                 String orderString = jsonb.toJson(order);
 
                 logger.info("Sending Order " + order.getOrderId() + " with a status of "
-                + order.getStatus() + " to Bar: " + orderString);
+                        + order.getStatus() + " to Bar: " + orderString);
 
                 return orderString;
             } catch (Exception e) {
@@ -176,7 +176,7 @@ public class OrderResource {
         List<Order> ordersList = manager.getOrders()
                 .values()
                 .stream()
-                .filter(order -> (tableId == null) 
+                .filter(order -> (tableId == null)
                         || order.getTableId().equals(tableId))
                 .collect(Collectors.toList());
 
@@ -185,14 +185,14 @@ public class OrderResource {
                 .entity(ordersList)
                 .build();
     }
-    
+
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/")
-    public Response resetApp() {
+    public Response resetOrder() {
         return manager.resetOrder();
     }
-    
+
     // tag::IncomingStatus[]
     @Incoming("updateStatus")
     public Response updateStatus(String orderString)  {
@@ -201,7 +201,7 @@ public class OrderResource {
         manager.updateStatus(order.getOrderId(), order.getStatus());
 
         logger.info("Order " + order.getOrderId() + " status updated to "
-        + order.getStatus() + ": " + orderString);
+                + order.getStatus() + ": " + orderString);
 
         return Response
                 .status(Response.Status.OK)

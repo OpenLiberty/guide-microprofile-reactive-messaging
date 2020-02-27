@@ -98,7 +98,7 @@ public class ServingWindowResource {
     }
 
     @DELETE
-    public Response resetApp() {
+    public Response resetServingWindow() {
         readyList.clear();
         return Response
                 .status(Response.Status.OK)

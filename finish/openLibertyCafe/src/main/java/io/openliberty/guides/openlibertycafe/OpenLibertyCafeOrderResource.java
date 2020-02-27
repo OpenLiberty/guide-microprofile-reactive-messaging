@@ -44,7 +44,7 @@ public class OpenLibertyCafeOrderResource {
     @RestClient
     private OrderClient orderClient;
 
-    @GET 
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "listAllOrders",
             summary = "Lists all of the submitted orders",
@@ -117,8 +117,8 @@ public class OpenLibertyCafeOrderResource {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Tag
-    public Response reset(){
-        orderClient.resetApp();
+    public Response resetOrder(){
+        orderClient.resetOrder();
         return Response
                 .status(Response.Status.OK)
                 .build();

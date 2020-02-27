@@ -117,8 +117,8 @@ public class OpenLibertyCafeOrderResource {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Tag
-    public Response reset(){
-        orderClient.resetApp();
+    public Response resetOrder(){
+        orderClient.resetOrder();
         return Response
                 .status(Response.Status.OK)
                 .build();

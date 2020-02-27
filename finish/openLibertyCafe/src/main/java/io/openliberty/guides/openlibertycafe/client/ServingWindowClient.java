@@ -36,6 +36,6 @@ public interface ServingWindowClient {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    Response resetApp();
+    Response resetServingWindow();
 
 }
