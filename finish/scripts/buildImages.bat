@@ -5,7 +5,7 @@ start /b scripts\buildImagesBatScripts\kitchen.bat
 start /b scripts\buildImagesBatScripts\bar.bat
 start /b scripts\buildImagesBatScripts\servingWindow.bat
 start /b scripts\buildImagesBatScripts\order.bat
-start /b scripts\buildImagesBatScripts\restaurantBFF.bat
+start /b scripts\buildImagesBatScripts\openLibertyCafe.bat
 
 TIMEOUT /t 1 /nobreak > NUL
 
