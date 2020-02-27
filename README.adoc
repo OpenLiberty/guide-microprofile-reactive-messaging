@@ -56,9 +56,9 @@ It communicates with the backend microservices on the caller's behalf.
 
 The waiter places a request using the `OpenLibertyCafe` microservice.
 
-The `Order` microservice consumes the request, produces Order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
+The `Order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
 
-An Order begins with a `NEW` status. The `Kitchen` and `Bar` microservices consume and process the Order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the Order processing time, and the status updates are reported back to the `Order` microservice via reactive messages on Kafka.
+An order begins with a `NEW` status. The `Kitchen` and `Bar` microservices consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `Order` microservice via reactive messages on Kafka.
 
 The `ServingWindow` microservice contains a list of all ready-to-serve food and beverages. It consumes these statuses from the `Kitchen` and `Bar` microservices.
 Once the Order is served, it’s marked as `COMPLETED` and the status is sent back to the `Order` microservice as a message.
@@ -146,7 +146,7 @@ microprofile-config.properties
 include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Order` microservice creates Orders when the [hotspot=postOrder file=0]`POST` request of the endpoint `/orders` is called. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` Orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`LinkedBlockingQueue`. As soon as an Order is added to the Queue, the [hotspot=takeF hotspot=takeB file=0]`take()` method retrieves and removes the Orders. The Reactive Messaging implementation generates Reactive Streams for those Orders and publishes it to Kafka over [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which we configured previously in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` stream. The [hotspot=IncomingStatus file=0]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=1]`microprofile-config.properties` receives updated Order statuses from the Kafka topic which is being sent by `Kitchen` or `Bar` microservices.
+The `Order` microservice creates orders when the [hotspot=postOrder file=0]`POST` request of the endpoint `/orders` is called. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`LinkedBlockingQueue`. As soon as an Order is added to the Queue, the [hotspot=takeF hotspot=takeB file=0]`take()` method retrieves and removes the orders. The Reactive Messaging implementation generates Reactive Streams for those orders and publishes it to Kafka over [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which we configured previously in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` stream. The [hotspot=IncomingStatus file=0]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=1]`microprofile-config.properties` receives updated order statuses from the Kafka topic which is being sent by `Kitchen` or `Bar` microservices.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
@@ -179,7 +179,7 @@ KitchenResource.java
 include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenResource.java[]
 ----
 
-If the order is a food, `Kitchen` service receives an Order on the [hotspot=foodOrderConsume file=0]`@Incoming("foodOrderConsume")` channel, processes it in [hotspot=initFoodOrder file=0]`initFoodOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=foodOrderPublishIntermediate file=0]`@Outgoing("foodOrderPublishIntermediate")` channel and a `READY` status on the [hotspot=foodOrder file=0]`@Outgoing("foodOrderPublish")` channel to Kafka over MicroProfile Reactive Messaging channels.
+If the order is a food, `Kitchen` service receives an order on the [hotspot=foodOrderConsume file=0]`@Incoming("foodOrderConsume")` channel, processes it in [hotspot=initFoodOrder file=0]`initFoodOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=foodOrderPublishIntermediate file=0]`@Outgoing("foodOrderPublishIntermediate")` channel and a `READY` status on the [hotspot=foodOrder file=0]`@Outgoing("foodOrderPublish")` channel to Kafka over MicroProfile Reactive Messaging channels.
 
 *Building the Bar microservice*
 
@@ -195,7 +195,7 @@ BarResource.java
 include::finish/bar/src/main/java/io/openliberty/guides/bar/BarResource.java[]
 ----
 
-If the order is a drink, `Bar` service receives an Order on the [hotspot=bevOrderConsume file=1]`@Incoming("bevOrderConsume")` channel, processes it in [hotspot=initBevOrder file=1]`initBeverageOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=bevOrderPublishInter file=1]`@Outgoing("bevOrderPublishInter")` channel and a `READY` status on the [hotspot=bevOrder file=1]`@Outgoing("beverageOrderPublish")` channel to Kafka over MicroProfile Reactive Messaging channels.
+If the order is a drink, `Bar` service receives an order on the [hotspot=bevOrderConsume file=1]`@Incoming("bevOrderConsume")` channel, processes it in [hotspot=initBevOrder file=1]`initBeverageOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=bevOrderPublishInter file=1]`@Outgoing("bevOrderPublishInter")` channel and a `READY` status on the [hotspot=bevOrder file=1]`@Outgoing("beverageOrderPublish")` channel to Kafka over MicroProfile Reactive Messaging channels.
 
 *Building the ServingWindow microservice*
 
@@ -211,8 +211,8 @@ ServingWindowResource.java
 include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java[]
 ----
 
-The `ServingWindow` microservice receives a `Ready` Order from the `Bar` and `Kitchen` microservices over the [hotspot=addReadyOrder file=2]`@Incoming("orderReady")` channel.
-Once the Order is served, it's marked as `COMPLETED` and the status is sent across to the `Order` microservice using the [hotspot=sendCompletedOrder file=2]`@Outgoing("completedOrder")` channel.
+The `ServingWindow` microservice receives a `Ready` order from the `Bar` and `Kitchen` microservices over the [hotspot=addReadyOrder file=2]`@Incoming("orderReady")` channel.
+Once the order is served, it's marked as `COMPLETED` and the status is sent across to the `Order` microservice using the [hotspot=sendCompletedOrder file=2]`@Outgoing("completedOrder")` channel.
 
 == Configuring the server
 
@@ -261,7 +261,7 @@ docker build -t order:1.0-SNAPSHOT order/.
 docker build -t kitchen:1.0-SNAPSHOT kitchen/.
 docker build -t bar:1.0-SNAPSHOT bar/.
 docker build -t servingwindow:1.0-SNAPSHOT servingWindow/.
-docker build -t restaurantbff:1.0-SNAPSHOT OpenLibertyCafe/.
+docker build -t openlibertycafe:1.0-SNAPSHOT openLibertyCafe/.
 ```
 
 Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
@@ -358,7 +358,7 @@ Click `Execute` again and you will see the response with a `READY` status.
 
 *Complete an Order*
 
-Make a `POST` request to the `/api/servingWindow/{orderId}` endpoint to complete an Order. Expand the `POST` endpoint on the UI, click the *Try it out* button. Copy the following orderId into the text box, and then click the `Execute` button. The status for the `orderId 0002` is changed from `READY` to `COMPLETED` and the updated status is cascaded to the `Order` microservice.
+Make a `POST` request to the `/api/servingWindow/{orderId}` endpoint to complete an order. Expand the `POST` endpoint on the UI, click the *Try it out* button. Copy the following orderId into the text box, and then click the `Execute` button. The status for the `orderId 0002` is changed from `READY` to `COMPLETED` and the updated status is cascaded to the `Order` microservice.
  
 [source, role='command']
 ----
