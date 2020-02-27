@@ -106,5 +106,11 @@ public class ServingWindowResource {
         });
     }
     
+    @POST
+    @Path("/reset")
+    public void reset() {
+    	readyList.clear();
+    }
+    
 
 }

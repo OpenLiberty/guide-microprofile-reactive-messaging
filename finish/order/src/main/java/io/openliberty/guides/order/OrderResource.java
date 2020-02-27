@@ -74,6 +74,7 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
+    // tag::createOrder[]
     public Response createOrder(Order order) {
         order.setOrderId(String.format("%04d", counter.incrementAndGet()))
                 .setStatus(Status.NEW);
@@ -84,15 +85,15 @@ public class OrderResource {
             // end::foodOrder[]
                 // tag::fOrderQueue[]
                 foodQueue.add(order);
-                break;
                 // end::fOrderQueue[]
+                break;
             // tag::beverageOrder[]
             case BEVERAGE:
             // end::beverageOrder[]
                 // tag::bOrderQueue[]
                 beverageQueue.add(order);
-                break;
                 // end::bOrderQueue[]
+                break;
         }
         
         return Response
@@ -100,10 +101,12 @@ public class OrderResource {
                 .entity(order)
                 .build();
     }
+    // end::createOrder[]
     // end::postOrder[]
 
     // tag::OutgoingFood[]
     @Outgoing("food")
+    // end::OutgoingFood[]
     public PublisherBuilder<String> sendFoodOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -125,10 +128,11 @@ public class OrderResource {
             }
         });
     }
-    // end::OutgoingFood[]
+
 
     // tag::OutgoingBev[]
     @Outgoing("beverage")
+    // end::OutgoingBev[]
     public PublisherBuilder<String> sendBeverageOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -150,7 +154,7 @@ public class OrderResource {
             }
         });
     }
-    // end::OutgoingBev[]
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -187,7 +191,13 @@ public class OrderResource {
                 .entity(ordersList)
                 .build();
     }
-
+    
+    @POST
+    @Path("/reset")
+    public void reset() {
+        manager.resetOrder();
+    }
+    
     // tag::IncomingStatus[]
     @Incoming("updateStatus")
     public void updateStatus(String orderString)  {
