@@ -21,11 +21,7 @@ import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -79,6 +75,7 @@ public class ServingWindowResource {
                 .build();
     }
 
+    @Incoming("orderReady")
     public void addReadyOrder(String readyOrder)  {
         Order order = JsonbBuilder.create().fromJson(readyOrder, Order.class);
         if (order.getStatus().equals(Status.READY)) {
@@ -88,6 +85,7 @@ public class ServingWindowResource {
         }
     }
 
+    @Outgoing("completedOrder")
     public PublisherBuilder<String> sendCompletedOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -98,5 +96,14 @@ public class ServingWindowResource {
             }
         });
     }
+
+    @DELETE
+    public Response resetApp() {
+        readyList.clear();
+        return Response
+                .status(Response.Status.OK)
+                .build();
+    }
+
 
 }

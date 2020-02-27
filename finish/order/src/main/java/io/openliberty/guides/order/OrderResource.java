@@ -28,13 +28,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -192,21 +186,26 @@ public class OrderResource {
                 .build();
     }
     
-    @POST
-    @Path("/reset")
-    public void reset() {
-        manager.resetOrder();
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/")
+    public Response resetApp() {
+        return manager.resetOrder();
     }
     
     // tag::IncomingStatus[]
     @Incoming("updateStatus")
-    public void updateStatus(String orderString)  {
+    public Response updateStatus(String orderString)  {
         Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
 
         manager.updateStatus(order.getOrderId(), order.getStatus());
 
         logger.info("Order " + order.getOrderId() + " status updated to "
         + order.getStatus() + ": " + orderString);
+
+        return Response
+                .status(Response.Status.OK)
+                .build();
     }
     // end::IncomingStatus[]
 }

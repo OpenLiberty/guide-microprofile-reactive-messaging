@@ -28,13 +28,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -64,44 +58,62 @@ public class OrderResource {
         return Response
                 .status(Response.Status.OK)
                 .entity("The order service is running...\n"
-                    + foodQueue.size() + " food orders in the queue.\n"
-                    + beverageQueue.size() + " beverage orders in the queue.")
+                        + foodQueue.size() + " food orders in the queue.\n"
+                        + beverageQueue.size() + " beverage orders in the queue.")
                 .build();
     }
 
+    // tag::postOrder[]
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
+    // tag::createOrder[]
     public Response createOrder(Order order) {
         order.setOrderId(String.format("%04d", counter.incrementAndGet()))
                 .setStatus(Status.NEW);
 
         switch(order.getType()){
+            // tag::foodOrder[]
             case FOOD:
+                // end::foodOrder[]
+                // tag::fOrderQueue[]
                 foodQueue.add(order);
+                // end::fOrderQueue[]
                 break;
+            // tag::beverageOrder[]
             case BEVERAGE:
+                // end::beverageOrder[]
+                // tag::bOrderQueue[]
                 beverageQueue.add(order);
+                // end::bOrderQueue[]
                 break;
         }
-        
+
         return Response
                 .status(Response.Status.OK)
                 .entity(order)
                 .build();
     }
+    // end::createOrder[]
+    // end::postOrder[]
+
+    // tag::OutgoingFood[]
+    @Outgoing("food")
+    // end::OutgoingFood[]
     public PublisherBuilder<String> sendFoodOrder() {
         return ReactiveStreams.generate(() -> {
             try {
+                // tag::takeF[]
                 Order order = foodQueue.take();
+                // end::takeF[]
                 manager.addOrder(order);
 
                 Jsonb jsonb = JsonbBuilder.create();
                 String orderString = jsonb.toJson(order);
 
                 logger.info("Sending Order " + order.getOrderId() + " with a status of "
-                + order.getStatus() + " to Kitchen: " + orderString);
+                        + order.getStatus() + " to Kitchen: " + orderString);
 
                 return orderString;
             } catch (Exception e) {
@@ -111,17 +123,23 @@ public class OrderResource {
         });
     }
 
+
+    // tag::OutgoingBev[]
+    @Outgoing("beverage")
+    // end::OutgoingBev[]
     public PublisherBuilder<String> sendBeverageOrder() {
         return ReactiveStreams.generate(() -> {
             try {
+                // tag::takeB[]
                 Order order = beverageQueue.take();
+                // end::takeB[]
                 manager.addOrder(order);
 
                 Jsonb jsonb = JsonbBuilder.create();
                 String orderString = jsonb.toJson(order);
 
                 logger.info("Sending Order " + order.getOrderId() + " with a status of "
-                + order.getStatus() + " to Bar: " + orderString);
+                        + order.getStatus() + " to Bar: " + orderString);
 
                 return orderString;
             } catch (Exception e) {
@@ -130,6 +148,7 @@ public class OrderResource {
             }
         });
     }
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -157,7 +176,7 @@ public class OrderResource {
         List<Order> ordersList = manager.getOrders()
                 .values()
                 .stream()
-                .filter(order -> (tableId == null) 
+                .filter(order -> (tableId == null)
                         || order.getTableId().equals(tableId))
                 .collect(Collectors.toList());
 
@@ -167,12 +186,26 @@ public class OrderResource {
                 .build();
     }
 
-    public void updateStatus(String orderString)  {
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/")
+    public Response resetApp() {
+        return manager.resetOrder();
+    }
+
+    // tag::IncomingStatus[]
+    @Incoming("updateStatus")
+    public Response updateStatus(String orderString)  {
         Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
 
         manager.updateStatus(order.getOrderId(), order.getStatus());
 
         logger.info("Order " + order.getOrderId() + " status updated to "
-        + order.getStatus() + ": " + orderString);
+                + order.getStatus() + ": " + orderString);
+
+        return Response
+                .status(Response.Status.OK)
+                .build();
     }
+    // end::IncomingStatus[]
 }

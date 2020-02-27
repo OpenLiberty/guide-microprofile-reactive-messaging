@@ -34,4 +34,8 @@ public interface ServingWindowClient {
     @Tag(name = "Serving Window")
     Response serveOrder(@PathParam("orderId") String orderId);
 
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    Response resetApp();
+
 }
