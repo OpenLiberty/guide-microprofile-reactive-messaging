@@ -13,17 +13,17 @@ mvn -pl order verify
 mvn -pl bar verify
 mvn -pl kitchen verify
 mvn -pl servingWindow verify
-mvn -pl restaurantBFF verify
+mvn -pl openLibertyCafe verify
 
 ./scripts/buildImages.sh
 ./scripts/startContainers.sh
 
 sleep 120
 
-bffOrderStatus="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/api/orders")"
-bffServingWindowStatus="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/api/servingWindow")"
+cafeOrderStatus="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/api/orders")"
+cafeServingWindowStatus="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/api/servingWindow")"
 
-if [ "$bffOrderStatus" == "200" ] && [ "$bffServingWindowStatus" == "200" ]
+if [ "$cafeOrderStatus" == "200" ] && [ "$cafeServingWindowStatus" == "200" ]
 then
   echo BFF OK
   
