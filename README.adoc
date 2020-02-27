@@ -9,7 +9,7 @@
 :projectid: microprofile-reactive-messaging
 :page-layout: guide-multipane
 :page-duration: 30 minutes
-:page-releasedate: 2020-01-15
+:page-releasedate: 2020-03-13
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
@@ -45,7 +45,7 @@ https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that ma
 === What is asynchronous programming?
 Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-The Restaurant application is designed with reactive architecture. The application that you'll be working with consists of five microservices : `Order`, `Kitchen`, `Bar`, `ServingWindow`, and `OpenLibertyCafe`. It also uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+The OpenLiberty Cafe application is designed with reactive architecture. The application that you'll be working with consists of five microservices : `Order`, `Kitchen`, `Bar`, `ServingWindow`, and `OpenLibertyCafe`. It also uses Kafka broker to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
 You'll update the `Order`, `Kitchen`, `Bar`, and `ServingWindow` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
@@ -150,8 +150,8 @@ The `Order` microservice creates orders when the [hotspot=postOrder file=0]`POST
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
- #Replace the Maven configuration file.#
- `order/pom.xml`
+#Replace the Maven configuration file.#
+`order/pom.xml`
 ---- 
 pom.xml
 [source, XML ,linenums,role="code_column"]
@@ -220,8 +220,8 @@ To get the service running, the Open Liberty server needs to be correctly config
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
- #Replace the bar server.xml configuration file.#
- `bar/src/main/liberty/config/server.xml`
+#Replace the bar server.xml configuration file.#
+`bar/src/main/liberty/config/server.xml`
 ----
 server.xml
 [source,xml,linenums,role="code_column"]
