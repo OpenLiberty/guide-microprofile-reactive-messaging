@@ -195,6 +195,7 @@ public class OrderResource {
 
     // tag::IncomingStatus[]
     @Incoming("updateStatus")
+    // end::IncomingStatus[]
     public Response updateStatus(String orderString)  {
         Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
 
