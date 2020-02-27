@@ -19,12 +19,7 @@ import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -49,7 +44,7 @@ public class OpenLibertyCafeOrderResource {
     @RestClient
     private OrderClient orderClient;
 
-    @GET 
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "listAllOrders",
             summary = "Lists all of the submitted orders",
@@ -114,6 +109,16 @@ public class OpenLibertyCafeOrderResource {
             orderClient.createOrder(order);
         }
 
+        return Response
+                .status(Response.Status.OK)
+                .build();
+    }
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Tag
+    public Response reset(){
+        orderClient.resetApp();
         return Response
                 .status(Response.Status.OK)
                 .build();

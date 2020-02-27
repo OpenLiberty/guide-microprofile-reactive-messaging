@@ -40,11 +40,21 @@ public interface OrderClient {
     @Tag(name = "Order")
     Response getOrders();
 
+    @GET
+    @Path("/status")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Tag(name = "Order")
+    Response getStatus();
+
     //Get single order by orderId
     @GET
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Tag(name = "Order")
     Response getSingleOrder(@PathParam("orderId") String orderId);
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    Response resetApp();
 
 }
