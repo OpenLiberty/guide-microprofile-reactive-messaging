@@ -22,8 +22,8 @@ import org.testcontainers.junit.jupiter.Container;
 
 public class AppContainerConfig implements SharedContainerConfiguration {
 
-	private static Network network = Network.newNetwork();
-	
+    private static Network network = Network.newNetwork();
+    
     @Container
     public static KafkaContainer kafka = new KafkaContainer()
         .withNetwork(network);
@@ -39,15 +39,15 @@ public class AppContainerConfig implements SharedContainerConfiguration {
     public void startContainers() {
         if (ApplicationEnvironment.Resolver.load().getClass() == HollowTestcontainersConfiguration.class) {
             // Run in dev mode. 
-        	// The application talks to KafkaContainer from outside of the Docker network,
-        	// and it can talk to kafka directly on 9093. 
-        	// The MicroProfile configure should define as following:
+            // The application talks to KafkaContainer from outside of the Docker network,
+            // and it can talk to kafka directly on 9093. 
+            // The MicroProfile configure should define as following:
             // mp.messaging.connector.liberty-kafka.bootstrap.servers=localhost:9093
         } else {
             // Run by maven verify goal.
-        	// The application talks to KafkaContainer within Docker network, 
-        	// and it need to talk to the broker on port 9092
-        	kafka.withNetworkAliases("kafka");
+            // The application talks to KafkaContainer within Docker network, 
+            // and it need to talk to the broker on port 9092
+            kafka.withNetworkAliases("kafka");
             app.withEnv("MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS", "kafka:9092");
         }
         kafka.start();

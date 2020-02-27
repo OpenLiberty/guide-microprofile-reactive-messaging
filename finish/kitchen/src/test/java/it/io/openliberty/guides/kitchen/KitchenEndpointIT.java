@@ -82,15 +82,15 @@ public class KitchenEndpointIT {
     @Test
     @Order(1)
     public void testGetStatus() {
-    	Response response = kitchenResource.getStatus();
+        Response response = kitchenResource.getStatus();
         assertEquals(200, response.getStatus());
     }
 
     @Test
     @Order(2)
     public void testInitFoodOrder() throws IOException, InterruptedException {
-    	order = new io.openliberty.guides.models.Order("0001", "1", Type.FOOD, "burger", Status.NEW);
-    	String jOrder = JsonbBuilder.create().toJson(order);
+        order = new io.openliberty.guides.models.Order("0001", "1", Type.FOOD, "burger", Status.NEW);
+        String jOrder = JsonbBuilder.create().toJson(order);
         producer.send(new ProducerRecord<String, String>("foodTopic", jOrder));
         verify(Status.IN_PROGRESS);
     }
@@ -98,7 +98,7 @@ public class KitchenEndpointIT {
     @Test
     @Order(3)
     public void testFoodOrderReady() throws IOException, InterruptedException {
-    	Thread.sleep(10000);
+        Thread.sleep(10000);
         verify(Status.READY);
     }
     
@@ -111,7 +111,7 @@ public class KitchenEndpointIT {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
             System.out.println("Polled " + records.count() + " records from Kafka:");
             for (ConsumerRecord<String, String> record : records) {
-            	System.out.println(record.value());
+                System.out.println(record.value());
                 order = jsonb.fromJson(record.value(), io.openliberty.guides.models.Order.class);
                 assertEquals("0001",order.getOrderId());
                 assertEquals(expectedStatus,order.getStatus());

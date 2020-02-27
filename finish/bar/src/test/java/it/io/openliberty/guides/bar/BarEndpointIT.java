@@ -84,15 +84,15 @@ public class BarEndpointIT {
     @Test
     @Order(1)
     public void testGetStatus() {
-    	Response response = barResource.getStatus();
+        Response response = barResource.getStatus();
         assertEquals(200, response.getStatus());
     }
 
     @Test
     @Order(2)
     public void testInitBeverageOrder() throws IOException, InterruptedException {
-    	order = new io.openliberty.guides.models.Order("0001", "1", Type.BEVERAGE, "Coke", Status.NEW);
-    	String jOrder = JsonbBuilder.create().toJson(order);
+        order = new io.openliberty.guides.models.Order("0001", "1", Type.BEVERAGE, "Coke", Status.NEW);
+        String jOrder = JsonbBuilder.create().toJson(order);
         producer.send(new ProducerRecord<String, String>("beverageTopic", jOrder));
         verify(Status.IN_PROGRESS);
     }
@@ -100,8 +100,8 @@ public class BarEndpointIT {
     @Test
     @Order(3)
     public void testFoodOrderReady() throws IOException, InterruptedException {
-    	Thread.sleep(10000);
-    	verify(Status.READY);
+        Thread.sleep(10000);
+        verify(Status.READY);
     }
     
     private void verify(Status expectedStatus) {
@@ -113,15 +113,15 @@ public class BarEndpointIT {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
             System.out.println("Polled " + records.count() + " records from Kafka:");
             for (ConsumerRecord<String, String> record : records) {
-            	System.out.println(record.value());
-				order = jsonb.fromJson(record.value(), io.openliberty.guides.models.Order.class);
-				assertEquals("0001",order.getOrderId());
-				assertEquals(expectedStatus,order.getStatus());
-				recordsProcessed++;
+                System.out.println(record.value());
+                order = jsonb.fromJson(record.value(), io.openliberty.guides.models.Order.class);
+                assertEquals("0001",order.getOrderId());
+                assertEquals(expectedStatus,order.getStatus());
+                recordsProcessed++;
             }
             consumer.commitAsync();
             if (recordsProcessed > 0)
-            	break;
+                break;
             elapsedTime = System.currentTimeMillis() - startTime;
         }
         assertTrue(recordsProcessed > 0, "No records processed");

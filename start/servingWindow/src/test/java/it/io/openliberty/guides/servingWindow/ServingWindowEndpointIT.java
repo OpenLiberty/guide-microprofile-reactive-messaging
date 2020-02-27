@@ -80,8 +80,8 @@ public class ServingWindowEndpointIT {
     @Test
     @Order(1)
     public void testAddReadyOrder() throws InterruptedException {
-    	order = new io.openliberty.guides.models.Order("0001", "1", Type.FOOD, "burger", Status.READY);
-    	String jOrder = JsonbBuilder.create().toJson(order);
+        order = new io.openliberty.guides.models.Order("0001", "1", Type.FOOD, "burger", Status.READY);
+        String jOrder = JsonbBuilder.create().toJson(order);
         producer.send(new ProducerRecord<String, String>("statusTopic", jOrder));
         Thread.sleep(5000);
         Assertions.assertEquals(1, getReadyListSize(), "No ready order was added.");
@@ -91,8 +91,8 @@ public class ServingWindowEndpointIT {
     @Test
     @Order(2)
     public void testMarkOrderComplete() throws InterruptedException {
-    	servingWindowResource.markOrderComplete("0001");
-    	Thread.sleep(5000);
+        servingWindowResource.markOrderComplete("0001");
+        Thread.sleep(5000);
         Assertions.assertEquals(0, getReadyListSize(), "The order was not removed.");
         verify(Status.COMPLETED);
     }
@@ -100,13 +100,13 @@ public class ServingWindowEndpointIT {
     @Test
     @Order(3)
     public void testMarkOrderCompleteNotFound() throws InterruptedException {
-    	Response response = servingWindowResource.markOrderComplete("unknown");
+        Response response = servingWindowResource.markOrderComplete("unknown");
         Assertions.assertEquals(404, response.getStatus());
     }
     
     private int getReadyListSize() {
-    	Response response = servingWindowResource.listContents();
-    	return response.readEntity(ArrayList.class).size();
+        Response response = servingWindowResource.listContents();
+        return response.readEntity(ArrayList.class).size();
     }
     
     private void verify(Status expectedStatus) {
@@ -118,14 +118,14 @@ public class ServingWindowEndpointIT {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
             System.out.println("Polled " + records.count() + " records from Kafka:");
             for (ConsumerRecord<String, String> record : records) {
-            	System.out.println(record.value());
-				order = jsonb.fromJson(record.value(), io.openliberty.guides.models.Order.class);
-				Assertions.assertEquals(expectedStatus,order.getStatus());
-				recordsProcessed++;
+                System.out.println(record.value());
+                order = jsonb.fromJson(record.value(), io.openliberty.guides.models.Order.class);
+                Assertions.assertEquals(expectedStatus,order.getStatus());
+                recordsProcessed++;
             }
             consumer.commitAsync();
             if (recordsProcessed > 0)
-            	break;
+                break;
             elapsedTime = System.currentTimeMillis() - startTime;
         }
         Assertions.assertTrue(recordsProcessed > 0, "No records processed");
