@@ -1,3 +1,3 @@
-docker stop kitchen bar order servingwindow openlibertycafe kafka zookeeper
+docker stop kitchen bar order servingwindow restaurantbff kafka zookeeper
 
 docker network rm reactive-app

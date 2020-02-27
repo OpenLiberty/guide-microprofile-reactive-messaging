@@ -12,7 +12,7 @@ LABEL \
   org.opencontainers.image.revision="$REVISION" \
   vendor="Open Liberty" \
   name="kitchen" \
-  version="$VERSION-$REVISION" \
+  version="$VERSION=-$REVISION" \
   summary="The kitchen microservice from the MicroProfile Reactive Messaging guide" \
   description="This image contains the kitchen microservice running with the Open Liberty runtime."
 
