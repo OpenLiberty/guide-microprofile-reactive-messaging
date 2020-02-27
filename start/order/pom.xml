@@ -21,7 +21,7 @@
         <liberty.var.default.http.port>9081</liberty.var.default.http.port>
         <liberty.var.default.https.port>9444</liberty.var.default.https.port>
     </properties>
-    
+
     <dependencies>
         <!-- Provided dependencies -->
         <dependency>
@@ -43,28 +43,24 @@
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
-        <!-- tag::reactiveMessaging[] -->
         <dependency>
             <groupId>org.eclipse.microprofile.reactive.messaging</groupId>
             <artifactId>microprofile-reactive-messaging-api</artifactId>
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
-        <!-- end::reactiveMessaging[] -->
-        
+
         <!--  Required dependencies -->
-		<dependency>
+                <dependency>
            <groupId>io.openliberty.guides</groupId>
            <artifactId>models</artifactId>
            <version>1.0-SNAPSHOT</version>
         </dependency>
-        <!-- tag::kafka[] -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>2.4.0</version>
         </dependency>
-		<!-- end::kafka[] -->
         <!-- For tests -->
         <dependency>
             <groupId>org.microshed</groupId>
@@ -82,6 +78,12 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.30</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
