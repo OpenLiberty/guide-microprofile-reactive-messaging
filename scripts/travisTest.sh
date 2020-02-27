@@ -7,23 +7,53 @@ set -euxo pipefail
 ##
 ##############################################################################
 
-# LMP 3.0+ goals are listed here: https://github.com/OpenLiberty/ci.maven#goals
+./scripts/packageApps.sh
 
-## Rebuild the application
-#       package                   - Take the compiled code and package it in its distributable format.
-#       liberty:create            - Create a Liberty server.
-#       liberty:install-feature   - Install a feature packaged as a Subsystem Archive (esa) to the Liberty runtime.
-#       liberty:deploy            - Copy applications to the Liberty server's dropins or apps directory. 
-mvn -q clean package liberty:create liberty:install-feature liberty:deploy
+mvn -pl order verify
+mvn -pl bar verify
+mvn -pl kitchen verify
+mvn -pl servingWindow verify
+mvn -pl openLibertyCafe verify
 
+./scripts/buildImages.sh
+./scripts/startContainers.sh
 
-## Run the tests
-# These commands are separated because if one of the commands fail, the test script will fail and exit. 
-# e.g if liberty:start fails, then there is no need to run the failsafe commands. 
-#       liberty:start             - Start a Liberty server in the background.
-#       failsafe:integration-test - Runs the integration tests of an application.
-#       liberty:stop              - Stop a Liberty server.
-#       failsafe:verify           - Verifies that the integration tests of an application passed.
-mvn liberty:start
-mvn failsafe:integration-test liberty:stop
-mvn failsafe:verify
+sleep 120
+
+cafeOrderStatus="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/api/orders")"
+cafeServingWindowStatus="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/api/servingWindow")"
+
+if [ "$cafeOrderStatus" == "200" ] && [ "$cafeServingWindowStatus" == "200" ]
+then
+  echo BFF OK
+  
+  orderStatus="$(docker exec -it order curl --write-out "%{http_code}" --silent --output /dev/null "http://order:9081/orders/status")"
+  servingWindowStatus="$(docker exec -it servingwindow curl --write-out "%{http_code}" --silent --output /dev/null "http://servingwindow:9082/servingWindow")"
+  kitchenStatus="$(docker exec -it kitchen curl --write-out "%{http_code}" --silent --output /dev/null "http://kitchen:9083/kitchen/foodMessaging")"
+  barStatus="$(docker exec -it bar curl --write-out "%{http_code}" --silent --output /dev/null "http://bar:9084/bar/beverageMessaging")"
+
+  if [ "$orderStatus" == "200" ] && [ "$servingWindowStatus" == "200" ] && [ "$kitchenStatus" == "200" ] && [ "$barStatus" == "200" ]
+  then
+    echo ENDPOINT OK
+  else
+    echo order status:
+    echo "$orderStatus"
+    echo serving window status:
+    echo "$servingWindowStatus"
+    echo kitchen status:
+    echo "$kitchenStatus"
+    echo bar status:
+    echo "$barStatus"
+    echo ENDPOINT
+    exit 1
+  fi
+else
+  echo bff order status:
+  echo "$bffOrderStatus"
+  echo bff serving window status:
+  echo "$bffServingWindowStatus"
+  echo ENDPOINT
+  exit 1
+fi
+
+./scripts/stopContainers.sh
