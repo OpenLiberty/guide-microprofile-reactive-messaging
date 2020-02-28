@@ -190,22 +190,22 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/")
     public Response resetOrder() {
-        return manager.resetOrder();
+        manager.resetOrder();
+        
+        return Response
+                .status(Response.Status.OK)
+                .build();
     }
 
     // tag::IncomingStatus[]
     @Incoming("updateStatus")
-    public Response updateStatus(String orderString)  {
+    public void updateStatus(String orderString)  {
         Order order = JsonbBuilder.create().fromJson(orderString, Order.class);
 
         manager.updateStatus(order.getOrderId(), order.getStatus());
 
         logger.info("Order " + order.getOrderId() + " status updated to "
                 + order.getStatus() + ": " + orderString);
-
-        return Response
-                .status(Response.Status.OK)
-                .build();
     }
     // end::IncomingStatus[]
 }

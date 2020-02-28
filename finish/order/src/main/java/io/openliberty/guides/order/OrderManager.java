@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.core.Response;
 
 @ApplicationScoped
 public class OrderManager {
@@ -45,10 +44,7 @@ public class OrderManager {
         return new TreeMap<>(orders);
     }
 
-    public Response resetOrder() {
+    public void resetOrder() {
         orders.clear();
-        return Response
-                .status(Response.Status.OK)
-                .build();
     }
 }
