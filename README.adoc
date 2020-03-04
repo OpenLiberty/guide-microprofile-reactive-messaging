@@ -334,7 +334,7 @@ Next, make a `GET` request to the `/api/orders` endpoint. To make this request, 
 
 *Check READY Order Status*
 
-Click `Execute` again and you will see the response with a `READY` status. Just in case if you see a `IN_PROGRESS` status then wait for a couple of seconds and click the `Execute` button again.
+Click `Execute` again and you will see the response with a `READY` status. Just in case if you see an `IN_PROGRESS` status then wait for a couple of seconds and click the `Execute` button again.
 
 [source, role="no_copy"]
 ----
