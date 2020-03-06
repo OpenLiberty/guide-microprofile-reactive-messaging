@@ -179,7 +179,7 @@ In order to develop the MicroProfile Reactive Messaging application using Maven,
 
 === Building the other microservices
 
-The `Kitchen`, `Bar` and `ServingWindow` microservices are put together in this section.
+The `Kitchen`, `Bar`, `ServingWindow`, and `Status` microservices are put together in this section.
 
 *Building the Kitchen microservice*
 
