@@ -42,8 +42,7 @@ public class OpenLibertyCafeStatusResource {
             summary = "Lists all of the submitted orders",
             description = "This operation retrieves all of the submitted orders " +
                     "and order details from the order database")
-    @Tag(name = "Status",
-            description = "Submitting and listing Orders")
+    @Tag(name = "Status", description = "Listing and quering Orders")
     public Response getOrders(){
         return statusClient.getOrders();
     }
