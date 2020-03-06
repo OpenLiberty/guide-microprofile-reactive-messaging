@@ -9,7 +9,7 @@
 :projectid: microprofile-reactive-messaging
 :page-layout: guide-multipane
 :page-duration: 30 minutes
-:page-releasedate: 2020-03-13
+:page-releasedate: 2020-04-13
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
@@ -45,23 +45,24 @@ https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that ma
 === What is asynchronous programming?
 Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-The OpenLiberty Cafe application is designed with reactive architecture. The application that you'll be working with consists of five microservices : `Order`, `Kitchen`, `Bar`, `ServingWindow`, and `OpenLibertyCafe`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+The OpenLiberty Cafe application is designed with reactive architecture. The application that you'll be working with consists of six microservices : `Kitchen`, `Bar`, `Order`, `ServingWindow`, `Status`, and `OpenLibertyCafe`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
-You'll update the `Order`, `Kitchen`, `Bar`, and `ServingWindow` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
+You'll update the `Order`, `Kitchen`, `Bar`, `ServingWindow`, and `Status` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
-The `OpenLibertyCafe` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
+The `OpenLibertyCafe` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backends for frontends^] service.
 It communicates with the backend microservices on the caller's behalf.
 
 The waiter places a request using the `OpenLibertyCafe` microservice.
 
-The `Order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type.
+The `Order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type. 
 
-An order begins with a `NEW` status. The `Kitchen` and `Bar` microservices consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `Order` microservice via reactive messages on Kafka.
+An order begins with a `NEW` status. The `Kitchen` and `Bar` microservices illustrate how to handle orders as a real cafe. They consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `Order` microservice via reactive messages on Kafka.
 
-The `ServingWindow` microservice contains a list of all ready-to-serve food and beverages. It consumes these statuses from the `Kitchen` and `Bar` microservices.
-Once the Order is served, it is marked as `COMPLETED` and the status is sent back to the `Order` microservice as a message.
+The `ServingWindow` microservice illustrates where the food and beverages are ready to serve. It consumes the `READY` order from the `Kitchen` and `Bar` microservices. Once the Order is served, waiter can mark the order to `COMPLETED` status and the status is sent back to the `Status` microservice as a message.
+
+The `Status` microservice receives any status update and provides queries for waiter. It is the place to persist all orders data. Because persisting data is not the focus of this guide, the `Status` microservice simply uses a Map object to store the data.
 
 // =================================================================================================
 // Prerequisites
@@ -104,24 +105,39 @@ Open Liberty includes the `liberty-kafka` connector for sending and receiving 
 === Configuring the MicroProfile Reactive Messaging
 
 //File 0
-microprofile-config.properties
+order/microprofile-config.properties
 [source, Text, linenums, role='code_column hide_tags=copyright']
 ----
 include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
+//File 1
+bar/microprofile-config.properties
+[source, Text, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/bar/src/main/resources/META-INF/microprofile-config.properties[]
+----
+
 Navigate to the `start` directory to begin. Most of the code is already provided for use.
 
-Each of the four microservices `Order`, `Kitchen`, `Bar`, and `ServingWindow` contain `microprofile-config.properties`
+Each of the five microservices `Order`, `Kitchen`, `Bar`, `ServingWindow`, and `Status` contain `microprofile-config.properties`
 file, which configures the Kafka connector with the MicroProfile Reactive Messaging channels.
 
-[role="code_command hotspot", subs="quotes"]
+[role="code_command hotspot file=0", subs="quotes"]
 ----
 #Create the microprofile-config.properties file.#
 `order/src/main/resources/META-INF/microprofile-config.properties`
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Order` microservice uses two Outgoing streams [hotspot=foodStream file=0]`food` and [hotspot=bevStream file=0]`beverage`, and one Incoming stream [hotspot=updateStatus file=0]`updateStatus`. All these streams connect to the connector [hotspot=kafka1 hotspot=kafka2 hotspot=kafka3 file=0]`liberty-kafka`. The [hotspot=topic1 hotspot=topic2 hotspot=topic3 file=0]`topic` property defines the topics in Kafka, which are used to communicate with the `Kitchen` and `Bar`  microservices. The [hotspot=serializer1 hotspot=serializer2 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly [hotspot=deserializer1 file=0]`key.deserializer` and [hotspot=deserializerVal1 file=0]`value.deserializer` properties define how to deserialize the messages. The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#api[Apache Kafka client API^].
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Order` microservice uses three Outgoing streams: [hotspot=foodStream file=0]`food`, [hotspot=bevStream file=0]`beverage`, and [hotspot=updateStatus file=0]`updateStatus`. All these streams connect to the connector [hotspot=kafka1 hotspot=kafka2 hotspot=kafka3 file=0]`liberty-kafka`. The [hotspot=topic1 hotspot=topic2 hotspot=topic3 file=0]`topic` property defines the topics in Kafka, which are used to communicate with the `Kitchen`, `Bar`, and `Status`  microservices. The [hotspot=serializer1 hotspot=serializer2 hotspot=serializer3 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 hotspot=serializerVal3 file=0]`value.serializer` properties characterize how to serialize the messages. 
+
+[role="code_command hotspot file=1", subs="quotes"]
+----
+#Create the microprofile-config.properties file.#
+`bar/src/main/resources/META-INF/microprofile-config.properties`
+----
+
+The [hotspot=kafkaConfig file=1]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Bar` microservice uses two Outgoing streams [hotspot=beverageOrderPublish file=1]`beverageOrderPublish` and [hotspot=bevOrderPublishInter file=1]`bevOrderPublishInter`, and one Incoming stream [hotspot=bevOrderConsume file=1]`bevOrderConsume`. All these streams connect to the connector [hotspot=kafka1 hotspot=kafka2 hotspot=kafka3 file=1]`liberty-kafka`. The [hotspot=topic1 hotspot=topic2 hotspot=topic3 file=1]`topic` property defines the topics in Kafka, which are used to communicate with the `ServingWindow` and `Status`  microservices. The [hotspot=serializer1 hotspot=serializer3 file=1]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal3 file=1]`value.serializer` properties characterize how to serialize the messages. Similarly [hotspot=deserializer3 file=1]`key.deserializer` and [hotspot=deserializerVal3 file=1]`value.deserializer` properties define how to deserialize the messages. The [hotspot=group file=1]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#api[Apache Kafka client API^].
 
 The rest of the microservices use similar `microprofile-config.properties` configuration.
 
@@ -140,13 +156,13 @@ OrderResource.java
 include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.java[]
 ----
 
-microprofile-config.properties
+order/microprofile-config.properties
 [source, Text, linenums, role='code_column hide_tags=copyright']
 ----
 include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Order` microservice creates orders when the [hotspot=postOrder file=0]`POST` request of the endpoint `/orders` is called. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`LinkedBlockingQueue`. As soon as an Order is added to the Queue, the [hotspot=takeF hotspot=takeB file=0]`take()` method retrieves and removes the orders. The Reactive Messaging implementation generates Reactive Streams for those orders and publishes it to Kafka over [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which we configured previously in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` stream. The [hotspot=IncomingStatus file=0]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=1]`microprofile-config.properties` receives updated order statuses from the Kafka topic which is being sent by the `Kitchen` or `Bar` microservices.
+The `Order` microservice creates orders when the [hotspot=postOrder file=0]`POST` request of the endpoint `/orders` is called. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`LinkedBlockingQueue`. As soon as an Order is added to the Queue, the [hotspot=takeF hotspot=takeB file=0]`take()` method retrieves and removes the orders. The Reactive Messaging implementation generates Reactive Streams for those orders and publishes it to Kafka over [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which we configured previously in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` stream.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
@@ -214,6 +230,31 @@ include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/
 The `ServingWindow` microservice receives a `Ready` order from the `Bar` and `Kitchen` microservices over the [hotspot=addReadyOrder file=2]`@Incoming("orderReady")` channel.
 Once the order is served, it's marked as `COMPLETED` and the status is sent across to the `Order` microservice using the [hotspot=sendCompletedOrder file=2]`@Outgoing("completedOrder")` channel.
 
+
+*Building the Status microservice*
+
+//servingWindow
+[role="code_command hotspot file=3", subs="quotes"]
+----
+#Replace the `StatusResource` class.#
+`status/src/main/java/io/openliberty/guides/servingWindow/StatusResource.java`
+----
+
+StatusResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/status/src/main/java/io/openliberty/guides/status/StatusResource.java[]
+----
+
+status/microprofile-config.properties
+[source, Text, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/status/src/main/resources/META-INF/microprofile-config.properties[]
+----
+
+The `Status` microservice receives message from the `Order`, `Bar`, `Kitchen`, `ServingWindows` microservices over the [hotspot=updateStatus file=3]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=4]`microprofile-config.properties` receives updated order statuses from the Kafka topic.
+ 
+
 == Configuring the server
 
 To get the service running, the Open Liberty server needs to be correctly configured.
@@ -235,7 +276,7 @@ The rest of the microservices have [hotspot file=0]`server.xml` already configur
 
 == Building the application
 
-You will build and run the `Order`, `Kitchen`, `Bar`, `ServingWindow` and `OpenLibertyCafe` microservices in Docker containers.
+You will build and run the `Order`, `Kitchen`, `Bar`, `ServingWindow`, `Status`, and `OpenLibertyCafe` microservices in Docker containers.
 
 Start your Docker environment.
 
@@ -257,10 +298,11 @@ Run the following commands to containerize the microservices:
 
 [role='command']
 ```
-docker build -t order:1.0-SNAPSHOT order/.
 docker build -t kitchen:1.0-SNAPSHOT kitchen/.
 docker build -t bar:1.0-SNAPSHOT bar/.
 docker build -t servingwindow:1.0-SNAPSHOT servingWindow/.
+docker build -t order:1.0-SNAPSHOT order/.
+docker build -t status:1.0-SNAPSHOT status/.
 docker build -t openlibertycafe:1.0-SNAPSHOT openLibertyCafe/.
 ```
 
@@ -310,7 +352,7 @@ Make a `POST` request to the `/api/orders` endpoint. To make this request, expan
 
 *Check IN_PROGRESS Order Status*
 
-Next, make a `GET` request to the `/api/orders` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response should show that the Orders have an `IN_PROGRESS` status. Just in case if you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
+Next, make a `GET` request to the `/api/status` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response should show that the Orders have an `IN_PROGRESS` status. Just in case if you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
 
 [source, role="no_copy"]
 ----
@@ -366,7 +408,7 @@ Make a `POST` request to the `/api/servingWindow/{orderId}` endpoint to complete
 0002
 ----
 
-Then, make a `GET` request to the `/api/orders` endpoint again and verify that the status for the order with an `orderId` of `0002` is now labelled as `COMPLETED`.
+Then, make a `GET` request to the `/api/status` endpoint again and verify that the status for the order with an `orderId` of `0002` is now labelled as `COMPLETED`.
 
 [source, role="no_copy"]
 ----

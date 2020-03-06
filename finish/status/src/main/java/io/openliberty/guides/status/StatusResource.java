@@ -94,7 +94,9 @@ public class StatusResource {
                 .build();
     }
     
+    // tag::updateStatus[]
     @Incoming("updateStatus")
+    // end::updateStatus[]
     public void updateStatus(Order order)  {
         String orderId = order.getOrderId();
         if (manager.getOrder(orderId).isPresent()) {
