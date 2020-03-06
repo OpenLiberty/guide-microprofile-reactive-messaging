@@ -13,6 +13,7 @@ mvn -pl order verify
 mvn -pl bar verify
 mvn -pl kitchen verify
 mvn -pl servingWindow verify
+mvn -pl status verify
 mvn -pl openLibertyCafe verify
 
 ./scripts/buildImages.sh
@@ -20,14 +21,14 @@ mvn -pl openLibertyCafe verify
 
 sleep 120
 
-cafeOrderStatus="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/api/orders")"
+cafeOrderStatus="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/api/status")"
 cafeServingWindowStatus="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9080/api/servingWindow")"
 
 if [ "$cafeOrderStatus" == "200" ] && [ "$cafeServingWindowStatus" == "200" ]
 then
   echo BFF OK
   
-  orderStatus="$(docker exec -it order curl --write-out "%{http_code}" --silent --output /dev/null "http://order:9081/orders/status")"
+  orderStatus="$(docker exec -it order curl --write-out "%{http_code}" --silent --output /dev/null "http://status:9085/status")"
   servingWindowStatus="$(docker exec -it servingwindow curl --write-out "%{http_code}" --silent --output /dev/null "http://servingwindow:9082/servingWindow")"
   kitchenStatus="$(docker exec -it kitchen curl --write-out "%{http_code}" --silent --output /dev/null "http://kitchen:9083/kitchen/foodMessaging")"
   barStatus="$(docker exec -it bar curl --write-out "%{http_code}" --silent --output /dev/null "http://bar:9084/bar/beverageMessaging")"

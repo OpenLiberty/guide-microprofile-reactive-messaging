@@ -12,26 +12,28 @@
 // end::copyright[]
 package io.openliberty.guides.openlibertycafe;
 
+import java.util.Set;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.models.Type;
 import io.openliberty.guides.openlibertycafe.client.OrderClient;
-import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-
-import java.util.Set;
 
 @ApplicationScoped
 @Path("/orders")
@@ -43,26 +45,6 @@ public class OpenLibertyCafeOrderResource {
     @Inject
     @RestClient
     private OrderClient orderClient;
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Operation(operationId = "listAllOrders",
-            summary = "Lists all of the submitted orders",
-            description = "This operation retrieves all of the submitted orders " +
-                    "and order details from the order database")
-    @Tag(name = "Order",
-            description = "Submitting and listing Orders")
-    public Response getOrders(){
-        return orderClient.getOrders();
-    }
-
-    @GET
-    @Path("{orderId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Tag(name = "Order")
-    public Response getSingleOrder(@PathParam("orderId") String orderId){
-        return orderClient.getSingleOrder(orderId);
-    }
 
     //OrderRequest object validator
     private Response validate(OrderRequest orderRequest) {
@@ -109,16 +91,6 @@ public class OpenLibertyCafeOrderResource {
             orderClient.createOrder(order);
         }
 
-        return Response
-                .status(Response.Status.OK)
-                .build();
-    }
-
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    @Tag
-    public Response resetOrder(){
-        orderClient.resetOrder();
         return Response
                 .status(Response.Status.OK)
                 .build();

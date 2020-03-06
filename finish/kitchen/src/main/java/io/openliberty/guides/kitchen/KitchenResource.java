@@ -22,8 +22,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -43,7 +41,6 @@ import io.openliberty.guides.models.Status;
 public class KitchenResource {
 
     private static Logger logger = Logger.getLogger(KitchenResource.class.getName());
-    private static Jsonb jsonb = JsonbBuilder.create();
 
     private Executor executor = Executors.newSingleThreadExecutor();
     private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
@@ -63,41 +60,37 @@ public class KitchenResource {
     @Outgoing("foodOrderPublishIntermediate")
     // end::foodOrderPublishIntermediate[]
     // tag::initFoodOrder[]
-    public CompletionStage<String> initFoodOrder(String newOrder) {
-        Order order = jsonb.fromJson(newOrder, Order.class);
-        logger.info("Order " + order.getOrderId() + " received with a status of NEW");
-        logger.info(newOrder);
-        return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
+    public CompletionStage<Order> initFoodOrder(Order newOrder) {
+        logger.info("Order " + newOrder.getOrderId() + " received with a status of NEW");
+        logger.info(newOrder.toString());
+        return prepareOrder(newOrder);
     }
     // end::initFoodOrder[]
 
     // tag::foodOrder[]
     @Outgoing("foodOrderPublish")
     // end::foodOrder[]
-    public PublisherBuilder<String> sendReadyOrder() {
+    public PublisherBuilder<Order> sendReadyOrder() {
         return ReactiveStreams.generate(() -> {
             try {
                 Order order = inProgress.take();
                 prepare(5);
                 order.setStatus(Status.READY);
-                String orderString = jsonb.toJson(order);
                 logger.info("Order " + order.getOrderId() + " is READY");
-                logger.info(orderString);
-                return orderString;
+                logger.info(order.toString());
+                return order;
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return null;
             }
         });
     }
-    
-    
+
     private CompletionStage<Order> prepareOrder(Order order) {
         return CompletableFuture.supplyAsync(() -> {
             prepare(10);
             Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
             logger.info("Order " + order.getOrderId() + " is IN PROGRESS");
-            logger.info(jsonb.toJson(order));
             inProgress.add(inProgressOrder);
             return inProgressOrder;
         }, executor);
