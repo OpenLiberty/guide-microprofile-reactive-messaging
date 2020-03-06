@@ -15,6 +15,8 @@ package it.io.openliberty.guides.openlibertycafe;
 import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.openlibertycafe.client.OrderClient;
 import io.openliberty.guides.openlibertycafe.client.ServingWindowClient;
+import io.openliberty.guides.openlibertycafe.client.StatusClient;
+
 import org.microshed.testing.SharedContainerConfiguration;
 import org.microshed.testing.testcontainers.ApplicationContainer;
 import org.mockserver.client.MockServerClient;
@@ -44,9 +46,11 @@ public class AppContainerConfig implements SharedContainerConfiguration {
     public static ApplicationContainer mockApp = new ApplicationContainer()
             .withAppContextRoot("/")
             .withReadinessPath("/api/orders")
+            .withReadinessPath("/api/status")
             .withReadinessPath("/api/servingWindow")
             .withNetwork(network)
             .withMpRestClient(OrderClient.class, "http://mock-server:" + MockServerContainer.PORT)
+            .withMpRestClient(StatusClient.class, "http://mock-server:" + MockServerContainer.PORT)
             .withMpRestClient(ServingWindowClient.class, "http://mock-server:" + MockServerContainer.PORT);
 
     @Override
@@ -56,24 +60,33 @@ public class AppContainerConfig implements SharedContainerConfiguration {
                 mockServer.getContainerIpAddress(),
                 mockServer.getServerPort());
 
-        //For getOrders() in Order Client
+        //For getOrders() in Status Client
         mockClient
                 .when(HttpRequest.request()
                         .withMethod("GET")
-                        .withPath("/orders"))
+                        .withPath("/status"))
                 .respond(HttpResponse.response()
                         .withStatusCode(200)
                         .withHeader("Content-Type", "application/json"));
 
-        //For getSingleOrder("0001") in Order Client
+        //For getSingleOrder("0001") in Status Client
         mockClient
                 .when(HttpRequest.request()
                         .withMethod("GET")
-                        .withPath("/orders/0001"))
+                        .withPath("/status/order/0001"))
                 .respond(HttpResponse.response()
                         .withStatusCode(200)
                         .withHeader("Content-Type", "application/json"));
 
+        //For getOrdersList("0001") in Status Client
+        mockClient
+                .when(HttpRequest.request()
+                        .withMethod("GET")
+                        .withPath("/status/table/0001"))
+                .respond(HttpResponse.response()
+                        .withStatusCode(200)
+                        .withHeader("Content-Type", "application/json"));
+        
         if(foodList.isEmpty()){
             foodList.add("Pho");
             beverageList.add("Iced Tea");

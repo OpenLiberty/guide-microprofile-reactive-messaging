@@ -17,11 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Properties;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.core.Response;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -29,76 +25,61 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
+import org.microshed.testing.kafka.KafkaConsumerConfig;
+import org.microshed.testing.kafka.KafkaProducerConfig;
 
 import io.openliberty.guides.bar.BarResource;
+import io.openliberty.guides.models.Order;
+import io.openliberty.guides.models.Order.JsonbSerializer;
+import io.openliberty.guides.models.Order.OrderDeserializer;
 import io.openliberty.guides.models.Status;
 import io.openliberty.guides.models.Type;
 
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
+@TestMethodOrder(OrderAnnotation.class)
 public class BarEndpointIT {
 
-    private static final String CONSUMER_OFFSET_RESET = "earliest";
     private static final long POLL_TIMEOUT = 30 * 1000;
 
     @RESTClient
     public static BarResource barResource;
     
-    private static KafkaProducer<String, String> producer;
-    private static KafkaConsumer<String, String> consumer;
-    private static io.openliberty.guides.models.Order order;
-    private static Jsonb jsonb;
+    @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
+    public static KafkaProducer<String, Order> producer;
+
+    @KafkaConsumerConfig(valueDeserializer = OrderDeserializer.class, 
+        groupId = "update-status", topics = "statusTopic", 
+        properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
+    public static KafkaConsumer<String, Order> consumer;
+
+    private static Order order;
     
-    @BeforeAll
-    public static void setup() throws InterruptedException {
-        String KAFKA_SERVER = AppContainerConfig.kafka.getBootstrapServers();
-        
-        Properties properties = new Properties();
-        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
-        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        producer = new KafkaProducer<>(properties);
-
-        properties = new Properties();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "update-status");
-        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_RESET);
-        consumer = new KafkaConsumer<>(properties);
-        consumer.subscribe(Arrays.asList("statusTopic"));
-
-        jsonb = JsonbBuilder.create();
-    }
-
     @Test
-    @Order(1)
+    @org.junit.jupiter.api.Order(1)
     public void testGetStatus() {
         Response response = barResource.getStatus();
         assertEquals(200, response.getStatus());
     }
 
     @Test
-    @Order(2)
+    @org.junit.jupiter.api.Order(2)
     public void testInitBeverageOrder() throws IOException, InterruptedException {
-        order = new io.openliberty.guides.models.Order("0001", "1", Type.BEVERAGE, "Coke", Status.NEW);
-        String jOrder = JsonbBuilder.create().toJson(order);
-        producer.send(new ProducerRecord<String, String>("beverageTopic", jOrder));
+        order = new Order("0001", "1", Type.BEVERAGE, "Coke", Status.NEW);
+        producer.send(new ProducerRecord<String, Order>("beverageTopic", order));
         verify(Status.IN_PROGRESS);
     }
 
     @Test
-    @Order(3)
+    @org.junit.jupiter.api.Order(3)
     public void testFoodOrderReady() throws IOException, InterruptedException {
         Thread.sleep(10000);
         verify(Status.READY);
@@ -110,11 +91,11 @@ public class BarEndpointIT {
         long elapsedTime = 0;
 
         while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
+            ConsumerRecords<String, Order> records = consumer.poll(Duration.ofMillis(3000));
             System.out.println("Polled " + records.count() + " records from Kafka:");
-            for (ConsumerRecord<String, String> record : records) {
-                System.out.println(record.value());
-                order = jsonb.fromJson(record.value(), io.openliberty.guides.models.Order.class);
+            for (ConsumerRecord<String, Order> record : records) {
+                order = record.value();
+                System.out.println(order);
                 assertEquals("0001",order.getOrderId());
                 assertEquals(expectedStatus,order.getStatus());
                 recordsProcessed++;

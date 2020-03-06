@@ -22,8 +22,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -43,7 +41,6 @@ import io.openliberty.guides.models.Status;
 public class BarResource {
 
     private static Logger logger = Logger.getLogger(BarResource.class.getName());
-    private static Jsonb jsonb = JsonbBuilder.create();
 
     private Executor executor = Executors.newSingleThreadExecutor();
     private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
@@ -63,27 +60,25 @@ public class BarResource {
     @Outgoing("bevOrderPublishInter")
     // end::bevOrderPublishInter[]
     // tag::initBevOrder[]
-    public CompletionStage<String> initBeverageOrder(String newOrder) {
-        Order order = jsonb.fromJson(newOrder, Order.class);
-        logger.info("Order " + order.getOrderId() + " received as NEW");
-        logger.info(newOrder);
-        return prepareOrder(order).thenApply(Order -> jsonb.toJson(Order));
+    public CompletionStage<Order> initBeverageOrder(Order newOrder) {
+        logger.info("Order " + newOrder.getOrderId() + " received as NEW");
+        logger.info(newOrder.toString());
+        return prepareOrder(newOrder);
     }
     // end::initBevOrder[]
 
     // tag::bevOrder[]
     @Outgoing("beverageOrderPublish")
     // end::bevOrder[]
-    public PublisherBuilder<String> sendReadyOrder() {
+    public PublisherBuilder<Order> sendReadyOrder() {
         return ReactiveStreams.generate(() -> {
             try {
                 Order order = inProgress.take();
                 prepare(5);
                 order.setStatus(Status.READY);
-                String orderString = jsonb.toJson(order);
                 logger.info("Order " + order.getOrderId() + " is READY");
-                logger.info(orderString);
-                return orderString;
+                logger.info(order.toString());
+                return order;
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return null;
@@ -96,7 +91,7 @@ public class BarResource {
             prepare(10);
             Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
             logger.info("Order " + order.getOrderId() + " is IN PROGRESS");
-            logger.info(jsonb.toJson(order));
+            logger.info(order.toString());
             inProgress.add(inProgressOrder);
             return inProgressOrder;
         }, executor);

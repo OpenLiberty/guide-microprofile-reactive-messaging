@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.order;
+package io.openliberty.guides.status;
 
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
@@ -23,11 +23,13 @@ import java.util.TreeMap;
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class OrderManager {
+public class StatusManager {
+
     private Map<String, Order> orders = Collections.synchronizedMap(new TreeMap<String, Order>());
 
     public void addOrder(Order order) {
-        orders.put(order.getOrderId(), order);
+    	if (!orders.containsKey(order.getOrderId()))
+            orders.put(order.getOrderId(), order);
     }
 
     public void updateStatus(String orderId, Status status) {

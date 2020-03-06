@@ -3,6 +3,7 @@ set KAFKA_SERVER=kafka:9092
 set NETWORK=reactive-app
 set ORDER_SERVICE_URL="http://order:9081"
 set SERVINGWINDOW_SERVICE_URL="http://servingwindow:9082"
+set STATUS_SERVICE_URL="http://order:9085"
 
 docker network create %NETWORK%
 
@@ -52,8 +53,16 @@ start /b docker run -d ^
   order:1.0-SNAPSHOT 
 
 start /b docker run -d ^
+  -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=%KAFKA_SERVER% ^
+  --network=%NETWORK% ^
+  --name=status ^
+  --rm ^
+  status:1.0-SNAPSHOT 
+  
+start /b docker run -d ^
   -e OrderClient_mp_rest_url=%ORDER_SERVICE_URL% ^
   -e ServingWindowClient_mp_rest_url=%SERVINGWINDOW_SERVICE_URL% ^
+  -e StatusClient_mp_rest_url=%STATUS_SERVICE_URL% ^
   -p 9080:9080 ^
   --network=%NETWORK% ^
   --name=openlibertycafe ^

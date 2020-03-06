@@ -14,51 +14,61 @@ package it.io.openliberty.guides.order;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Properties;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
-import io.openliberty.guides.models.Type;
-import io.openliberty.guides.order.OrderResource;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
+import org.microshed.testing.kafka.KafkaConsumerConfig;
+import org.microshed.testing.kafka.KafkaProducerConfig;
 
 import io.openliberty.guides.models.Order;
+import io.openliberty.guides.models.Order.JsonbSerializer;
+import io.openliberty.guides.models.Order.OrderDeserializer;
 import io.openliberty.guides.models.Status;
+import io.openliberty.guides.models.Type;
+import io.openliberty.guides.order.OrderResource;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
+@TestMethodOrder(OrderAnnotation.class)
 public class OrderEndpointIT {
 
-    private static final String CONSUMER_OFFSET_RESET = "earliest";
     private static final long POLL_TIMEOUT = 30 * 1000;
 
     @RESTClient
     public static OrderResource orderResource;
 
-    private static KafkaProducer<String, String> producer;
-    private static KafkaConsumer<String, String> consumer;
+    @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
+    public static KafkaProducer<String, Order> producer;
 
+    @KafkaConsumerConfig(valueDeserializer = OrderDeserializer.class, 
+        groupId = "food-consumer", topics = "foodTopic", 
+        properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
+    public static KafkaConsumer<String, Order> foodConsumer;
+    
+    @KafkaConsumerConfig(valueDeserializer = OrderDeserializer.class, 
+            groupId = "beverage-consumer", topics = "beverageTopic", 
+            properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
+        public static KafkaConsumer<String, Order> beverageConsumer;
+    
+    @KafkaConsumerConfig(valueDeserializer = OrderDeserializer.class, 
+            groupId = "update-status", topics = "statusTopic", 
+            properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
+    public static KafkaConsumer<String, Order> statusConsumer;
+        
     private static ArrayList<Order> orderList = new ArrayList<Order>();
-
-    private static Jsonb jsonb;
 
     @BeforeAll
     public static void setup() {
@@ -66,26 +76,6 @@ public class OrderEndpointIT {
         orderList.add(new Order().setItem("Pizza").setType(Type.FOOD).setTableId("0001"));
         orderList.add(new Order().setItem("Burger").setType(Type.FOOD).setTableId("0001"));
         orderList.add(new Order().setItem("Coke").setType(Type.BEVERAGE).setTableId("0002"));
-
-        // init kafka producer & consumer
-        String KAFKA_SERVER = AppContainerConfig.kafka.getBootstrapServers();
-
-        Properties properties = new Properties();
-        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
-        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        producer = new KafkaProducer<>(properties);
-
-        properties = new Properties();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "update-status");
-        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_RESET);
-        consumer = new KafkaConsumer<>(properties);
-        consumer.subscribe(Arrays.asList("foodTopic", "beverageTopic"));
-
-        jsonb = JsonbBuilder.create();
     }
 
     @Test
@@ -125,80 +115,22 @@ public class OrderEndpointIT {
         }
 
         // verify the order is sent correctly to kafka
-        verify();
+        verify(foodConsumer, 2);
+        verify(beverageConsumer, 1);
+        verify(statusConsumer, 3);
     }
 
-    @Test
-    @org.junit.jupiter.api.Order(3)
-    public void testGetOrderList() {
-        Response response = orderResource.getOrdersList(null);
-        ArrayList<Order> orders = response.readEntity(new GenericType<ArrayList<Order>>() {});
-        Assertions.assertEquals(200, response.getStatus(),
-                "Response should be 200");
-        for (Order order : orderList) {
-            Assertions.assertTrue(orders.contains(order),
-                    "Order " + order.getOrderId() + " not found in response");
-        }
-    }
-
-    @Test
-    @org.junit.jupiter.api.Order(4)
-    public void testGetOrderListByTableId() {
-        final String tableId = "0001";
-        Response response = orderResource.getOrdersList(tableId);
-        ArrayList<Order> orders = response.readEntity(new GenericType<ArrayList<Order>>() {});
-        Assertions.assertEquals(200, response.getStatus(),
-                "Response should be 200");
-        for (Order order : orderList) {
-            if (order.getTableId().equals(tableId))
-                Assertions.assertTrue(orders.contains(order),
-                        "Order " + order.getOrderId() + " not in found response");
-        }
-    }
-
-    @Test
-    @org.junit.jupiter.api.Order(5)
-    public void testGetOrder() {
-        Order order = orderList.get(0);
-        Response response = orderResource.getOrder(order.getOrderId());
-        Assertions.assertEquals(200, response.getStatus(),
-                "Response should be 200");
-        Assertions.assertEquals(order, response.readEntity(Order.class),
-                "Order " + order.getOrderId() + " from response does not match");
-    }
-
-    @Test
-    @org.junit.jupiter.api.Order(6)
-    public void testUpdateOrder() throws InterruptedException {
-        Order order = orderList.get(0);
-        order.setStatus(Status.IN_PROGRESS);
-
-        producer.send(new ProducerRecord<>("statusTopic", jsonb.toJson(order)));
-        Thread.sleep(1000);
-        Response response = orderResource.getOrder(order.getOrderId());
-        Assertions.assertEquals(order, response.readEntity(Order.class),
-                "Order " + order.getOrderId() + " from response does not match");
-    }
-
-    @Test
-    @org.junit.jupiter.api.Order(7)
-    public void testOrderDNE() {
-        Response res = orderResource.getOrder("openliberty");
-        Assertions.assertEquals(404, res.getStatus(),
-                "Response should be 404");
-    }
-
-    private void verify() {
-        int expectedRecords = orderList.size();
+    private void verify(KafkaConsumer<String, Order> consumer, int expectedRecords) {
         int recordsMatched = 0;
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         Order order;
 
         while (recordsMatched < expectedRecords && elapsedTime < POLL_TIMEOUT) {
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
-            for (ConsumerRecord<String, String> record : records) {
-                order = jsonb.fromJson(record.value(), Order.class);
+            ConsumerRecords<String, Order> records = consumer.poll(Duration.ofMillis(3000));
+            System.out.println("Polled " + records.count() + " records from Kafka:");
+            for (ConsumerRecord<String, Order> record : records) {
+                order = record.value();
                 if (orderList.contains(order))
                     recordsMatched++;
             }
@@ -206,7 +138,7 @@ public class OrderEndpointIT {
             elapsedTime = System.currentTimeMillis() - startTime;
         }
 
-        Assertions.assertTrue(recordsMatched == expectedRecords,
+        Assertions.assertEquals(expectedRecords, recordsMatched,
                 "Kafka did not receive orders correctly");
     }
 }
