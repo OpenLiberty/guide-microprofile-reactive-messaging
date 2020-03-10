@@ -47,7 +47,7 @@ Imagine asynchronous programming as a restaurant. After you're seated, a waiter 
 
 The OpenLiberty Cafe application is designed with reactive architecture. The application that you'll be working with consists of six microservices : `Kitchen`, `Bar`, `Order`, `ServingWindow`, `Status`, and `OpenLibertyCafe`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
-You'll update the `Order`, `Kitchen`, `Bar`, `ServingWindow`, and `Status` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
+You'll update the `Kitchen`, `Bar`, `Order`, `ServingWindow`, and `Status` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
@@ -58,11 +58,11 @@ The waiter places a request using the `OpenLibertyCafe` microservice.
 
 The `Order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type. 
 
-An order begins with a `NEW` status. The `Kitchen` and `Bar` microservices illustrate how to handle orders as a real cafe. They consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `Order` microservice via reactive messages on Kafka.
+An order begins with a `NEW` status. The `Kitchen` and `Bar` microservices illustrate how to handle the orders as a real cafe. They consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `Status` microservice via reactive messages on the Kafka.
 
-The `ServingWindow` microservice illustrates where the food and beverages are ready to serve. It consumes the `READY` order from the `Kitchen` and `Bar` microservices. Once the Order is served, waiter can mark the order to `COMPLETED` status and the status is sent back to the `Status` microservice as a message.
+The `ServingWindow` microservice illustrates when the food and beverages are ready to be served. It consumes the `READY` order from the `Kitchen` and `Bar` microservices. Once the order is served, the waiter can mark the order as `COMPLETED` and the status is sent back to the `Status` microservice as a message.
 
-The `Status` microservice receives any status update and provides queries for waiter. It is the place to persist all orders data. Because persisting data is not the focus of this guide, the `Status` microservice simply uses a Map object to store the data.
+The `Status` microservice receives status updates and provides queries for the waiter. All the orders are persisted here. Because persisting data is not the focus of this guide, the `Status` microservice simply uses a Map object to store the data.
 
 // =================================================================================================
 // Prerequisites
@@ -143,7 +143,7 @@ The rest of the microservices use similar `microprofile-config.properties` confi
 
 === Building the Order microservice
 
-The `Order` microservice uses MicroProfile Reactive Messaging to send messages to `Kitchen` and `Bar` microservices over Kafka.
+The `Order` microservice uses the MicroProfile Reactive Messaging to send messages to `Kitchen` and `Bar` microservices over Kafka.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -233,11 +233,11 @@ Once the order is served, it's marked as `COMPLETED` and the status is sent acro
 
 *Building the Status microservice*
 
-//servingWindow
+//status
 [role="code_command hotspot file=3", subs="quotes"]
 ----
 #Replace the `StatusResource` class.#
-`status/src/main/java/io/openliberty/guides/servingWindow/StatusResource.java`
+`status/src/main/java/io/openliberty/guides/status/StatusResource.java`
 ----
 
 StatusResource.java
@@ -252,7 +252,7 @@ status/microprofile-config.properties
 include::finish/status/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Status` microservice receives message from the `Order`, `Bar`, `Kitchen`, `ServingWindows` microservices over the [hotspot=updateStatus file=3]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=4]`microprofile-config.properties` receives updated order statuses from the Kafka topic.
+The `Status` microservice receives the message from the `Kitchen`, `Bar`, `Order`, and `ServingWindow` microservices over the [hotspot=updateStatus file=3]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=4]`microprofile-config.properties`.
  
 
 == Configuring the server
@@ -400,13 +400,15 @@ Click `Execute` again and you will see the response with a `READY` status. Just 
 
 *Complete an Order*
 
-Make a `POST` request to the `/api/servingWindow/{orderId}` endpoint to complete an order. Expand the `POST` endpoint on the UI, click the *Try it out* button. Copy the following orderId into the text box, and then click the `Execute` button. The status for the `orderId 0002` is changed from `READY` to `COMPLETED` and the updated status is cascaded to the `Order` microservice.
+Make a `POST` request to the `/api/servingWindow/{orderId}` endpoint to complete an order. Expand the `POST` endpoint on the UI, click the *Try it out* button. Copy the following orderId into the text box, and then click the `Execute` button.
  
 [source, role='command']
 ----
 
 0002
 ----
+
+The status for the `orderId 0002` is changed from `READY` to `COMPLETED` and the updated status is cascaded to the `Status` microservice.
 
 Then, make a `GET` request to the `/api/status` endpoint again and verify that the status for the order with an `orderId` of `0002` is now labelled as `COMPLETED`.
 
@@ -416,7 +418,7 @@ Then, make a `GET` request to the `/api/status` endpoint again and verify that t
   {
     "item": "burger",
     "orderId": "0001",
-    "status": "IN_PROGRESS",
+    "status": "READY",
     "tableId": "1",
     "type": "FOOD"
   },
