@@ -57,7 +57,7 @@ public class BarResource {
     @Incoming("bevOrderConsume")
     // end::bevOrderConsume[]
     // tag::bevOrderPublishInter[]
-    @Outgoing("bevOrderPublishInter")
+    @Outgoing("beverageOrderPublishStatus")
     // end::bevOrderPublishInter[]
     // tag::initBevOrder[]
     public CompletionStage<Order> initBeverageOrder(Order newOrder) {
@@ -68,7 +68,7 @@ public class BarResource {
     // end::initBevOrder[]
 
     // tag::bevOrder[]
-    @Outgoing("beverageOrderPublish")
+    @Outgoing("beverageOrderPublishStatus")
     // end::bevOrder[]
     public PublisherBuilder<Order> sendReadyOrder() {
         return ReactiveStreams.generate(() -> {

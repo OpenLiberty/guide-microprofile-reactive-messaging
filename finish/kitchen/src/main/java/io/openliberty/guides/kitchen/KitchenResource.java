@@ -57,7 +57,7 @@ public class KitchenResource {
     @Incoming("foodOrderConsume")
     // end::foodOrderConsume[]
     // tag::foodOrderPublishIntermediate[]
-    @Outgoing("foodOrderPublishIntermediate")
+    @Outgoing("foodOrderPublishStatus")
     // end::foodOrderPublishIntermediate[]
     // tag::initFoodOrder[]
     public CompletionStage<Order> initFoodOrder(Order newOrder) {
@@ -68,7 +68,7 @@ public class KitchenResource {
     // end::initFoodOrder[]
 
     // tag::foodOrder[]
-    @Outgoing("foodOrderPublish")
+    @Outgoing("foodOrderPublishStatus")
     // end::foodOrder[]
     public PublisherBuilder<Order> sendReadyOrder() {
         return ReactiveStreams.generate(() -> {
