@@ -54,7 +54,7 @@ public class BarResource {
     }
 
     // tag::bevOrderConsume[]    
-    @Incoming("bevOrderConsume")
+    @Incoming("beverageOrderConsume")
     // end::bevOrderConsume[]
     // tag::bevOrderPublishInter[]
     @Outgoing("beverageOrderPublishStatus")
