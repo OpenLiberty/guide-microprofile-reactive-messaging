@@ -12,10 +12,8 @@
 // end::copyright[]
 package it.io.openliberty.guides.bar;
 
-import org.microshed.testing.ApplicationEnvironment;
 import org.microshed.testing.SharedContainerConfiguration;
 import org.microshed.testing.testcontainers.ApplicationContainer;
-import org.microshed.testing.testcontainers.config.HollowTestcontainersConfiguration;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.junit.jupiter.Container;
@@ -34,24 +32,5 @@ public class AppContainerConfig implements SharedContainerConfiguration {
                     .withExposedPorts(new Integer(9084))
                     .withReadinessPath("/health/ready")
                     .withNetwork(network);
-    
-    @Override
-    public void startContainers() {
-        if (ApplicationEnvironment.Resolver.load().getClass() == HollowTestcontainersConfiguration.class) {
-            // Run in dev mode. 
-            // The application talks to KafkaContainer from outside of the Docker network,
-            // and it can talk to kafka directly on 9093. 
-            // The MicroProfile configure should define as following:
-            // mp.messaging.connector.liberty-kafka.bootstrap.servers=localhost:9093
-        } else {
-            // Run by maven verify goal.
-            // The application talks to KafkaContainer within Docker network, 
-            // and it need to talk to the broker on port 9092
-            kafka.withNetworkAliases("kafka");
-            app.withEnv("MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS", "kafka:9092");
-        }
-        kafka.start();
-        app.start();
-    }
-    
+
 }
