@@ -30,8 +30,8 @@ then
   
   orderStatus="$(docker exec -it order curl --write-out "%{http_code}" --silent --output /dev/null "http://status:9085/status")"
   servingWindowStatus="$(docker exec -it servingwindow curl --write-out "%{http_code}" --silent --output /dev/null "http://servingwindow:9082/servingWindow")"
-  kitchenStatus="$(docker exec -it kitchen curl --write-out "%{http_code}" --silent --output /dev/null "http://kitchen:9083/kitchen/foodMessaging")"
-  barStatus="$(docker exec -it bar curl --write-out "%{http_code}" --silent --output /dev/null "http://bar:9084/bar/beverageMessaging")"
+  kitchenStatus="$(docker exec -it kitchen curl --write-out "%{http_code}" --silent --output /dev/null "http://kitchen:9083/health/ready")"
+  barStatus="$(docker exec -it bar curl --write-out "%{http_code}" --silent --output /dev/null "http://bar:9084/health/ready")"
 
   if [ "$orderStatus" == "200" ] && [ "$servingWindowStatus" == "200" ] && [ "$kitchenStatus" == "200" ] && [ "$barStatus" == "200" ]
   then

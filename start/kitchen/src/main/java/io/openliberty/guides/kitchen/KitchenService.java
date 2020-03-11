@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.bar;
+package io.openliberty.guides.kitchen;
 
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
@@ -22,11 +22,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
@@ -37,39 +32,20 @@ import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
 
 @ApplicationScoped
-@Path("/beverageMessaging")
-public class BarResource {
+public class KitchenService {
 
-    private static Logger logger = Logger.getLogger(BarResource.class.getName());
+    private static Logger logger = Logger.getLogger(KitchenService.class.getName());
 
     private Executor executor = Executors.newSingleThreadExecutor();
     private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
     private Random random = new Random();
 
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response getStatus() {
-        return Response.ok().entity("The bar service is running...\n"
-                + inProgress.size() + " orders in the queue.").build();
-    }
-
-    // tag::bevOrderConsume[]    
-    @Incoming("beverageOrderConsume")
-    // end::bevOrderConsume[]
-    // tag::bevOrderPublishInter[]
-    @Outgoing("beverageOrderPublishStatus")
-    // end::bevOrderPublishInter[]
-    // tag::initBevOrder[]
-    public CompletionStage<Order> initBeverageOrder(Order newOrder) {
-        logger.info("Order " + newOrder.getOrderId() + " received as NEW");
+    public CompletionStage<Order> initFoodOrder(Order newOrder) {
+        logger.info("Order " + newOrder.getOrderId() + " received with a status of NEW");
         logger.info(newOrder.toString());
         return prepareOrder(newOrder);
     }
-    // end::initBevOrder[]
 
-    // tag::bevOrder[]
-    @Outgoing("beverageOrderPublishStatus")
-    // end::bevOrder[]
     public PublisherBuilder<Order> sendReadyOrder() {
         return ReactiveStreams.generate(() -> {
             try {
@@ -91,7 +67,6 @@ public class BarResource {
             prepare(10);
             Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
             logger.info("Order " + order.getOrderId() + " is IN PROGRESS");
-            logger.info(order.toString());
             inProgress.add(inProgressOrder);
             return inProgressOrder;
         }, executor);
