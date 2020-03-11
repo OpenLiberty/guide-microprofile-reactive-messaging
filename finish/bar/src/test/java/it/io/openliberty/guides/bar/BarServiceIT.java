@@ -18,8 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.time.Duration;
 
-import javax.ws.rs.core.Response;
-
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -30,12 +28,10 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.microshed.testing.SharedContainerConfig;
-import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
 import org.microshed.testing.kafka.KafkaConsumerConfig;
 import org.microshed.testing.kafka.KafkaProducerConfig;
 
-import io.openliberty.guides.bar.BarResource;
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Order.JsonbSerializer;
 import io.openliberty.guides.models.Order.OrderDeserializer;
@@ -46,13 +42,10 @@ import io.openliberty.guides.models.Type;
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
 @TestMethodOrder(OrderAnnotation.class)
-public class BarEndpointIT {
+public class BarServiceIT {
 
     private static final long POLL_TIMEOUT = 30 * 1000;
 
-    @RESTClient
-    public static BarResource barResource;
-    
     @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
     public static KafkaProducer<String, Order> producer;
 
@@ -63,15 +56,9 @@ public class BarEndpointIT {
 
     private static Order order;
     
-    @Test
-    @org.junit.jupiter.api.Order(1)
-    public void testGetStatus() {
-        Response response = barResource.getStatus();
-        assertEquals(200, response.getStatus());
-    }
 
     @Test
-    @org.junit.jupiter.api.Order(2)
+    @org.junit.jupiter.api.Order(1)
     public void testInitBeverageOrder() throws IOException, InterruptedException {
         order = new Order("0001", "1", Type.BEVERAGE, "Coke", Status.NEW);
         producer.send(new ProducerRecord<String, Order>("beverageTopic", order));
@@ -79,7 +66,7 @@ public class BarEndpointIT {
     }
 
     @Test
-    @org.junit.jupiter.api.Order(3)
+    @org.junit.jupiter.api.Order(2)
     public void testFoodOrderReady() throws IOException, InterruptedException {
         Thread.sleep(10000);
         verify(Status.READY);
