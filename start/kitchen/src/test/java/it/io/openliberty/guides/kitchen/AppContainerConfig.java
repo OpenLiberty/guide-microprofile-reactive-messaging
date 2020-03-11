@@ -32,7 +32,7 @@ public class AppContainerConfig implements SharedContainerConfiguration {
     public static ApplicationContainer app = new ApplicationContainer()
                     .withAppContextRoot("/")
                     .withExposedPorts(new Integer(9083))
-                    .withReadinessPath("/kitchen/foodMessaging")
+                    .withReadinessPath("/health/ready")
                     .withNetwork(network);
     
     @Override

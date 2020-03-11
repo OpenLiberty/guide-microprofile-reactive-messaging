@@ -18,8 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.time.Duration;
 
-import javax.ws.rs.core.Response;
-
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -27,16 +25,13 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-//import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.microshed.testing.SharedContainerConfig;
-import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
 import org.microshed.testing.kafka.KafkaConsumerConfig;
 import org.microshed.testing.kafka.KafkaProducerConfig;
 
-import io.openliberty.guides.kitchen.KitchenResource;
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Order.JsonbSerializer;
 import io.openliberty.guides.models.Order.OrderDeserializer;
@@ -46,12 +41,9 @@ import io.openliberty.guides.models.Type;
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
 @TestMethodOrder(OrderAnnotation.class)
-public class KitchenEndpointIT {
+public class KitchenServiceIT {
 
     private static final long POLL_TIMEOUT = 30 * 1000;
-
-    @RESTClient
-    public static KitchenResource kitchenResource;
     
     @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
     public static KafkaProducer<String, Order> producer;
@@ -63,13 +55,6 @@ public class KitchenEndpointIT {
 
     private static Order order;
    
-    @Test
-    @org.junit.jupiter.api.Order(1)
-    public void testGetStatus() {
-        Response response = kitchenResource.getStatus();
-        assertEquals(200, response.getStatus());
-    }
-
     @Test
     @org.junit.jupiter.api.Order(2)
     public void testInitFoodOrder() throws IOException, InterruptedException {

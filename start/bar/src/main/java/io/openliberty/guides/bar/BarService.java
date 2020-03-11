@@ -22,11 +22,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
@@ -37,21 +32,13 @@ import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
 
 @ApplicationScoped
-@Path("/beverageMessaging")
-public class BarResource {
+public class BarService {
 
-    private static Logger logger = Logger.getLogger(BarResource.class.getName());
+    private static Logger logger = Logger.getLogger(BarService.class.getName());
 
     private Executor executor = Executors.newSingleThreadExecutor();
     private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
     private Random random = new Random();
-
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response getStatus() {
-        return Response.ok().entity("The bar service is running...\n"
-                + inProgress.size() + " orders in the queue.").build();
-    }
 
     public CompletionStage<Order> initBeverageOrder(Order newOrder) {
         logger.info("Order " + newOrder.getOrderId() + " received as NEW");
