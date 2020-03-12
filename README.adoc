@@ -45,7 +45,7 @@ https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that ma
 === What is asynchronous programming?
 Imagine asynchronous programming as a restaurant. After you're seated, a waiter takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waiter may take more orders or serve other tables. After your food is ready, your waiter brings out the food to your table. However, in a synchronous model, the waiter must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-The OpenLiberty Cafe application is designed with reactive architecture. The application that you'll be working with consists of six microservices : `Kitchen`, `Bar`, `Order`, `ServingWindow`, `Status`, and `OpenLibertyCafe`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+The OpenLiberty Cafe application is designed with reactive architecture. The application that you'll be working with consists of six microservices : `Bar`, `Kitchen`, `Order`, `OpenLibertyCafe`, `ServingWindow`, and `Status`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
 You'll update the `Kitchen`, `Order` and `Status` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
@@ -58,7 +58,7 @@ The waiter places a request using the `OpenLibertyCafe` microservice.
 
 The `Order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` or `beverage` channel depending on the type. 
 
-An order begins with a `NEW` status. The `Kitchen` and `Bar` microservices illustrate how to handle the orders as a real cafe. They consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `Status` microservice via reactive messages on the Kafka.
+An order begins with a `NEW` status. The `Bar` and `Kitchen` microservices illustrate how to handle the orders as a real cafe. They consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `Status` microservice via reactive messages on the Kafka.
 
 The `ServingWindow` microservice illustrates when the food and beverages are ready to be served. It consumes the `READY` order from the `Kitchen` and `Bar` microservices. Once the order is served, the waiter can mark the order as `COMPLETED` and the status is sent back to the `Status` microservice as a message.
 
@@ -164,7 +164,7 @@ In order to develop the MicroProfile Reactive Messaging application using Maven,
 
 === Completing the other microservices
 
-The `Bar`, `ServingWindow`, and `OpenLibertyCafe` microservices are provided to you. You need to complete the implementation of the `Kitchen` and `Status` microservices in this section.
+The `Bar`, `OpenLibertyCafe`, and `ServingWindow` microservices are provided to you. You need to complete the implementation of the `Kitchen` and `Status` microservices in this section.
 
 *Completing the Kitchen microservice*
 
