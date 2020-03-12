@@ -111,13 +111,6 @@ order/microprofile-config.properties
 include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-// //File 1
-// bar/microprofile-config.properties
-// [source, Text, linenums, role='code_column hide_tags=copyright']
-// ----
-// include::finish/bar/src/main/resources/META-INF/microprofile-config.properties[]
-// ----
-
 Navigate to the `start` directory to begin. Most of the code is already provided for use.
 
 Each of the five microservices `Order`, `Kitchen`, `Bar`, `ServingWindow`, and `Status` contain `microprofile-config.properties`
