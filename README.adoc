@@ -120,7 +120,7 @@ bar/microprofile-config.properties
 include::finish/bar/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Bar` microservice uses an outgoing stream [hotspot=beverageOrderPublish file=0]`beverageOrderPublishStatus`, which sends messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `ServingWindow` and `Status` microservices can consume the messages. The `Bar` microservice listens messages from an incoming stream [hotspot=bevOrderConsume file=0]`beverageOrderConsume`, which messages are sent by the `Order` microservice through the [hotspot=topic2 file=0]`beverageTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` property characterizes how to serialize the messages. Similarly [hotspot=deserializerVal2 file=0]`value.deserializer` property defines how to deserialize the messages. The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#api[Apache Kafka client API^].
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Bar` microservice uses an outgoing stream [hotspot=beverageOrderPublish file=0]`beverageOrderPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `ServingWindow` and `Status` microservices can consume the messages. The `Bar` microservice listens messages from an incoming stream [hotspot=bevOrderConsume file=0]`beverageOrderConsume`, which messages are sent by the `Order` microservice through the [hotspot=topic2 file=0]`beverageTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` property characterizes how to serialize the messages. Similarly [hotspot=deserializerVal2 file=0]`value.deserializer` property defines how to deserialize the messages. The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#api[Apache Kafka client API^].
 
 The rest of the microservices use similar `microprofile-config.properties` configuration to define their required incoming and outgoing streams.
 
@@ -139,6 +139,7 @@ OrderResource.java
 ----
 include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.java[]
 ----
+
 order/microprofile-config.properties
 [source, Text, linenums, role='code_column hide_tags=copyright']
 ----
@@ -152,6 +153,7 @@ The `Order` microservice creates orders when the [hotspot=postOrder file=0]`POST
 #Replace the Maven configuration file.#
 `order/pom.xml`
 ---- 
+
 pom.xml
 [source, XML ,linenums,role="code_column"]
 ----
@@ -216,7 +218,7 @@ If the order is an item of food, `Kitchen` service receives an order on the [hot
 *Building the Status microservice*
 
 //status
-[role="code_command hotspot file=3", subs="quotes"]
+[role="code_command hotspot file=0", subs="quotes"]
 ----
 #Replace the `StatusResource` class.#
 `status/src/main/java/io/openliberty/guides/status/StatusResource.java`
@@ -234,7 +236,7 @@ status/microprofile-config.properties
 include::finish/status/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Status` microservice receives the message from the `Kitchen`, `Bar`, `Order`, and `ServingWindow` microservices over the [hotspot=updateStatus file=3]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=4]`microprofile-config.properties`.
+The `Status` microservice receives the message from the `Kitchen`, `Bar`, `Order`, and `ServingWindow` microservices over the [hotspot=updateStatus file=0]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=1]`microprofile-config.properties`.
  
 == Configuring the server
 
