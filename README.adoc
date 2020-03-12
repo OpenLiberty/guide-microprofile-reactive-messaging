@@ -164,7 +164,7 @@ In order to develop the MicroProfile Reactive Messaging application using Maven,
 
 === Completing the Kitchen and Status microservices
 
-You need to complete the implementation of the `Kitchen` and `Status` microservices in this section.
+You will complete the `Kitchen` and `Status` microservices implementation in this section.
 
 *Completing the Kitchen microservice*
 
