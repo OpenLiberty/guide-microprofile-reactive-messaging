@@ -123,13 +123,13 @@ Navigate to the `start` directory to begin. Most of the code is already provided
 Each of the five microservices `Order`, `Kitchen`, `Bar`, `ServingWindow`, and `Status` contain `microprofile-config.properties`
 file, which configures the Kafka connector with the MicroProfile Reactive Messaging channels.
 
-[role="code_command hotspot file=0", subs="quotes"]
+[role="code_command hotspot", subs="quotes"]
 ----
 #Create the microprofile-config.properties file.#
 `order/src/main/resources/META-INF/microprofile-config.properties`
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Order` microservice uses three Outgoing streams: [hotspot=foodStream file=0]`food`, [hotspot=bevStream file=0]`beverage`, and [hotspot=updateStatus file=0]`updateStatus`. All these streams connect to the connector [hotspot=kafka1 hotspot=kafka2 hotspot=kafka3 file=0]`liberty-kafka`. The [hotspot=topic1 hotspot=topic2 hotspot=topic3 file=0]`topic` property defines the topics in Kafka, which are used to communicate with the `Kitchen`, `Bar`, and `Status`  microservices. The [hotspot=serializer1 hotspot=serializer2 hotspot=serializer3 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 hotspot=serializerVal3 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly `key.deserializer` and `value.deserializer` properties define how to deserialize the messages. The `group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#api[Apache Kafka client API^].
+The [hotspot=kafkaConfig]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Order` microservice uses three Outgoing streams: [hotspot=foodStream]`food`, [hotspot=bevStream]`beverage`, and [hotspot=updateStatus]`updateStatus`. All these streams connect to the connector [hotspot=kafka1 hotspot=kafka2 hotspot=kafka3]`liberty-kafka`. The [hotspot=topic1 hotspot=topic2 hotspot=topic3]`topic` property defines the topics in Kafka, which are used to communicate with the `Kitchen`, `Bar`, and `Status`  microservices. The [hotspot=serializer1 hotspot=serializer2 hotspot=serializer3]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 hotspot=serializerVal3]`value.serializer` properties characterize how to serialize the messages. Similarly `key.deserializer` and `value.deserializer` properties define how to deserialize the messages. The `group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#api[Apache Kafka client API^].
 
 // [role="code_command hotspot file=1", subs="quotes"]
 // ----
