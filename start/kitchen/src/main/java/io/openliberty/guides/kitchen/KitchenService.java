@@ -12,71 +12,9 @@
 // end::copyright[]
 package io.openliberty.guides.kitchen;
 
-import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Logger;
-
 import javax.enterprise.context.ApplicationScoped;
-
-import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
-import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
-
-import io.openliberty.guides.models.Order;
-import io.openliberty.guides.models.Status;
 
 @ApplicationScoped
 public class KitchenService {
 
-    private static Logger logger = Logger.getLogger(KitchenService.class.getName());
-
-    private Executor executor = Executors.newSingleThreadExecutor();
-    private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
-    private Random random = new Random();
-
-    public CompletionStage<Order> initFoodOrder(Order newOrder) {
-        logger.info("Order " + newOrder.getOrderId() + " received with a status of NEW");
-        logger.info(newOrder.toString());
-        return prepareOrder(newOrder);
-    }
-
-    public PublisherBuilder<Order> sendReadyOrder() {
-        return ReactiveStreams.generate(() -> {
-            try {
-                Order order = inProgress.take();
-                prepare(5);
-                order.setStatus(Status.READY);
-                logger.info("Order " + order.getOrderId() + " is READY");
-                logger.info(order.toString());
-                return order;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
-    }
-
-    private CompletionStage<Order> prepareOrder(Order order) {
-        return CompletableFuture.supplyAsync(() -> {
-            prepare(10);
-            Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
-            logger.info("Order " + order.getOrderId() + " is IN PROGRESS");
-            inProgress.add(inProgressOrder);
-            return inProgressOrder;
-        }, executor);
-    }
-
-    private void prepare(int sleepTime) {
-        try {
-            Thread.sleep((random.nextInt(5)+sleepTime) * 1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
 }
