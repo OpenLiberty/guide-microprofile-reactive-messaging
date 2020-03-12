@@ -123,7 +123,7 @@ Navigate to the `start` directory to begin. Most of the code is already provided
 Each of the five microservices `Order`, `Kitchen`, `Bar`, `ServingWindow`, and `Status` contain `microprofile-config.properties`
 file, which configures the Kafka connector with the MicroProfile Reactive Messaging channels.
 
-[role="code_command hotspot", subs="quotes"]
+[role="code_command", subs="quotes"]
 ----
 #Create the microprofile-config.properties file.#
 `order/src/main/resources/META-INF/microprofile-config.properties`
