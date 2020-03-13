@@ -87,20 +87,22 @@ MicroProfile Reactive Messaging recommends a design to build reactive applicatio
 
 *Channel*
 
-A channel is a name indicating which source or destination of messages is used. Channels are opaque Strings.
+Channel is a bridge for transporting messages between service and messaging-broker. It is managed by the Reactive Messaging.
 
 *@Outgoing* 
 
-Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute.
+Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute. For example, `@Outgoing("food")`
 
 *@Incoming*
 
-Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute.
+Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute. For example, `@Incoming("foodOrderConsume")`
 
 *Connector*
 
 Reactive messaging uses connectors to attach one end of a channel to other messaging technology and are configured using MicroProfile Config.
 Open Liberty includes the `liberty-kafka` connector for sending and receiving messages from an Apache Kafka.
+
+------------
 
 === Configuring the MicroProfile Reactive Messaging
 
@@ -123,6 +125,8 @@ include::finish/kitchen/src/main/resources/META-INF/microprofile-config.properti
 The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Kitchen` microservice uses an outgoing stream [hotspot=foodOrderPublishStatus file=0]`foodOrderPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `ServingWindow` and `Status` microservices can consume the messages. The `Kitchen` microservice listens messages from an incoming stream [hotspot=foodOrderConsume file=0]`foodOrderConsume`, which messages are sent by the `Order` microservice through the [hotspot=topic2 file=0]`foodTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages. The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#api[Apache Kafka client API^].
 
 The rest of the microservices use similar `microprofile-config.properties` configuration to define their required incoming and outgoing streams.
+
+------------
 
 === Building the Order microservice
 
@@ -161,6 +165,8 @@ include::finish/order/pom.xml[]
 ----
 
 In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api` and [hotspot=kafka file=2]`kafka-clients` dependencies to the [hotspot file=2]`pom.xml`
+
+------------
 
 === Completing the Kitchen and Status microservices
 
