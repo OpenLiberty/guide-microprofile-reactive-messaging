@@ -102,6 +102,8 @@ Incoming is an annotation indicating that the method consumes a channel. The na
 Reactive messaging uses connectors to attach one end of a channel to other messaging technology and are configured using MicroProfile Config.
 Open Liberty includes the `liberty-kafka` connector for sending and receiving messages from an Apache Kafka.
 
+image::reactive-messaging-keyconcepts.png[Reactive key concepts,align="center"]
+
 ---
 
 === Configuring the MicroProfile Reactive Messaging
