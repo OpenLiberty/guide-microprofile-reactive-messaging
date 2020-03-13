@@ -87,7 +87,7 @@ MicroProfile Reactive Messaging recommends a design to build reactive applicatio
 
 *Channel*
 
-Channel is a bridge for transporting messages between service and messaging-broker. It is managed by the Reactive Messaging.
+Channel is a bridge for transporting messages between service and messaging-broker. It is managed by the MicroProfile Reactive Messaging.
 
 *@Outgoing* 
 
