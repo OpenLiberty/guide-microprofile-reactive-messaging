@@ -188,7 +188,7 @@ KitchenService.java
 include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenService.java[]
 ----
 
-If the order is an item of food, `Kitchen` service receives an order on the [hotspot=foodOrderConsume file=0]`@Incoming("foodOrderConsume")` channel, processes it in [hotspot=initFoodOrder file=0]`initFoodOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=foodOrderPublishIntermediate file=0]`@Outgoing("foodOrderPublishIntermediate")` channel and a `READY` status on the [hotspot=foodOrder file=0]`@Outgoing("foodOrderPublish")` channel to Kafka over MicroProfile Reactive Messaging channels.
+If the order is an item of food, `Kitchen` service receives an order on the [hotspot=foodOrderConsume file=0]`@Incoming("foodOrderConsume")` channel, processes it in [hotspot=initFoodOrder file=0]`initFoodOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=foodOrderPublishIntermediate file=0]`@Outgoing("foodOrderPublishStatus")` channel to Kafka over MicroProfile Reactive Messaging channels. After a while, a `READY` status will be sent to the [hotspot=foodOrder file=0]`@Outgoing("foodOrderPublishStatus")` channel.
 
 // *Completing the Bar microservice*
 
@@ -226,7 +226,7 @@ If the order is an item of food, `Kitchen` service receives an order on the [hot
 *Completing the Status microservice*
 
 //status
-[role="code_command hotspot file=0", subs="quotes"]
+[role="code_command hotspot file=1", subs="quotes"]
 ----
 #Replace the `StatusResource` class.#
 `status/src/main/java/io/openliberty/guides/status/StatusResource.java`
@@ -244,7 +244,7 @@ status/microprofile-config.properties
 include::finish/status/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Status` microservice receives the message from the `Bar`, `Kitchen`, `Order`, and `ServingWindow` microservices over the [hotspot=updateStatus file=0]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=1]`microprofile-config.properties`.
+The `Status` microservice receives the message from the `Bar`, `Kitchen`, `Order`, and `ServingWindow` microservices over the [hotspot=updateStatus file=1]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=2]`microprofile-config.properties`.
  
 == Configuring the server
 
