@@ -13,23 +13,21 @@
 package io.openliberty.guides.kitchen;
 
 import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
-import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
+import org.reactivestreams.Publisher;
 
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableEmitter;
 
 @ApplicationScoped
 public class KitchenService {
@@ -37,8 +35,8 @@ public class KitchenService {
     private static Logger logger = Logger.getLogger(KitchenService.class.getName());
 
     private Executor executor = Executors.newSingleThreadExecutor();
-    private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
     private Random random = new Random();
+    private FlowableEmitter<Order> receivedMessageSink;
 
     // tag::foodOrderConsume[]
     @Incoming("foodOrderConsume")
@@ -47,40 +45,27 @@ public class KitchenService {
     @Outgoing("foodOrderPublishStatus")
     // end::foodOrderPublishIntermediate[]
     // tag::initFoodOrder[]
-    public CompletionStage<Order> initFoodOrder(Order newOrder) {
-        logger.info("Order " + newOrder.getOrderId() + " received with a status of NEW");
-        logger.info(newOrder.toString());
-        return prepareOrder(newOrder);
+    public Order initFoodOrder(Order newOrder) {
+    	logger.info("Order " + newOrder.getOrderId() + " received with a status of NEW");
+    	logger.info(newOrder.toString());
+    	Order order = prepareOrder(newOrder);
+    	executor.execute(() -> {
+    		prepare(5);
+    		order.setStatus(Status.READY);
+    		logger.info("Order " + order.getOrderId() + " is READY");
+    		logger.info(order.toString());
+    		receivedMessageSink.onNext(order);
+    	});
+    	return order;
     }
     // end::initFoodOrder[]
 
-    // tag::foodOrder[]
-    @Outgoing("foodOrderPublishStatus")
-    // end::foodOrder[]
-    public PublisherBuilder<Order> sendReadyOrder() {
-        return ReactiveStreams.generate(() -> {
-            try {
-                Order order = inProgress.take();
-                prepare(5);
-                order.setStatus(Status.READY);
-                logger.info("Order " + order.getOrderId() + " is READY");
-                logger.info(order.toString());
-                return order;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
-    }
-
-    private CompletionStage<Order> prepareOrder(Order order) {
-        return CompletableFuture.supplyAsync(() -> {
+    private Order prepareOrder(Order order) {
             prepare(10);
             Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
             logger.info("Order " + order.getOrderId() + " is IN PROGRESS");
-            inProgress.add(inProgressOrder);
+            logger.info(order.toString());
             return inProgressOrder;
-        }, executor);
     }
 
     private void prepare(int sleepTime) {
@@ -90,4 +75,13 @@ public class KitchenService {
             Thread.currentThread().interrupt();
         }
     }
+    
+    // tag::foodOrder[]
+    @Outgoing("foodOrderPublishStatus")
+   // end::foodOrder[]
+	public Publisher<Order> receivedMessages() {
+		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedMessageSink = emitter,
+				BackpressureStrategy.BUFFER);
+		return flowable;
+	}
 }

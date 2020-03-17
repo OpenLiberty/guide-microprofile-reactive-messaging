@@ -13,23 +13,21 @@
 package io.openliberty.guides.bar;
 
 import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
-import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
+import org.reactivestreams.Publisher;
 
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableEmitter;
 
 @ApplicationScoped
 public class BarService {
@@ -37,8 +35,8 @@ public class BarService {
     private static Logger logger = Logger.getLogger(BarService.class.getName());
 
     private Executor executor = Executors.newSingleThreadExecutor();
-    private BlockingQueue<Order> inProgress = new LinkedBlockingQueue<>();
     private Random random = new Random();
+    private FlowableEmitter<Order> receivedMessageSink;
 
     // tag::bevOrderConsume[]    
     @Incoming("beverageOrderConsume")
@@ -47,41 +45,27 @@ public class BarService {
     @Outgoing("beverageOrderPublishStatus")
     // end::bevOrderPublishInter[]
     // tag::initBevOrder[]
-    public CompletionStage<Order> initBeverageOrder(Order newOrder) {
+    public Order initBeverageOrder(Order newOrder) {
         logger.info("Order " + newOrder.getOrderId() + " received as NEW");
         logger.info(newOrder.toString());
-        return prepareOrder(newOrder);
+        Order order = prepareOrder(newOrder);
+        executor.execute(() -> {
+    		prepare(5);
+    		order.setStatus(Status.READY);
+    		logger.info("Order " + order.getOrderId() + " is READY");
+    		logger.info(order.toString());
+    		receivedMessageSink.onNext(order);
+    	});
+    	return order;
     }
     // end::initBevOrder[]
 
-    // tag::bevOrder[]
-    @Outgoing("beverageOrderPublishStatus")
-    // end::bevOrder[]
-    public PublisherBuilder<Order> sendReadyOrder() {
-        return ReactiveStreams.generate(() -> {
-            try {
-                Order order = inProgress.take();
-                prepare(5);
-                order.setStatus(Status.READY);
-                logger.info("Order " + order.getOrderId() + " is READY");
-                logger.info(order.toString());
-                return order;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
-    }
-
-    private CompletionStage<Order> prepareOrder(Order order) {
-        return CompletableFuture.supplyAsync(() -> {
+    private Order prepareOrder(Order order) {
             prepare(10);
             Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
             logger.info("Order " + order.getOrderId() + " is IN PROGRESS");
             logger.info(order.toString());
-            inProgress.add(inProgressOrder);
             return inProgressOrder;
-        }, executor);
     }
 
     private void prepare(int sleepTime) {
@@ -91,4 +75,13 @@ public class BarService {
             Thread.currentThread().interrupt();
         }
     }
+    
+   // tag::bevOrder[]
+    @Outgoing("beverageOrderPublishStatus")
+   // end::bevOrder[]
+	public Publisher<Order> receivedMessages() {
+		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedMessageSink = emitter,
+				BackpressureStrategy.BUFFER);
+		return flowable;
+	}
 }
