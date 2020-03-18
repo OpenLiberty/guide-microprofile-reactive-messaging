@@ -46,17 +46,17 @@ public class KitchenService {
     // end::foodOrderPublishIntermediate[]
     // tag::initFoodOrder[]
     public Order receiveFoodOrder(Order newOrder) {
-    	logger.info("Order " + newOrder.getOrderId() + " received with a status of NEW");
-    	logger.info(newOrder.toString());
-    	Order order = prepareOrder(newOrder);
-    	executor.execute(() -> {
-    		prepare(5);
-    		order.setStatus(Status.READY);
-    		logger.info("Order " + order.getOrderId() + " is READY");
-    		logger.info(order.toString());
-    		receivedOrders.onNext(order);
-    	});
-    	return order;
+        logger.info("Order " + newOrder.getOrderId() + " received with a status of NEW");
+        logger.info(newOrder.toString());
+        Order order = prepareOrder(newOrder);
+        executor.execute(() -> {
+            prepare(5);
+            order.setStatus(Status.READY);
+            logger.info("Order " + order.getOrderId() + " is READY");
+            logger.info(order.toString());
+            receivedOrders.onNext(order);
+        });
+        return order;
     }
     // end::initFoodOrder[]
 
@@ -79,9 +79,9 @@ public class KitchenService {
     // tag::foodOrder[]
     @Outgoing("foodOrderPublishStatus")
    // end::foodOrder[]
-	public Publisher<Order> sendReadyOrder() {
-		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
-				BackpressureStrategy.BUFFER);
-		return flowable;
-	}
+    public Publisher<Order> sendReadyOrder() {
+        Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
+                BackpressureStrategy.BUFFER);
+        return flowable;
+    }
 }

@@ -69,19 +69,19 @@ public class OrderResource {
             // tag::foodOrder[]
             case FOOD:
                 // end::foodOrder[]
-            	logger.info("Sending Order " + order.getOrderId() + " with a status of "
-	                    + order.getStatus() + " to Kitchen: " + order.toString());
+                logger.info("Sending Order " + order.getOrderId() + " with a status of "
+                        + order.getStatus() + " to Kitchen: " + order.toString());
                 // tag::fOrderQueue[]
-            	foodItem.onNext(order);
+                foodItem.onNext(order);
                 // end::fOrderQueue[]
                 break;
             // tag::beverageOrder[]
             case BEVERAGE:
                 // end::beverageOrder[]
-            	logger.info("Sending Order " + order.getOrderId() + " with a status of "
+                logger.info("Sending Order " + order.getOrderId() + " with a status of "
                         + order.getStatus() + " to Bar: " + order.toString());
                 // tag::bOrderQueue[]
-            	beverageItem.onNext(order);
+                beverageItem.onNext(order);
                 // end::bOrderQueue[]
                 break;
         }
@@ -97,32 +97,32 @@ public class OrderResource {
     // tag::OutgoingFood[]
     @Outgoing("food")
     // end::OutgoingFood[]
-	public Publisher<Order> sendFoodOrder() {
-    	// tag::takeF[]
-		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.foodItem = emitter,
-				BackpressureStrategy.BUFFER);
-		// end::takeF[]
-		return flowable;
-	}
+    public Publisher<Order> sendFoodOrder() {
+        // tag::takeF[]
+        Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.foodItem = emitter,
+                BackpressureStrategy.BUFFER);
+        // end::takeF[]
+        return flowable;
+    }
     
     // tag::OutgoingBev[]
     @Outgoing("beverage")
     // end::OutgoingBev[]
-	public Publisher<Order> sendBeverageOrder() {
-    	// tag::takeB[]
-		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.beverageItem = emitter,
-				BackpressureStrategy.BUFFER);
-		// end::takeB[]
-		return flowable;
-	}
+    public Publisher<Order> sendBeverageOrder() {
+        // tag::takeB[]
+        Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.beverageItem = emitter,
+                BackpressureStrategy.BUFFER);
+        // end::takeB[]
+        return flowable;
+    }
     
     @Outgoing("updateStatus")
- 	public Publisher<Order> updateStatus() {
-    	System.out.println("In updateStatus");
- 		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.statusUpdate = emitter,
- 				BackpressureStrategy.BUFFER)
- 				.doAfterNext( order -> logger.info("Sending Order " + order.getOrderId()
- 				+ " with a status of " + order.getStatus() + " to Status: " + order.toString()));
- 		return flowable;
- 	}
+     public Publisher<Order> updateStatus() {
+        System.out.println("In updateStatus");
+         Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.statusUpdate = emitter,
+                 BackpressureStrategy.BUFFER)
+                 .doAfterNext( order -> logger.info("Sending Order " + order.getOrderId()
+                 + " with a status of " + order.getStatus() + " to Status: " + order.toString()));
+         return flowable;
+     }
 }
