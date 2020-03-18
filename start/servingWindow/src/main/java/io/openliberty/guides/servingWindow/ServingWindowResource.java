@@ -14,8 +14,6 @@ package io.openliberty.guides.servingWindow;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -30,11 +28,13 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
-import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
+import org.reactivestreams.Publisher;
 
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableEmitter;
 
 @ApplicationScoped
 @Path("/servingWindow")
@@ -43,7 +43,7 @@ public class ServingWindowResource {
     private static Logger logger = Logger.getLogger(ServingWindowResource.class.getName());
 
     private List<Order> readyList = new ArrayList<Order>();
-    private BlockingQueue<Order> completedQueue = new LinkedBlockingQueue<>();
+    private FlowableEmitter<Order> receivedMessageSink;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -63,7 +63,7 @@ public class ServingWindowResource {
                 order.setStatus(Status.COMPLETED);
                 logger.info("Order " + orderId + " is now COMPLETE");
                 logger.info(order.toString());
-                completedQueue.add(order);
+                receivedMessageSink.onNext(order);
                 readyList.remove(order);
                 return Response
                         .status(Response.Status.OK)
@@ -77,6 +77,9 @@ public class ServingWindowResource {
                 .build();
     }
 
+    // tag::addReadyOrder[]
+    @Incoming("orderReady")
+    // end::addReadyOrder[]
     public void addReadyOrder(Order readyOrder)  {
         if (readyOrder.getStatus().equals(Status.READY)) {
             logger.info("Order " + readyOrder.getOrderId() + " is READY to be completed");
@@ -84,17 +87,15 @@ public class ServingWindowResource {
             readyList.add(readyOrder);
         }
     }
-
-    public PublisherBuilder<Order> sendCompletedOrder() {
-        return ReactiveStreams.generate(() -> {
-            try {
-                return completedQueue.take();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
-    }
+    
+    // tag::sendCompletedOrder[]
+    @Outgoing("completedOrder")
+   // end::sendCompletedOrder[]
+	public Publisher<Order> sendCompletedOrder() {
+		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedMessageSink = emitter,
+				BackpressureStrategy.BUFFER);
+		return flowable;
+	}
 
     @DELETE
     public Response resetServingWindow() {
