@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.reactivestreams.Publisher;
 
 import io.openliberty.guides.models.Order;
@@ -34,9 +36,16 @@ public class BarService {
 
     private Executor executor = Executors.newSingleThreadExecutor();
     private Random random = new Random();
-    private FlowableEmitter<Order> receivedMessageSink;
+    private FlowableEmitter<Order> receivedOrders;
 
-    public Order initBeverageOrder(Order newOrder) {
+    // tag::bevOrderConsume[]    
+    @Incoming("beverageOrderConsume")
+    // end::bevOrderConsume[]
+    // tag::bevOrderPublishInter[]
+    @Outgoing("beverageOrderPublishStatus")
+    // end::bevOrderPublishInter[]
+    // tag::initBevOrder[]
+    public Order receiveBeverageOrder(Order newOrder) {
         logger.info("Order " + newOrder.getOrderId() + " received as NEW");
         logger.info(newOrder.toString());
         Order order = prepareOrder(newOrder);
@@ -45,11 +54,12 @@ public class BarService {
     		order.setStatus(Status.READY);
     		logger.info("Order " + order.getOrderId() + " is READY");
     		logger.info(order.toString());
-    		receivedMessageSink.onNext(order);
+    		receivedOrders.onNext(order);
     	});
     	return order;
     }
-    
+    // end::initBevOrder[]
+
     private Order prepareOrder(Order order) {
             prepare(10);
             Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
@@ -65,9 +75,12 @@ public class BarService {
             Thread.currentThread().interrupt();
         }
     }
-   
-	public Publisher<Order> receivedMessages() {
-		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedMessageSink = emitter,
+    
+   // tag::bevOrder[]
+    @Outgoing("beverageOrderPublishStatus")
+   // end::bevOrder[]
+	public Publisher<Order> sendReadyOrder() {
+		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
 				BackpressureStrategy.BUFFER);
 		return flowable;
 	}

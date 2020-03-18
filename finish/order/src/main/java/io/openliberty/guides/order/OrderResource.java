@@ -98,8 +98,10 @@ public class OrderResource {
     @Outgoing("food")
     // end::OutgoingFood[]
 	public Publisher<Order> sendFoodOrder() {
+    	// tag::takeF[]
 		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.foodItem = emitter,
 				BackpressureStrategy.BUFFER);
+		// end::takeF[]
 		return flowable;
 	}
     
@@ -107,8 +109,10 @@ public class OrderResource {
     @Outgoing("beverage")
     // end::OutgoingBev[]
 	public Publisher<Order> sendBeverageOrder() {
+    	// tag::takeB[]
 		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.beverageItem = emitter,
 				BackpressureStrategy.BUFFER);
+		// end::takeB[]
 		return flowable;
 	}
     

@@ -36,7 +36,7 @@ public class BarService {
 
     private Executor executor = Executors.newSingleThreadExecutor();
     private Random random = new Random();
-    private FlowableEmitter<Order> receivedMessageSink;
+    private FlowableEmitter<Order> receivedOrders;
 
     // tag::bevOrderConsume[]    
     @Incoming("beverageOrderConsume")
@@ -45,7 +45,7 @@ public class BarService {
     @Outgoing("beverageOrderPublishStatus")
     // end::bevOrderPublishInter[]
     // tag::initBevOrder[]
-    public Order initBeverageOrder(Order newOrder) {
+    public Order receiveBeverageOrder(Order newOrder) {
         logger.info("Order " + newOrder.getOrderId() + " received as NEW");
         logger.info(newOrder.toString());
         Order order = prepareOrder(newOrder);
@@ -54,7 +54,7 @@ public class BarService {
     		order.setStatus(Status.READY);
     		logger.info("Order " + order.getOrderId() + " is READY");
     		logger.info(order.toString());
-    		receivedMessageSink.onNext(order);
+    		receivedOrders.onNext(order);
     	});
     	return order;
     }
@@ -79,8 +79,8 @@ public class BarService {
    // tag::bevOrder[]
     @Outgoing("beverageOrderPublishStatus")
    // end::bevOrder[]
-	public Publisher<Order> receivedMessages() {
-		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedMessageSink = emitter,
+	public Publisher<Order> sendReadyOrder() {
+		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
 				BackpressureStrategy.BUFFER);
 		return flowable;
 	}

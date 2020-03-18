@@ -36,7 +36,7 @@ public class KitchenService {
 
     private Executor executor = Executors.newSingleThreadExecutor();
     private Random random = new Random();
-    private FlowableEmitter<Order> receivedMessageSink;
+    private FlowableEmitter<Order> receivedOrders;
 
     // tag::foodOrderConsume[]
     @Incoming("foodOrderConsume")
@@ -45,7 +45,7 @@ public class KitchenService {
     @Outgoing("foodOrderPublishStatus")
     // end::foodOrderPublishIntermediate[]
     // tag::initFoodOrder[]
-    public Order initFoodOrder(Order newOrder) {
+    public Order receiveFoodOrder(Order newOrder) {
     	logger.info("Order " + newOrder.getOrderId() + " received with a status of NEW");
     	logger.info(newOrder.toString());
     	Order order = prepareOrder(newOrder);
@@ -54,7 +54,7 @@ public class KitchenService {
     		order.setStatus(Status.READY);
     		logger.info("Order " + order.getOrderId() + " is READY");
     		logger.info(order.toString());
-    		receivedMessageSink.onNext(order);
+    		receivedOrders.onNext(order);
     	});
     	return order;
     }
@@ -79,8 +79,8 @@ public class KitchenService {
     // tag::foodOrder[]
     @Outgoing("foodOrderPublishStatus")
    // end::foodOrder[]
-	public Publisher<Order> receivedMessages() {
-		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedMessageSink = emitter,
+	public Publisher<Order> sendReadyOrder() {
+		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
 				BackpressureStrategy.BUFFER);
 		return flowable;
 	}

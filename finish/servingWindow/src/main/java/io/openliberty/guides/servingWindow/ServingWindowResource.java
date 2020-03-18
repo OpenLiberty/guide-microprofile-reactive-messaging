@@ -43,7 +43,7 @@ public class ServingWindowResource {
     private static Logger logger = Logger.getLogger(ServingWindowResource.class.getName());
 
     private List<Order> readyList = new ArrayList<Order>();
-    private FlowableEmitter<Order> receivedMessageSink;
+    private FlowableEmitter<Order> receivedOrders;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -63,7 +63,7 @@ public class ServingWindowResource {
                 order.setStatus(Status.COMPLETED);
                 logger.info("Order " + orderId + " is now COMPLETE");
                 logger.info(order.toString());
-                receivedMessageSink.onNext(order);
+                receivedOrders.onNext(order);
                 readyList.remove(order);
                 return Response
                         .status(Response.Status.OK)
@@ -92,7 +92,7 @@ public class ServingWindowResource {
     @Outgoing("completedOrder")
    // end::sendCompletedOrder[]
 	public Publisher<Order> sendCompletedOrder() {
-		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedMessageSink = emitter,
+		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
 				BackpressureStrategy.BUFFER);
 		return flowable;
 	}
