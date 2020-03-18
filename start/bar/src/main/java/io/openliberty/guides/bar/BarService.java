@@ -50,13 +50,13 @@ public class BarService {
         logger.info(newOrder.toString());
         Order order = prepareOrder(newOrder);
         executor.execute(() -> {
-    		prepare(5);
-    		order.setStatus(Status.READY);
-    		logger.info("Order " + order.getOrderId() + " is READY");
-    		logger.info(order.toString());
-    		receivedOrders.onNext(order);
-    	});
-    	return order;
+            prepare(5);
+            order.setStatus(Status.READY);
+            logger.info("Order " + order.getOrderId() + " is READY");
+            logger.info(order.toString());
+            receivedOrders.onNext(order);
+        });
+        return order;
     }
     // end::initBevOrder[]
 
@@ -76,12 +76,12 @@ public class BarService {
         }
     }
     
-   // tag::bevOrder[]
+    // tag::bevOrder[]
     @Outgoing("beverageOrderPublishStatus")
-   // end::bevOrder[]
-	public Publisher<Order> sendReadyOrder() {
-		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
-				BackpressureStrategy.BUFFER);
-		return flowable;
-	}
+    // end::bevOrder[]
+    public Publisher<Order> sendReadyOrder() {
+        Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
+                BackpressureStrategy.BUFFER);
+        return flowable;
+    }
 }

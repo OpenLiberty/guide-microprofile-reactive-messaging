@@ -90,12 +90,12 @@ public class ServingWindowResource {
     
     // tag::sendCompletedOrder[]
     @Outgoing("completedOrder")
-   // end::sendCompletedOrder[]
-	public Publisher<Order> sendCompletedOrder() {
-		Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
-				BackpressureStrategy.BUFFER);
-		return flowable;
-	}
+    // end::sendCompletedOrder[]
+    public Publisher<Order> sendCompletedOrder() {
+        Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
+                BackpressureStrategy.BUFFER);
+        return flowable;
+    }
 
     @DELETE
     public Response resetServingWindow() {
