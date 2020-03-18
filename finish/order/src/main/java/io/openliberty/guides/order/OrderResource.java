@@ -99,8 +99,8 @@ public class OrderResource {
     // end::OutgoingFood[]
     public Publisher<Order> sendFoodOrder() {
         // tag::takeF[]
-        Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.foodItem = emitter,
-                BackpressureStrategy.BUFFER);
+        Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
+        this.foodItem = emitter, BackpressureStrategy.BUFFER);
         // end::takeF[]
         return flowable;
     }
@@ -110,8 +110,8 @@ public class OrderResource {
     // end::OutgoingBev[]
     public Publisher<Order> sendBeverageOrder() {
         // tag::takeB[]
-        Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.beverageItem = emitter,
-                BackpressureStrategy.BUFFER);
+        Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
+        this.beverageItem = emitter, BackpressureStrategy.BUFFER);
         // end::takeB[]
         return flowable;
     }
@@ -119,10 +119,11 @@ public class OrderResource {
     @Outgoing("updateStatus")
      public Publisher<Order> updateStatus() {
         System.out.println("In updateStatus");
-         Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.statusUpdate = emitter,
-                 BackpressureStrategy.BUFFER)
-                 .doAfterNext( order -> logger.info("Sending Order " + order.getOrderId()
-                 + " with a status of " + order.getStatus() + " to Status: " + order.toString()));
+         Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
+         this.statusUpdate = emitter, BackpressureStrategy.BUFFER)
+                 .doAfterNext( order -> logger.info("Sending Order "
+         + order.getOrderId() + " with a status of " + order.getStatus() 
+         + " to Status: " + order.toString()));
          return flowable;
      }
 }

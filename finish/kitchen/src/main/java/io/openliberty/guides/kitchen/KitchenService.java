@@ -80,8 +80,8 @@ public class KitchenService {
     @Outgoing("foodOrderPublishStatus")
    // end::foodOrder[]
     public Publisher<Order> sendReadyOrder() {
-        Flowable<Order> flowable = Flowable.<Order>create(emitter -> this.receivedOrders = emitter,
-                BackpressureStrategy.BUFFER);
+        Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
+        this.receivedOrders = emitter, BackpressureStrategy.BUFFER);
         return flowable;
     }
 }
