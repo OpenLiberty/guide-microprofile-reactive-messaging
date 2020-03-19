@@ -52,7 +52,7 @@ public class OpenLibertyCafeServingWindowResource {
     @Operation(operationId = "completeReadyOrder",
                summary = "Complete a ready order",
                description = "This operation completes an order " +
-                   "by the ServingWindow service.")
+                   "by using the ServingWindow service.")
     @Tag(name = "Serving Window")
     public Response serveOrder(@PathParam("orderId") String orderId) {
         return servingWindowClient.serveOrder(orderId);
@@ -62,7 +62,7 @@ public class OpenLibertyCafeServingWindowResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "resetServingWindow",
                summary = "Clear ready orders",
-               description = "This operation remove all orders " + 
+               description = "This operation removes all orders " + 
                    "in the ServingWindow service.")
     @Tag
     public Response resetServingWindow(){

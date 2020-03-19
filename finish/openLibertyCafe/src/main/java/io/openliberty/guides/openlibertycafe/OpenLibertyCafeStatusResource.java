@@ -75,7 +75,7 @@ public class OpenLibertyCafeStatusResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "resetOrder",
                summary = "Clear all orders",
-               description = "This operation remove all orders " + 
+               description = "This operation removes all orders " + 
                    "in the Status service.")
     @Tag
     public Response resetOrder(){
