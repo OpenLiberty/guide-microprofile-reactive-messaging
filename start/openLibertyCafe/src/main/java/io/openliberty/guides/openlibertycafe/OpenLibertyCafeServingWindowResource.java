@@ -36,7 +36,7 @@ public class OpenLibertyCafeServingWindowResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "listReadyOrders",
-               summary = "Lists ready orders",
+               summary = "List ready orders",
                description = "This operation retrieves all orders in the " +
                    "READY state from the ServingWindow service.")
     @Tag(name = "Serving Window",

@@ -39,7 +39,7 @@ public class OpenLibertyCafeStatusResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "listAllOrders",
-               summary = "Lists all submitted orders",
+               summary = "List all submitted orders",
                description = "This operation retrieves all submitted orders " +
                    "and their details from the Status service.")
     @Tag(name = "Status", description = "Listing and quering orders")
@@ -63,7 +63,7 @@ public class OpenLibertyCafeStatusResource {
     @Path("/table/{tableId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "listOrdersByTable",
-               summary = "Lists the orders for a table",
+               summary = "List the orders for a table",
                description = "This operation retrieves all orders " +
                    "of the provided tableId from the Status service.")
     @Tag(name = "Status")
