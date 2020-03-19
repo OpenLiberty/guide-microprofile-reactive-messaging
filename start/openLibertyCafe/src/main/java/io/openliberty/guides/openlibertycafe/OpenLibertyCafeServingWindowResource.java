@@ -13,6 +13,8 @@
 package io.openliberty.guides.openlibertycafe;
 
 import io.openliberty.guides.openlibertycafe.client.ServingWindowClient;
+
+import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -33,8 +35,12 @@ public class OpenLibertyCafeServingWindowResource {
     //Returns list of all ready orders
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "listReadyOrders",
+               summary = "Lists ready orders",
+               description = "This operation retrieves all orders in the " +
+                   "READY state from the ServingWindow service.")
     @Tag(name = "Serving Window",
-            description = "Listing and completing 'READY' Orders")
+            description = "Listing and completing ready orders")
     public Response getReady2Serve(){
         return servingWindowClient.getReady2Serve();
     }
@@ -43,6 +49,10 @@ public class OpenLibertyCafeServingWindowResource {
     @POST
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "completeReadyOrder",
+               summary = "Complete a ready order",
+               description = "This operation completes an order " +
+                   "by the ServingWindow service.")
     @Tag(name = "Serving Window")
     public Response serveOrder(@PathParam("orderId") String orderId) {
         return servingWindowClient.serveOrder(orderId);
@@ -50,6 +60,10 @@ public class OpenLibertyCafeServingWindowResource {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "resetServingWindow",
+               summary = "Clear ready orders",
+               description = "This operation remove all orders " + 
+                   "in the ServingWindow service.")
     @Tag
     public Response resetServingWindow(){
         servingWindowClient.resetServingWindow();
