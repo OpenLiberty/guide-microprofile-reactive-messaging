@@ -93,17 +93,4 @@ public class StatusResource {
                 .status(Response.Status.OK)
                 .build();
     }
-    
-    @Incoming("updateStatus")
-    public void updateStatus(Order order)  {
-        String orderId = order.getOrderId();
-        if (manager.getOrder(orderId).isPresent()) {
-            manager.updateStatus(orderId, order.getStatus());
-            logger.info("Order " + orderId + " status updated to "
-                + order.getStatus() + ": " + order);
-        } else {
-            manager.addOrder(order);
-            logger.info("Order " + orderId + " was added: " + order);	
-        }
-    }
 }
