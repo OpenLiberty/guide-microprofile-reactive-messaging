@@ -45,9 +45,14 @@
         </dependency>
         <!--  Required dependencies -->
         <dependency>
-           <groupId>io.openliberty.guides</groupId>
-           <artifactId>models</artifactId>
-           <version>1.0-SNAPSHOT</version>
+            <groupId>io.openliberty.guides</groupId>
+            <artifactId>models</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.reactivex.rxjava3</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>3.0.0</version>
         </dependency>
         <!-- For tests -->
         <dependency>

@@ -12,8 +12,6 @@
 // end::copyright[]
 package io.openliberty.guides.order;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
@@ -27,11 +25,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
-import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
+import org.reactivestreams.Publisher;
 
 import io.openliberty.guides.models.Order;
 import io.openliberty.guides.models.Status;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableEmitter;
 
 @ApplicationScoped
 @Path("/orders")
@@ -39,9 +39,9 @@ public class OrderResource {
 
     private static Logger logger = Logger.getLogger(OrderResource.class.getName());
 
-    private BlockingQueue<Order> foodQueue = new LinkedBlockingQueue<>();
-    private BlockingQueue<Order> beverageQueue = new LinkedBlockingQueue<>();
-    private BlockingQueue<Order> statusQueue = new LinkedBlockingQueue<>();
+    private FlowableEmitter<Order> foodItem;
+    private FlowableEmitter<Order> beverageItem;
+    private FlowableEmitter<Order> statusUpdate;
 
     private AtomicInteger counter = new AtomicInteger();
 
@@ -51,9 +51,7 @@ public class OrderResource {
     public Response getStatus() {
         return Response
                 .status(Response.Status.OK)
-                .entity("The order service is running...\n"
-                        + foodQueue.size() + " food orders in the queue.\n"
-                        + beverageQueue.size() + " beverage orders in the queue.")
+                .entity("The order service is running...\n")
                 .build();
     }
 
@@ -71,19 +69,23 @@ public class OrderResource {
             // tag::foodOrder[]
             case FOOD:
                 // end::foodOrder[]
+                logger.info("Sending Order " + order.getOrderId() + " with a status of "
+                        + order.getStatus() + " to Kitchen: " + order.toString());
                 // tag::fOrderQueue[]
-                foodQueue.add(order);
+                foodItem.onNext(order);
                 // end::fOrderQueue[]
                 break;
             // tag::beverageOrder[]
             case BEVERAGE:
                 // end::beverageOrder[]
+                logger.info("Sending Order " + order.getOrderId() + " with a status of "
+                        + order.getStatus() + " to Bar: " + order.toString());
                 // tag::bOrderQueue[]
-                beverageQueue.add(order);
+                beverageItem.onNext(order);
                 // end::bOrderQueue[]
                 break;
         }
-
+        statusUpdate.onNext(order);
         return Response
                 .status(Response.Status.OK)
                 .entity(order)
@@ -95,58 +97,33 @@ public class OrderResource {
     // tag::OutgoingFood[]
     @Outgoing("food")
     // end::OutgoingFood[]
-    public PublisherBuilder<Order> sendFoodOrder() {
-        return ReactiveStreams.generate(() -> {
-            try {
-                // tag::takeF[]
-                Order order = foodQueue.take();
-                // end::takeF[]
-                statusQueue.add(order);
-                logger.info("Sending Order " + order.getOrderId() + " with a status of "
-                        + order.getStatus() + " to Kitchen: " + order.toString());
-                return order;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
+    public Publisher<Order> sendFoodOrder() {
+        // tag::takeF[]
+        Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
+        this.foodItem = emitter, BackpressureStrategy.BUFFER);
+        // end::takeF[]
+        return flowable;
     }
-
-
+    
     // tag::OutgoingBev[]
     @Outgoing("beverage")
     // end::OutgoingBev[]
-    public PublisherBuilder<Order> sendBeverageOrder() {
-        return ReactiveStreams.generate(() -> {
-            try {
-                // tag::takeB[]
-                Order order = beverageQueue.take();
-                // end::takeB[]
-                statusQueue.add(order);
-                logger.info("Sending Order " + order.getOrderId() + " with a status of "
-                        + order.getStatus() + " to Bar: " + order.toString());
-                return order;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
+    public Publisher<Order> sendBeverageOrder() {
+        // tag::takeB[]
+        Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
+        this.beverageItem = emitter, BackpressureStrategy.BUFFER);
+        // end::takeB[]
+        return flowable;
     }
-
+    
     @Outgoing("updateStatus")
-    public PublisherBuilder<Order> updateStatus() {
-        return ReactiveStreams.generate(() -> {
-            try {
-                // tag::takeC[]
-                Order order = statusQueue.take();
-                // end::takeC[]
-                logger.info("Sending Order " + order.getOrderId() + " with a status of "
-                        + order.getStatus() + " to Status: " + order.toString());
-                return order;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
-	}
+     public Publisher<Order> updateStatus() {
+        System.out.println("In updateStatus");
+         Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
+         this.statusUpdate = emitter, BackpressureStrategy.BUFFER)
+                 .doAfterNext( order -> logger.info("Sending Order "
+         + order.getOrderId() + " with a status of " + order.getStatus() 
+         + " to Status: " + order.toString()));
+         return flowable;
+     }
 }

@@ -124,7 +124,7 @@ kitchen/microprofile-config.properties
 include::finish/kitchen/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Kitchen` microservice uses an outgoing stream [hotspot=foodOrderPublishStatus file=0]`foodOrderPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `ServingWindow` and `Status` microservices can consume the messages. The `Kitchen` microservice listens messages from an incoming stream [hotspot=foodOrderConsume file=0]`foodOrderConsume`, which messages are sent by the `Order` microservice through the [hotspot=topic2 file=0]`foodTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages. The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#api[Apache Kafka client API^].
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Kitchen` microservice uses an outgoing stream [hotspot=foodOrderPublishStatus file=0]`foodOrderPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `ServingWindow` and `Status` microservices can consume the messages. The `Kitchen` microservice listens to messages from an incoming stream [hotspot=foodOrderConsume file=0]`foodOrderConsume`, wherein the messages are sent by the `Order` microservice through the [hotspot=topic2 file=0]`foodTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages. The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#api[Apache Kafka client API^].
 
 The rest of the microservices use similar `microprofile-config.properties` configuration to define their required incoming and outgoing streams.
 
@@ -152,7 +152,7 @@ order/microprofile-config.properties
 include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Order` microservice creates orders when the [hotspot=postOrder file=0]`POST` request of the endpoint `/orders` is called. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`LinkedBlockingQueue`. As soon as an order is added to the queue, the [hotspot=takeF hotspot=takeB file=0]`take()` method retrieves and removes the orders. The Reactive Messaging implementation generates Reactive streams for those orders and publishes it to Kafka over [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which are configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` stream.
+The `Order` microservice creates orders when the [hotspot=postOrder file=0]`POST` request of the endpoint `/orders` is called. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. As soon as an order is added to the emitter, the [hotspot=takeF hotspot=takeB file=0]`Flowable.<Order>create()` method retrieves and removes the orders. The Reactive Messaging implementation generates Reactive streams for those orders and publishes it to Kafka over [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which are configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` stream.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
@@ -188,40 +188,7 @@ KitchenService.java
 include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenService.java[]
 ----
 
-If the order is an item of food, `Kitchen` service receives an order on the [hotspot=foodOrderConsume file=0]`@Incoming("foodOrderConsume")` channel, processes it in [hotspot=initFoodOrder file=0]`initFoodOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=foodOrderPublishIntermediate file=0]`@Outgoing("foodOrderPublishStatus")` channel to Kafka over MicroProfile Reactive Messaging channels. After a while, a `READY` status will be sent to the [hotspot=foodOrder file=0]`@Outgoing("foodOrderPublishStatus")` channel.
-
-// *Completing the Bar microservice*
-
-// //bar
-// [role="code_command hotspot file=1", subs="quotes"]
-// ----
-// #Replace the `BarResource` class.#
-// `bar/src/main/java/io/openliberty/guides/bar/BarResource.java`
-// ----
-// BarResource.java
-// [source, Java, linenums, role='code_column hide_tags=copyright']
-// ----
-// include::finish/bar/src/main/java/io/openliberty/guides/bar/BarResource.java[]
-// ----
-
-// If the order is a drink, `Bar` service receives an order on the [hotspot=bevOrderConsume file=1]`@Incoming("bevOrderConsume")` channel, processes it in [hotspot=initBevOrder file=1]`initBeverageOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=bevOrderPublishInter file=1]`@Outgoing("bevOrderPublishInter")` channel and a `READY` status on the [hotspot=bevOrder file=1]`@Outgoing("beverageOrderPublish")` channel to Kafka over MicroProfile Reactive Messaging channels.
-
-// *Completing the ServingWindow microservice*
-
-// //servingWindow
-// [role="code_command hotspot file=2", subs="quotes"]
-// ----
-// #Replace the `ServingWindowResource` class.#
-// `servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java`
-// ----
-// ServingWindowResource.java
-// [source, Java, linenums, role='code_column hide_tags=copyright']
-// ----
-// include::finish/servingWindow/src/main/java/io/openliberty/guides/servingWindow/ServingWindowResource.java[]
-// ----
-
-// The `ServingWindow` microservice receives a `Ready` order from the `Bar` and `Kitchen` microservices over the [hotspot=addReadyOrder file=2]`@Incoming("orderReady")` channel.
-// Once the order is served, it's marked as `COMPLETED` and the status is sent across to the `Order` microservice using the [hotspot=sendCompletedOrder file=2]`@Outgoing("completedOrder")` channel.
+If the order is an item of food, `Kitchen` service receives an order on the [hotspot=foodOrderConsume file=0]`@Incoming("foodOrderConsume")` channel, processes it in [hotspot=initFoodOrder file=0]`receiveFoodOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=foodOrderPublishIntermediate file=0]`@Outgoing("foodOrderPublishStatus")` channel to Kafka over MicroProfile Reactive Messaging channels. After a while, a `READY` status will be sent to the [hotspot=foodOrder file=0]`@Outgoing("foodOrderPublishStatus")` channel.
 
 *Completing the Status microservice*
 
@@ -267,7 +234,7 @@ The rest of the microservices have [hotspot file=0]`server.xml` already configur
 
 == Building the application
 
-You will build and run the `Bar`, `Kitchen`, `OpenLibertyCafe`, `Order`, `ServingWindow`, and `Status` microservices in Docker containers.
+You will build and run the `Bar`, `Kitchen`, `Order`, `OpenLibertyCafe`, `ServingWindow`, and `Status` microservices in Docker containers.
 
 Start your Docker environment.
 
