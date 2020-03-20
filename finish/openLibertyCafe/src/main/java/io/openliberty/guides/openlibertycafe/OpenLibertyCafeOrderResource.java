@@ -27,6 +27,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -69,6 +70,10 @@ public class OpenLibertyCafeOrderResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "createOrder",
+               summary = "Create orders",
+               description = "This operation creates orders by using " + 
+                   "an OrderRequest and sends them to the Bar and Kitchen services.")
     @Tag(name = "Order")
     public Response createOrder(OrderRequest orderRequest) {
 

@@ -39,10 +39,10 @@ public class OpenLibertyCafeStatusResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(operationId = "listAllOrders",
-            summary = "Lists all of the submitted orders",
-            description = "This operation retrieves all of the submitted orders " +
-                    "and order details from the order database")
-    @Tag(name = "Status", description = "Listing and quering Orders")
+               summary = "List all submitted orders",
+               description = "This operation retrieves all submitted orders " +
+                   "and their details from the Status service.")
+    @Tag(name = "Status", description = "Listing and quering orders")
     public Response getOrders(){
         return statusClient.getOrders();
     }
@@ -50,6 +50,10 @@ public class OpenLibertyCafeStatusResource {
     @GET
     @Path("/order/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "listAnOrder",
+               summary = "Show an order",
+               description = "This operation retrieves the order " +
+                   "and its details with the provided orderId from the Status service.")
     @Tag(name = "Status")
     public Response getSingleOrder(@PathParam("orderId") String orderId){
         return statusClient.getSingleOrder(orderId);
@@ -58,6 +62,10 @@ public class OpenLibertyCafeStatusResource {
     @GET
     @Path("/table/{tableId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "listOrdersByTable",
+               summary = "List the orders for a table",
+               description = "This operation retrieves all orders " +
+                   "of the provided tableId from the Status service.")
     @Tag(name = "Status")
     public Response getOrdersList(@PathParam("tableId") String tableId){
         return statusClient.getOrdersList(tableId);
@@ -65,6 +73,10 @@ public class OpenLibertyCafeStatusResource {
     
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "resetOrder",
+               summary = "Clear all orders",
+               description = "This operation removes all orders " + 
+                   "in the Status service.")
     @Tag
     public Response resetOrder(){
     	statusClient.resetOrder();
