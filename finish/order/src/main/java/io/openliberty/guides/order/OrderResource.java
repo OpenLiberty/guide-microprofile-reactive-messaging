@@ -118,7 +118,6 @@ public class OrderResource {
     
     @Outgoing("updateStatus")
      public Publisher<Order> updateStatus() {
-        System.out.println("In updateStatus");
          Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
          this.statusUpdate = emitter, BackpressureStrategy.BUFFER)
                  .doAfterNext( order -> logger.info("Sending Order "
