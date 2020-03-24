@@ -40,18 +40,18 @@ https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/mi
 
 === What is Kafka?
 
-https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages. Kafka Producer is a client or a program, which produces the message and pushes it to the Topic. Whereas Kafka Consumer is a client or a program, which consumes the published messages from the Producer.
+https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages. A Kafka producer is a client or a program, which produces the message and pushes them to a topic. A Kafka consumer is a client or a program, which consumes the published messages from a topic.
 
 === What is asynchronous programming?
 Imagine asynchronous programming as a restaurant. After you're seated, a waitstaff takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waitstaff may take more orders or serve other tables. After your food is ready, your waitstaff brings out the food to your table. However, in a synchronous model, the waitstaff must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-The OpenLiberty Cafe application is designed with reactive architecture. The application that you'll be working with consists of six microservices : `Bar`, `Kitchen`, `Order`, `OpenLibertyCafe`, `ServingWindow`, and `Status`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+The OpenLiberty Cafe application that you'll be working with consists of six microservices : `Bar`, `Kitchen`, `Order`, `OpenLibertyCafe`, `ServingWindow`, and `Status`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
 You'll update the `Kitchen`, `Order` and `Status` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
-The `OpenLibertyCafe` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backends for frontends^] service.
+The `OpenLibertyCafe` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend microservices on the caller's behalf.
 
 The waitstaff places a request using the `OpenLibertyCafe` microservice.
@@ -87,26 +87,26 @@ MicroProfile Reactive Messaging recommends a design to build reactive applicatio
 
 *Channel*
 
-Channel is a bridge for transporting messages between service and messaging-broker. It is managed by the MicroProfile Reactive Messaging.
+A channel is a bridge for transporting messages between different parts of the reactive system. This can be between the service and a messaging-broker, or between two components within the same service.
 
 *@Outgoing* 
 
-Outgoing is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute. For example, `@Outgoing("food")`
+`@Outgoing` is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute. For example, `@Outgoing("food")`
 
 *@Incoming*
 
-Incoming is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute. For example, `@Incoming("foodOrderConsume")`
+`@Incoming` is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute. For example, `@Incoming("foodOrderConsume")`
 
 *Connector*
 
-Reactive messaging uses connectors to attach one end of a channel to other messaging technology and are configured using MicroProfile Config.
-Open Liberty includes the `liberty-kafka` connector for sending and receiving messages from an Apache Kafka.
+MicroProfile Reactive Messaging uses connectors to attach one end of a channel to another messaging technology and are configured using MicroProfile Config.
+Open Liberty includes the `liberty-kafka` connector for sending and receiving messages from Apache Kafka.
 
 image::reactive-messaging-keyconcepts.png[Reactive key concepts,align="center"]
 
 ---
 
-=== Configuring the MicroProfile Reactive Messaging
+=== Configuring MicroProfile Reactive Messaging connectors
 
 Navigate to the `start` directory to begin. Most of the code is already provided for use.
 
@@ -152,7 +152,7 @@ order/microprofile-config.properties
 include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Order` microservice creates orders when the [hotspot=postOrder file=0]`POST` request of the endpoint `/orders` is called. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. As soon as an order is added to the emitter, the [hotspot=takeF hotspot=takeB file=0]`Flowable.<Order>create()` method retrieves and removes the orders. The Reactive Messaging implementation generates Reactive streams for those orders and publishes it to Kafka over [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which are configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` stream.
+The `Order` microservice creates orders when an order is sent in a [hotspot=postOrder file=0]`POST` request to the `/orders` endpoint. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. We use [hotspot=takeF hotspot=takeB file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the Publisher. We return the Publisher from our [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which are configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
@@ -215,7 +215,7 @@ The `Status` microservice receives the message from the `Bar`, `Kitchen`, `Order
  
 == Configuring the server
 
-To get the service running, the Open Liberty server needs to be correctly configured.
+To use MicroProfile Reactive Messaging, we must enable the feature in the server.xml file for each service.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -420,10 +420,12 @@ You have just developed an application using MicroProfile Reactive Messaging, Op
 
 Learn more about MicroProfile.
 
+https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html[View the MicroProfile Reactive Messaging Specification^]
+
+https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/apidocs/[View the MicroProfile Reactive Messaging Javadoc^]
+
 https://microprofile.io/[See the MicroProfile specs^]
 
 https://openliberty.io/docs/ref/microprofile[View the MicroProfile API^]
-
-https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html#_microprofile_reactive_messaging[View the MicroProfile Reactive Messaging Specification^]
 
 include::{common-includes}/attribution.adoc[subs="attributes"]
