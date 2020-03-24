@@ -152,7 +152,7 @@ order/microprofile-config.properties
 include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Order` microservice creates orders when an order is sent in a [hotspot=postOrder file=0]`POST` request to the `/orders` endpoint. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. We use [hotspot=takeF hotspot=takeB file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the Publisher. We return the Publisher from our [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which are configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
+The `Order` microservice creates orders when an order is sent in a [hotspot=postOrder file=0]`POST` request to the `/orders` endpoint. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. We use [hotspot=takeF hotspot=takeB file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the Publisher. We return the Publisher from our [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which are configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` streams and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
@@ -422,9 +422,7 @@ Learn more about MicroProfile.
 
 https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html[View the MicroProfile Reactive Messaging Specification^]
 
-https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/apidocs/[View the MicroProfile Reactive Messaging Javadoc^]
-
-https://microprofile.io/[See the MicroProfile specs^]
+https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/apidocs/  [View the MicroProfile Reactive Messaging Javadoc^]
 
 https://openliberty.io/docs/ref/microprofile[View the MicroProfile API^]
 
