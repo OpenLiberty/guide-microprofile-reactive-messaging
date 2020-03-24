@@ -113,10 +113,10 @@ Navigate to the `start` directory to begin. Most of the code is already provided
 Each of the five microservices `Bar`, `Kitchen`, `Order`, `ServingWindow`, and `Status` contain `microprofile-config.properties`
 file. MicroProfile Reactive Messaging uses connectors to connect certain channels to Apache Kafka and setting options on those connectors.
 
-The format of the configuration keys used in MicroProfile Reactive Messaging connectors
+The format of the configuration keys used in MicroProfile Reactive Messaging connectors are as follows :
 
-- mp.messaging.connector.liberty-kafka. : Applies to all channels using the liberty-kafka connector
-- mp.messaging.[incoming.|outgoing.]. : Applies to a particular channel
+- mp.messaging.connector.liberty-kafka. :- Applies to all channels using the liberty-kafka connector
+- mp.messaging.[incoming.|outgoing.]. :- Applies to a particular channel
 - Each channel which is to be connected using a connector must have the connector property defined to say which connector to use
 
 [role="code_command hotspot file=0", subs="quotes"]
