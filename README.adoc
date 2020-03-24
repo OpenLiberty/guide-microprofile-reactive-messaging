@@ -111,6 +111,7 @@ image::reactive-messaging-keyconcepts.png[Reactive key concepts,align="center"]
 Navigate to the `start` directory to begin. Most of the code is already provided for use.
 
 In order to configure the MicroProfile Reactive Messaging connectors, We need to format the configuration keys as follows :
+
 - `mp.messaging.connector.liberty-kafka.` :- Applies to all channels using the liberty-kafka connector
 - `mp.messaging.[incoming.|outgoing.].` :- Applies to a particular channel
 - Each channel which is to be connected using a connector must have the connector property defined to say which connector to use
