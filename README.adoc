@@ -110,14 +110,13 @@ image::reactive-messaging-keyconcepts.png[Reactive key concepts,align="center"]
 
 Navigate to the `start` directory to begin. Most of the code is already provided for use.
 
-Each of the five microservices `Bar`, `Kitchen`, `Order`, `ServingWindow`, and `Status` contain `microprofile-config.properties`
-file. MicroProfile Reactive Messaging uses connectors to connect certain channels to Apache Kafka and setting options on those connectors.
-
-The format of the configuration keys used in MicroProfile Reactive Messaging connectors are as follows :
-
+In order to configure the MicroProfile Reactive Messaging connectors, We need to format the configuration keys as follows :
 - `mp.messaging.connector.liberty-kafka.` :- Applies to all channels using the liberty-kafka connector
 - `mp.messaging.[incoming.|outgoing.].` :- Applies to a particular channel
 - Each channel which is to be connected using a connector must have the connector property defined to say which connector to use
+
+Each of the five microservices `Bar`, `Kitchen`, `Order`, `ServingWindow`, and `Status` contain `microprofile-config.properties`
+file. MicroProfile Reactive Messaging uses connectors to connect certain channels to Apache Kafka and setting options on those connectors.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -130,9 +129,7 @@ kitchen/microprofile-config.properties
 include::finish/kitchen/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-- The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. 
-- The `Kitchen` microservice uses an outgoing stream [hotspot=foodOrderPublishStatus file=0]`foodOrderPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `ServingWindow` and `Status` microservices can consume the messages. The `Kitchen` microservice listens to messages from an incoming stream [hotspot=foodOrderConsume file=0]`foodOrderConsume`, wherein the messages are sent by the `Order` microservice through the [hotspot=topic2 file=0]`foodTopic` topic in the Kafka messaging-broker. 
-- The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages. The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Kitchen` microservice uses an outgoing stream [hotspot=foodOrderPublishStatus file=0]`foodOrderPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `ServingWindow` and `Status` microservices can consume the messages. The `Kitchen` microservice listens to messages from an incoming stream [hotspot=foodOrderConsume file=0]`foodOrderConsume`, wherein the messages are sent by the `Order` microservice through the [hotspot=topic2 file=0]`foodTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages. The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
 
 The rest of the microservices use similar `microprofile-config.properties` configuration to define their required incoming and outgoing streams.
 
