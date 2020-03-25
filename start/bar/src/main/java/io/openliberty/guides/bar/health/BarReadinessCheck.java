@@ -36,7 +36,7 @@ public class BarReadinessCheck implements HealthCheck {
     String kafkaServer;
 	
 	@Inject
-    @ConfigProperty(name = "mp.messaging.incoming.bevOrderConsume.group.id")
+    @ConfigProperty(name = "mp.messaging.incoming.beverageOrderConsume.group.id")
     String groupId;
 	
 	@Override
