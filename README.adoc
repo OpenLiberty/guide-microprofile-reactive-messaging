@@ -35,7 +35,7 @@ You will learn how to build reactive microservices using MicroProfile Reactive M
 
 === What is MicroProfile Reactive Messaging?
 
-Temporal decoupling of services in a microservice-based architecture can be achieved using asynchronous communication. MicroProfile Reactive Messaging provides a way to build systems of microservices advocating responsiveness, location transparency, elasticity, resiliency to failure and temporal decoupling. This helps in enforcing asynchronous message passing between the different parts of the system. See
+Temporal decoupling of services in a microservice-based architecture can be achieved using asynchronous communication. MicroProfile Reactive Messaging provides a way to build systems of microservices which advocates responsiveness, location transparency, elasticity, resiliency to failure and temporal decoupling. This helps in enforcing asynchronous message passing between the different parts of the system. See
 https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html#_microprofile_reactive_messaging[ MicroProfile Reactive Messaging Specification^] for more information.
 
 === What is Kafka?
@@ -69,7 +69,7 @@ The `Status` microservice receives status updates and provides queries for the w
 // =================================================================================================
 == Additional prerequisites
 
-You will now build and run the  microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+You will build and run the  microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
@@ -298,12 +298,12 @@ include::{common-includes}/os-tabs.adoc[]
 
 Once the application is up and running, you can access the application by making requests to the `OpenLibertyCafe` endpoint using OpenAPI.
 
-The services take some time to become available. Check out the service that you created at the
+The services may take some time to become available. Check out the service that you created at the
 http://localhost:9080/openapi/ui[^] URL.
 
 *Place Orders*
 
-Make a `POST` request to the `/api/orders` endpoint. To make this request, expand the `POST` endpoint on the UI, click the *Try it out button*. Copy the following example input into the text box, and then click the `Execute` button. The `POST` request adds a new `food` and `beverage` Order.
+Make a `POST` request to the `/api/orders` endpoint. To make this request, expand the `POST` endpoint on the UI and click the *Try it out button*. Copy the following example input into the text box, and then click the `Execute` button. The `POST` request adds a new `food` and `beverage` Order.
 
 [source, role='command']
 ----
@@ -320,7 +320,7 @@ Make a `POST` request to the `/api/orders` endpoint. To make this request, expan
 
 *Check IN_PROGRESS Order Status*
 
-Next, make a `GET` request to the `/api/status` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response should show that the Orders have an `IN_PROGRESS` status. Just in case if you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
+Next, make a `GET` request to the `/api/status` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response should show that the Orders have an `IN_PROGRESS` status, In case you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
 
 [source, role="no_copy"]
 ----
@@ -344,7 +344,7 @@ Next, make a `GET` request to the `/api/status` endpoint. To make this request, 
 
 *Check READY Order Status*
 
-Click `Execute` again and you will see the response with a `READY` status. Just in case if you see an `IN_PROGRESS` status then wait for a couple of seconds and click the `Execute` button again.
+Click `Execute` again and you will see the response with a `READY` status. In case you see an `IN_PROGRESS` status then wait for a couple of seconds and click the `Execute` button again.
 
 [source, role="no_copy"]
 ----
@@ -368,7 +368,7 @@ Click `Execute` again and you will see the response with a `READY` status. Just 
 
 *Complete an Order*
 
-Make a `POST` request to the `/api/servingWindow/{orderId}` endpoint to complete an order. Expand the `POST` endpoint on the UI, click the *Try it out* button. Copy the following orderId into the text box, and then click the `Execute` button.
+Make a `POST` request to the `/api/servingWindow/{orderId}` endpoint to complete an order. Expand the `POST` endpoint on the UI and click the *Try it out* button. Copy the following orderId into the text box, and then click the `Execute` button.
  
 [source, role='command']
 ----
@@ -432,7 +432,7 @@ Learn more about MicroProfile.
 
 https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html[View the MicroProfile Reactive Messaging Specification^]
 
-https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/apidocs/  [View the MicroProfile Reactive Messaging Javadoc^]
+https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/apidocs/[View the MicroProfile Reactive Messaging Javadoc^]
 
 https://openliberty.io/docs/ref/microprofile[View the MicroProfile API^]
 
