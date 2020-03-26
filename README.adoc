@@ -18,8 +18,8 @@
 :page-related-guides: ['containerize']
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
-:page-seo-title: Creating a MicroProfile Reactive Messaging REST service
-:page-seo-description: A tutorial on how to create a microservices in Open Liberty using MicroProfile Reactive Messaging
+:page-seo-title: Creating asynchronous Java microservices using MicroProfile Reactive Messaging 
+:page-seo-description: A getting started tutorial with examples on how to send and receive messages between asynchronous Java microservices using MicroProfile Reactive Messaging and Apache Kafka.
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/dev
 :source-highlighter: prettify
 = Creating asynchronous reactive microservices using MicroProfile Reactive Messaging
