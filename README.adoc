@@ -110,7 +110,7 @@ image::reactive-messaging-keyconcepts.png[Reactive key concepts,align="center"]
 
 Navigate to the `start` directory to begin. Most of the code is already provided for use.
 
-In order to configure the MicroProfile Reactive Messaging connectors, We need to format the configuration keys as follows :
+In order to configure the MicroProfile Reactive Messaging connectors, we need to format the configuration keys as follows :
 
 - `mp.messaging.connector.liberty-kafka.` :- Applies to all channels using the liberty-kafka connector
 - `mp.messaging.[incoming.|outgoing.].` :- Applies to a particular channel
@@ -132,7 +132,7 @@ include::finish/kitchen/src/main/resources/META-INF/microprofile-config.properti
 
 The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Kitchen` microservice uses an outgoing stream [hotspot=foodOrderPublishStatus file=0]`foodOrderPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `ServingWindow` and `Status` microservices can consume the messages.
 
-The `Kitchen` microservice listens to messages from an incoming stream [hotspot=foodOrderConsume file=0]`foodOrderConsume`, wherein the messages are sent by the `Order` microservice through the [hotspot=topic2 file=0]`foodTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages.
+The `Kitchen` microservice listens to messages from an incoming stream [hotspot=foodOrderConsume file=0]`foodOrderConsume`, wherein the messages are sent by the `Order` microservice through the [hotspot=topic2 file=0]`foodTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly the [hotspot=deserializer2 file=0]`key.deserializer` and [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages.
 
 The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
 
@@ -162,7 +162,7 @@ order/microprofile-config.properties
 include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Order` microservice creates orders when an order is sent in a [hotspot=postOrder file=0]`POST` request to the `/orders` endpoint. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. We use [hotspot=takeF hotspot=takeB file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the Publisher. We return the Publisher from our [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which are configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` streams and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
+The `Order` microservice creates orders when an order is sent in a [hotspot=postOrder file=0]`POST` request to the `/orders` endpoint. The [hotspot=createOrder file=0]`createOrder()` method receives [hotspot=foodOrder file=0]`food` or [hotspot=beverageOrder file=0]`beverage` orders and adds it to the respective [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. We use [hotspot=takeF hotspot=takeB file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the `Publisher`. We return the `Publisher` from our [hotspot=OutgoingFood file=0]`@Outgoing("food")` or [hotspot=OutgoingBev file=0]`@Outgoing("beverage")` channels, which are configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` or [hotspot=bevStream file=1]`beverage` streams and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
