@@ -12,8 +12,6 @@
     <modules>
         <module>models</module>
         <module>kitchen</module>
-        <module>bar</module>
-        <module>servingWindow</module>
         <module>order</module>
         <module>status</module>
         <module>openLibertyCafe</module>
