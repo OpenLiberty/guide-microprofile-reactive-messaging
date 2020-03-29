@@ -14,7 +14,6 @@ package it.io.openliberty.guides.openlibertycafe;
 
 import io.openliberty.guides.models.OrderRequest;
 import io.openliberty.guides.openlibertycafe.client.OrderClient;
-import io.openliberty.guides.openlibertycafe.client.ServingWindowClient;
 import io.openliberty.guides.openlibertycafe.client.StatusClient;
 
 import org.microshed.testing.SharedContainerConfiguration;
@@ -50,8 +49,7 @@ public class AppContainerConfig implements SharedContainerConfiguration {
             .withReadinessPath("/api/servingWindow")
             .withNetwork(network)
             .withMpRestClient(OrderClient.class, "http://mock-server:" + MockServerContainer.PORT)
-            .withMpRestClient(StatusClient.class, "http://mock-server:" + MockServerContainer.PORT)
-            .withMpRestClient(ServingWindowClient.class, "http://mock-server:" + MockServerContainer.PORT);
+            .withMpRestClient(StatusClient.class, "http://mock-server:" + MockServerContainer.PORT);
 
     @Override
     public void startContainers() {
@@ -92,7 +90,6 @@ public class AppContainerConfig implements SharedContainerConfiguration {
             beverageList.add("Iced Tea");
             orderRequest.setTableId("10");
             orderRequest.setFoodList(foodList);
-            orderRequest.setBeverageList(beverageList);
         }
 
         //For createOrder() in Order Client

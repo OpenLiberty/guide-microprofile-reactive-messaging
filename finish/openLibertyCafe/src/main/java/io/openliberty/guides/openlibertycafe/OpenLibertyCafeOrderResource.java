@@ -73,7 +73,7 @@ public class OpenLibertyCafeOrderResource {
     @Operation(operationId = "createOrder",
                summary = "Create orders",
                description = "This operation creates orders by using " + 
-                   "an OrderRequest and sends them to the Bar and Kitchen services.")
+                   "an OrderRequest and sends them to the Kitchen service.")
     @Tag(name = "Order")
     public Response createOrder(OrderRequest orderRequest) {
 
@@ -88,11 +88,6 @@ public class OpenLibertyCafeOrderResource {
         //Send individual order requests to the Order service through the client
         for (String foodItem : orderRequest.getFoodList()) {
             Order order = new Order().setTableId(tableId).setItem(foodItem).setType(Type.FOOD);
-            orderClient.createOrder(order);
-        }
-
-        for (String beverageItem : orderRequest.getBeverageList()) {
-            Order order = new Order().setTableId(tableId).setItem(beverageItem).setType(Type.BEVERAGE);
             orderClient.createOrder(order);
         }
 

@@ -40,7 +40,6 @@ public class OrderResource {
     private static Logger logger = Logger.getLogger(OrderResource.class.getName());
 
     private FlowableEmitter<Order> foodItem;
-    private FlowableEmitter<Order> beverageItem;
     private FlowableEmitter<Order> statusUpdate;
 
     private AtomicInteger counter = new AtomicInteger();
@@ -76,14 +75,6 @@ public class OrderResource {
                 // end::fOrderQueue[]
                 break;
             // tag::beverageOrder[]
-            case BEVERAGE:
-                // end::beverageOrder[]
-                logger.info("Sending Order " + order.getOrderId() + " with a status of "
-                        + order.getStatus() + " to Bar: " + order.toString());
-                // tag::bOrderQueue[]
-                beverageItem.onNext(order);
-                // end::bOrderQueue[]
-                break;
         }
         statusUpdate.onNext(order);
         return Response
@@ -102,17 +93,6 @@ public class OrderResource {
         Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
         this.foodItem = emitter, BackpressureStrategy.BUFFER);
         // end::takeF[]
-        return flowable;
-    }
-    
-    // tag::OutgoingBev[]
-    @Outgoing("beverage")
-    // end::OutgoingBev[]
-    public Publisher<Order> sendBeverageOrder() {
-        // tag::takeB[]
-        Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
-        this.beverageItem = emitter, BackpressureStrategy.BUFFER);
-        // end::takeB[]
         return flowable;
     }
     
