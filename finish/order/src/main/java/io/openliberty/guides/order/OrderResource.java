@@ -24,6 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.kafka.common.metrics.Stat;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.reactivestreams.Publisher;
 
@@ -61,15 +62,15 @@ public class OrderResource {
     @Path("/")
     // tag::createOrder[]
     public Response createOrder(Order order) {
-        order.setOrderId(String.format("%04d", counter.incrementAndGet()))
-                .setStatus(Status.NEW);
+        order.orderId = String.format("%04d", counter.incrementAndGet());
+        order.status = Status.NEW;
 
-        switch(order.getType()){
+        switch(order.type){
             // tag::foodOrder[]
             case FOOD:
                 // end::foodOrder[]
-                logger.info("Sending Order " + order.getOrderId() + " with a status of "
-                        + order.getStatus() + " to Kitchen: " + order.toString());
+                logger.info("Sending Order " + order.orderId + " with a status of "
+                        + order.status + " to Kitchen: " + order.toString());
                 // tag::fOrderQueue[]
                 foodItem.onNext(order);
                 // end::fOrderQueue[]
@@ -101,7 +102,7 @@ public class OrderResource {
          Flowable<Order> flowable = Flowable.<Order>create(emitter -> 
          this.statusUpdate = emitter, BackpressureStrategy.BUFFER)
                  .doAfterNext( order -> logger.info("Sending Order "
-         + order.getOrderId() + " with a status of " + order.getStatus() 
+         + order.orderId + " with a status of " + order.status
          + " to Status: " + order.toString()));
          return flowable;
      }

@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.metrics.Stat;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -52,9 +53,9 @@ public class StatusEndpointIT {
     @BeforeAll
     public static void setup() {
         // init test data
-        orderList.add(new Order().setOrderId("0001").setItem("Pizza").setType(Type.FOOD).setTableId("T1").setStatus(Status.NEW));
-        orderList.add(new Order().setOrderId("0002").setItem("Burger").setType(Type.FOOD).setTableId("T1").setStatus(Status.NEW));
-        orderList.add(new Order().setOrderId("0003").setItem("Coke").setType(Type.BEVERAGE).setTableId("T2").setStatus(Status.NEW));
+        orderList.add(new Order("0001", "T1", Type.FOOD, "Pizza", Status.NEW));
+        orderList.add(new Order("0002", "T1", Type.FOOD, "Burger", Status.NEW));
+        orderList.add(new Order("0003", "T2", Type.BEVERAGE, "Coke", Status.NEW));
     }
     
     @AfterAll
@@ -75,23 +76,23 @@ public class StatusEndpointIT {
                 "Response should be 200");
         Assertions.assertEquals(orderList.size(), orders.size());
         for (Order order : orderList) {
-        	System.out.println(order.getOrderId() + "," +  order.getStatus());
+        	System.out.println(order.orderId + "," +  order.status);
             Assertions.assertTrue(orders.contains(order),
-                "Order " + order.getOrderId() + " not found in response");
+                "Order " + order.orderId + " not found in response");
         }
     }
 
     @Test
     @org.junit.jupiter.api.Order(2)
     public void testGetOrderListByTableId() {
-        String tableId = orderList.get(0).getTableId();
+        String tableId = orderList.get(0).tableId;
         Response response = statusResource.getOrdersList(tableId);
         ArrayList<Order> orders = response.readEntity(new GenericType<ArrayList<Order>>() {});
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
         Assertions.assertEquals(2, orders.size());
         for (Order order : orders) {
-        	Assertions.assertEquals(tableId, order.getTableId());
+        	Assertions.assertEquals(tableId, order.tableId);
         }
     }
 
@@ -99,23 +100,23 @@ public class StatusEndpointIT {
     @org.junit.jupiter.api.Order(3)
     public void testGetOrder() throws InterruptedException {
         Order order = orderList.get(1);
-        Response response = statusResource.getOrder(order.getOrderId());
+        Response response = statusResource.getOrder(order.orderId);
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
         Assertions.assertEquals(order, response.readEntity(Order.class),
-                "Order " + order.getOrderId() + " from response does not match");
+                "Order " + order.orderId + " from response does not match");
     }
 
     @Test
     @org.junit.jupiter.api.Order(4)
     public void testUpdateOrder() throws InterruptedException {
         Order order = orderList.get(0);
-        order.setStatus(Status.IN_PROGRESS);
+        order.status = Status.IN_PROGRESS;
         producer.send(new ProducerRecord<String, Order>("statusTopic", order));
         Thread.sleep(1000);
-        Response response = statusResource.getOrder(order.getOrderId());
+        Response response = statusResource.getOrder(order.orderId);
         Assertions.assertEquals(order, response.readEntity(Order.class),
-                "Order " + order.getOrderId() + " from response does not match");
+                "Order " + order.orderId + " from response does not match");
     }
 
     @Test

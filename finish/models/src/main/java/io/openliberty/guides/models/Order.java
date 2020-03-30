@@ -24,11 +24,11 @@ public class Order {
 	
 	private static final Jsonb jsonb = JsonbBuilder.create();
 	
-    private String orderId;
-    private String tableId;
-    private Type type;
-    private String item;
-    private Status status;
+    public String orderId;
+    public String tableId;
+    public Type type;
+    public String item;
+    public Status status;
 
     public Order(String orderId,
                  String tableId,
@@ -42,53 +42,16 @@ public class Order {
         this.status = status;
     }
 
+    public Order(String tableId,
+                 Type type,
+                 String item){
+        this.tableId = tableId;
+        this.type = type;
+        this.item = item;
+    }
+
     public Order(){
 
-    }
-
-    public String getTableId() {
-        return tableId;
-    }
-
-    public Order setTableId(String tableId) {
-        this.tableId = tableId;
-        return this;
-    }
-
-    public String getItem() {
-        return item;
-    }
-
-    public Order setItem(String item) {
-        this.item = item;
-        return this;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public Order setType(Type type) {
-        this.type = type;
-        return this;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public Order setOrderId(String orderId) {
-        this.orderId = orderId;
-        return this;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public Order setStatus(Status status) {
-        this.status = status;
-        return this;
     }
 
     @Override
@@ -96,11 +59,11 @@ public class Order {
         if (this == o) return true;
         if (!(o instanceof Order)) return false;
         Order order = (Order) o;
-        return Objects.equals(orderId, order.getOrderId())
-                && Objects.equals(tableId, order.getTableId())
-                && Objects.equals(type, order.getType())
-                && Objects.equals(item, order.getItem())
-                && Objects.equals(status, order.getStatus());
+        return Objects.equals(orderId, order.orderId)
+                && Objects.equals(tableId, order.tableId)
+                && Objects.equals(type, order.type)
+                && Objects.equals(item, order.item)
+                && Objects.equals(status, order.status);
     }
 
     @Override

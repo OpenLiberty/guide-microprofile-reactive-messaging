@@ -81,8 +81,8 @@ public class KitchenServiceIT {
             for (ConsumerRecord<String, Order> record : records) {
                 order = record.value();
                 System.out.println(order);
-                assertEquals("0001",order.getOrderId());
-                assertEquals(expectedStatus,order.getStatus());
+                assertEquals("0001",order.orderId);
+                assertEquals(expectedStatus,order.status);
                 recordsProcessed++;
             }
             consumer.commitAsync();

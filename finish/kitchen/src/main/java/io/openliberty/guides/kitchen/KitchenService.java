@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import org.apache.kafka.common.metrics.Stat;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.reactivestreams.Publisher;
@@ -46,13 +47,13 @@ public class KitchenService {
     // end::foodOrderPublishIntermediate[]
     // tag::initFoodOrder[]
     public Order receiveFoodOrder(Order newOrder) {
-        logger.info("Order " + newOrder.getOrderId() + " received with a status of NEW");
+        logger.info("Order " + newOrder.orderId + " received with a status of NEW");
         logger.info(newOrder.toString());
         Order order = prepareOrder(newOrder);
         executor.execute(() -> {
             prepare(5);
-            order.setStatus(Status.READY);
-            logger.info("Order " + order.getOrderId() + " is READY");
+            order.status = Status.READY;
+            logger.info("Order " + order.orderId + " is READY");
             logger.info(order.toString());
             receivedOrders.onNext(order);
         });
@@ -62,8 +63,9 @@ public class KitchenService {
 
     private Order prepareOrder(Order order) {
         prepare(10);
-        Order inProgressOrder = order.setStatus(Status.IN_PROGRESS);
-        logger.info("Order " + order.getOrderId() + " is IN PROGRESS");
+        order.status = Status.IN_PROGRESS;
+        Order inProgressOrder = order;
+        logger.info("Order " + order.orderId + " is IN PROGRESS");
         logger.info(order.toString());
         return inProgressOrder;
     }

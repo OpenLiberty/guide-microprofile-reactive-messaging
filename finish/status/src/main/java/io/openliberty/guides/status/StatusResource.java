@@ -77,7 +77,7 @@ public class StatusResource {
         List<Order> ordersList = manager.getOrders()
                 .values()
                 .stream()
-                .filter(order -> order.getTableId().equals(tableId))
+                .filter(order -> order.tableId.equals(tableId))
                 .collect(Collectors.toList());
         return Response
                 .status(Response.Status.OK)
@@ -98,11 +98,11 @@ public class StatusResource {
     @Incoming("updateStatus")
     // end::updateStatus[]
     public void updateStatus(Order order)  {
-        String orderId = order.getOrderId();
+        String orderId = order.orderId;
         if (manager.getOrder(orderId).isPresent()) {
-            manager.updateStatus(orderId, order.getStatus());
+            manager.updateStatus(orderId, order.status);
             logger.info("Order " + orderId + " status updated to "
-                + order.getStatus() + ": " + order);
+                + order.status + ": " + order);
         } else {
             manager.addOrder(order);
             logger.info("Order " + orderId + " was added: " + order);	

@@ -87,7 +87,11 @@ public class OpenLibertyCafeOrderResource {
 
         //Send individual order requests to the Order service through the client
         for (String foodItem : orderRequest.getFoodList()) {
-            Order order = new Order().setTableId(tableId).setItem(foodItem).setType(Type.FOOD);
+            Order order = new Order();
+            order.tableId = tableId;
+            order.item = foodItem;
+            order.type = Type.FOOD;
+
             orderClient.createOrder(order);
         }
 

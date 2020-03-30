@@ -28,13 +28,13 @@ public class StatusManager {
     private Map<String, Order> orders = Collections.synchronizedMap(new TreeMap<String, Order>());
 
     public void addOrder(Order order) {
-    	if (!orders.containsKey(order.getOrderId()))
-            orders.put(order.getOrderId(), order);
+    	if (!orders.containsKey(order.orderId))
+            orders.put(order.orderId, order);
     }
 
     public void updateStatus(String orderId, Status status) {
         Optional<Order> order = getOrder(orderId);
-        if (order.isPresent()) order.get().setStatus(status);
+        if (order.isPresent()) order.get().status = status;
     }
 
     public Optional<Order> getOrder(String orderId) {

@@ -73,9 +73,9 @@ public class OrderEndpointIT {
     @BeforeAll
     public static void setup() {
         // init test data
-        orderList.add(new Order().setItem("Pizza").setType(Type.FOOD).setTableId("0001"));
-        orderList.add(new Order().setItem("Burger").setType(Type.FOOD).setTableId("0001"));
-        orderList.add(new Order().setItem("Coke").setType(Type.BEVERAGE).setTableId("0002"));
+        orderList.add(new Order("0001", Type.FOOD, "Pizza"));
+        orderList.add(new Order("0001", Type.FOOD, "Burger"));
+        orderList.add(new Order("0002", Type.BEVERAGE, "Coke"));
     }
 
     @Test
@@ -98,16 +98,15 @@ public class OrderEndpointIT {
             Order order = orderList.get(i);
             Order orderRes = res.readEntity(Order.class);
 
-            Assertions.assertEquals(order.getTableId(), orderRes.getTableId(),
+            Assertions.assertEquals(order.tableId, orderRes.tableId,
                     "Table Id from response does not match");
-            Assertions.assertEquals(order.getItem(), orderRes.getItem(),
+            Assertions.assertEquals(order.item, orderRes.item,
                     "Item from response does not match");
-            Assertions.assertEquals(order.getType(), orderRes.getType(),
+            Assertions.assertEquals(order.type, orderRes.type,
                     "Type from response does not match");
-
-            Assertions.assertTrue(orderRes.getOrderId() != null,
+            Assertions.assertTrue(orderRes.orderId != null,
                     "Order Id from response is null");
-            Assertions.assertEquals(orderRes.getStatus(), Status.NEW,
+            Assertions.assertEquals(orderRes.status, Status.NEW,
                     "Status from response should be NEW");
 
             // replace input order with response order (includes orderId and status)
