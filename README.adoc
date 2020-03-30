@@ -45,7 +45,7 @@ https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that ma
 === What is asynchronous programming?
 Imagine asynchronous programming as a restaurant. After you're seated, a waitstaff takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waitstaff may take more orders or serve other tables. After your food is ready, your waitstaff brings out the food to your table. However, in a synchronous model, the waitstaff must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-The OpenLiberty Cafe application that you'll be working with consists of four microservices : `Kitchen`, `Order`, `OpenLibertyCafe`, and `Status`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+The OpenLiberty Cafe application that you'll be working with consists of three important microservices : `Kitchen`, `Order`, and `Status`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
 You'll update the `Kitchen`, `Order` and `Status` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
@@ -100,7 +100,9 @@ A channel is a bridge for transporting messages between different parts of the r
 MicroProfile Reactive Messaging uses connectors to attach one end of a channel to another messaging technology and are configured using MicroProfile Config.
 Open Liberty includes the `liberty-kafka` connector for sending and receiving messages from Apache Kafka.
 
-image::reactive-messaging-keyconcepts.png[Reactive key concepts,align="center"]
+Detailed diagram with the MicroProfile Reactive Messaging channels, Apache Kafka topics and the interaction between them :
+
+image::reactive-messaging-restaurant-detail.png[Reactive restaurant detail,align="center"]
 
 ---
 
@@ -136,7 +138,7 @@ The [hotspot=group file=0]`group.id` defines a unique name for the consumer grou
 
 The rest of the microservices use similar `microprofile-config.properties` configuration to define their required incoming and outgoing streams.
 
-image::reactive-messaging-restaurant-detail.png[Reactive restaurant detail,align="center"]
+image::reactive-messaging-keyconcepts.png[Reactive key concepts,align="center"]
 
 ---
 
