@@ -144,7 +144,7 @@ image::reactive-messaging-keyconcepts.png[Reactive key concepts,align="center"]
 
 === Building the Order microservice
 
-The `Order` microservice uses the MicroProfile Reactive Messaging to send messages to `Kitchen` over Kafka.
+The `Order` microservice uses the MicroProfile Reactive Messaging to send messages to the `Kitchen` microservice over Kafka.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -164,7 +164,7 @@ order/microprofile-config.properties
 include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Order` microservice creates orders when an order is sent in a [hotspot=postOrder file=0]`POST` request to the `/orders` endpoint. The [hotspot=createOrder file=0]`createOrder()` method receive [hotspot=foodOrder file=0]`food` order and adds it to the [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. We use [hotspot=takeF hotspot=takeB file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the `Publisher`. We return the `Publisher` from our [hotspot=OutgoingFood file=0]`@Outgoing("food")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
+The `Order` microservice creates orders when an order is sent in a [hotspot=postOrder file=0]`POST` request to the `/orders` endpoint. The [hotspot=createOrder file=0]`createOrder()` method receive a [hotspot=foodOrder file=0]`food` order and adds it to the [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. We use [hotspot=takeF hotspot=takeB file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the `Publisher`. We return the `Publisher` from our [hotspot=OutgoingFood file=0]`@Outgoing("food")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
