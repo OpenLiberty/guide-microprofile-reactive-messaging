@@ -45,22 +45,22 @@ https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that ma
 === What is asynchronous programming?
 Imagine asynchronous programming as a restaurant. After you're seated, a waitstaff takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waitstaff may take more orders or serve other tables. After your food is ready, your waitstaff brings out the food to your table. However, in a synchronous model, the waitstaff must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-The OpenLiberty Cafe application that you'll be working with consists of three important microservices : `Kitchen`, `Order`, and `Status`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+The job manager application that you'll be working with consists of three important microservices : `System`, `Job`, and `Inventory`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
 
-You'll update the `Kitchen`, `Order` and `Status` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
+You'll update the `System`, `Job` and `Inventory` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
-The `OpenLibertyCafe` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
+The `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend microservices on the caller's behalf.
 
-The waitstaff places a request using the `OpenLibertyCafe` microservice.
+The `Job` microservice allows you to dispatch jobs that will be run by the `System` microservice
 
-The `Order` microservice consumes the request, produces order messages, and sends them to Kafka on the `food` channel.
+The `Job` microservice consumes the request, produces job messages, and sends them to Kafka on the `job` channel.
 
-An order begins with a `NEW` status. The `Kitchen` microservices illustrate how to handle the orders as a real cafe. It consume and process the order and update the status to `IN_PROGRESS` and `READY` consecutively. There’s a sleep operation in between each status to represent the order processing time, and the status updates are reported back to the `Status` microservice via reactive messages on the Kafka.
+A job begins with a `NEW` status. The `System` microservices illustrate how to handle the jobs as a real system. It consume and process the job and update the status to `IN_PROGRESS` and `COMPLETED` consecutively. There’s a sleep operation in between each status to represent the job processing time, and the status updates are reported back to the `Inventory` microservice via reactive messages on the Kafka.
 
-The `Status` microservice receives status updates and provides queries for the waitstaff. All the orders are persisted here. Because persisting data is not the focus of this guide, the `Status` microservice simply uses a Map object to store the data.
+The `Inventory` microservice receives status updates and provides queries for the user. All the jobs are persisted here. Because persisting data is not the focus of this guide, the `Inventory` microservice simply uses a Map object to store the data.
 
 // =================================================================================================
 // Prerequisites
@@ -89,11 +89,11 @@ A channel is a bridge for transporting messages between different parts of the r
 
 *@Outgoing* 
 
-`@Outgoing` is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute. For example, `@Outgoing("food")`
+`@Outgoing` is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute. For example, `@Outgoing("job")`
 
 *@Incoming*
 
-`@Incoming` is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute. For example, `@Incoming("foodOrderConsume")`
+`@Incoming` is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute. For example, `@Incoming("jobConsume")`
 
 *Connector*
 
@@ -116,23 +116,23 @@ In order to configure the MicroProfile Reactive Messaging connectors, we need to
 - `mp.messaging.[incoming.|outgoing.].` :- Applies to a particular channel
 - Each channel which is to be connected using a connector must have the connector property defined to say which connector to use
 
-Each of the three microservices `Kitchen`, `Order`, and `Status` contain `microprofile-config.properties`
+Each of the three microservices `System`, `Job`, and `Inventory` contain `microprofile-config.properties`
 file. MicroProfile Reactive Messaging uses connectors to connect certain channels to Apache Kafka and setting options on those connectors.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
 #Create the microprofile-config.properties file.#
-`kitchen/src/main/resources/META-INF/microprofile-config.properties`
+`system/src/main/resources/META-INF/microprofile-config.properties`
 ----
-kitchen/microprofile-config.properties
+system/microprofile-config.properties
 [source, text, linenums, role='code_column']
 ----
-include::finish/kitchen/src/main/resources/META-INF/microprofile-config.properties[]
+include::finish/system/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `Kitchen` microservice uses an outgoing stream [hotspot=foodOrderPublishStatus file=0]`foodOrderPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `Status` microservices can consume the messages.
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `System` microservice uses an outgoing stream [hotspot=foodOrderPublishStatus file=0]`foodOrderPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `Inventory` microservices can consume the messages.
 
-The `Kitchen` microservice listens to messages from an incoming stream [hotspot=foodOrderConsume file=0]`foodOrderConsume`, wherein the messages are sent by the `Order` microservice through the [hotspot=topic2 file=0]`foodTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly the [hotspot=deserializer2 file=0]`key.deserializer` and [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages.
+The `System` microservice listens to messages from an incoming stream [hotspot=foodOrderConsume file=0]`foodOrderConsume`, wherein the messages are sent by the `Job` microservice through the [hotspot=topic2 file=0]`foodTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly the [hotspot=deserializer2 file=0]`key.deserializer` and [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages.
 
 The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
 
@@ -142,9 +142,9 @@ image::reactive-messaging-keyconcepts.png[Reactive key concepts,align="center"]
 
 ---
 
-=== Building the Order microservice
+=== Building the Job microservice
 
-The `Order` microservice uses the MicroProfile Reactive Messaging to send messages to the `Kitchen` microservice over Kafka.
+The `Job` microservice uses the MicroProfile Reactive Messaging to send messages to the `System` microservice over Kafka.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -164,7 +164,7 @@ order/microprofile-config.properties
 include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Order` microservice creates orders when an order is sent in a [hotspot=postOrder file=0]`POST` request to the `/orders` endpoint. The [hotspot=createOrder file=0]`createOrder()` method receive a [hotspot=foodOrder file=0]`food` order and adds it to the [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. We use [hotspot=takeF hotspot=takeB file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the `Publisher`. We return the `Publisher` from our [hotspot=OutgoingFood file=0]`@Outgoing("food")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
+The `Job` microservice creates orders when an order is sent in a [hotspot=postOrder file=0]`POST` request to the `/orders` endpoint. The [hotspot=createOrder file=0]`createOrder()` method receive a [hotspot=foodOrder file=0]`food` order and adds it to the [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. We use [hotspot=takeF hotspot=takeB file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the `Publisher`. We return the `Publisher` from our [hotspot=OutgoingFood file=0]`@Outgoing("food")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
@@ -182,13 +182,13 @@ In order to develop the MicroProfile Reactive Messaging application using Maven,
 
 ---
 
-=== Completing the Kitchen and Status microservices
+=== Completing the System and Inventory microservices
 
-You will complete the `Kitchen` and `Status` microservices implementation in this section.
+You will complete the `System` and `Inventory` microservices implementation in this section.
 
-*Completing the Kitchen microservice*
+*Completing the System microservice*
 
-//Kitchen
+//System
 [role="code_command hotspot file=0", subs="quotes"]
 ----
 #Replace the `KitchenService` class.#
@@ -200,9 +200,9 @@ KitchenService.java
 include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenService.java[]
 ----
 
-If the order is an item of food, `Kitchen` service receives an order on the [hotspot=foodOrderConsume file=0]`@Incoming("foodOrderConsume")` channel, processes it in [hotspot=initFoodOrder file=0]`receiveFoodOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=foodOrderPublishIntermediate file=0]`@Outgoing("foodOrderPublishStatus")` channel to Kafka over MicroProfile Reactive Messaging channels. After a while, a `READY` status will be sent to the [hotspot=foodOrder file=0]`@Outgoing("foodOrderPublishStatus")` channel.
+If the order is an item of food, `System` service receives an order on the [hotspot=foodOrderConsume file=0]`@Incoming("foodOrderConsume")` channel, processes it in [hotspot=initFoodOrder file=0]`receiveFoodOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=foodOrderPublishIntermediate file=0]`@Outgoing("foodOrderPublishStatus")` channel to Kafka over MicroProfile Reactive Messaging channels. After a while, a `COMPLETED` status will be sent to the [hotspot=foodOrder file=0]`@Outgoing("foodOrderPublishStatus")` channel.
 
-*Completing the Status microservice*
+*Completing the Inventory microservice*
 
 //status
 [role="code_command hotspot file=1", subs="quotes"]
@@ -223,7 +223,7 @@ status/microprofile-config.properties
 include::finish/status/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Status` microservice receives the message from the `Kitchen`, and `Order` microservices over the [hotspot=updateStatus file=1]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=2]`microprofile-config.properties`.
+The `Inventory` microservice receives the message from the `System`, and `Job` microservices over the [hotspot=updateStatus file=1]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=2]`microprofile-config.properties`.
  
 == Configuring the server
 
@@ -246,7 +246,7 @@ The rest of the microservices have [hotspot file=0]`server.xml` already configur
 
 == Building the application
 
-You will build and run the `Kitchen`, `Order`, `OpenLibertyCafe`, and `Status` microservices in Docker containers.
+You will build and run the `System`, `Job`, `OpenLibertyCafe`, and `Inventory` microservices in Docker containers.
 
 Start your Docker environment.
 
@@ -303,7 +303,7 @@ http://localhost:9080/openapi/ui[^] URL.
 
 *Place Orders*
 
-Make a `POST` request to the `/api/orders` endpoint. To make this request, expand the `POST` endpoint on the UI and click the *Try it out button*. Copy the following example input into the text box, and then click the `Execute` button. The `POST` request adds a new `food` Order.
+Make a `POST` request to the `/api/orders` endpoint. To make this request, expand the `POST` endpoint on the UI and click the *Try it out button*. Copy the following example input into the text box, and then click the `Execute` button. The `POST` request adds a new `food` Job.
 
 [source, role='command']
 ----
@@ -315,7 +315,7 @@ Make a `POST` request to the `/api/orders` endpoint. To make this request, expan
 }
 ----
 
-*Check IN_PROGRESS Order Status*
+*Check IN_PROGRESS Job Inventory*
 
 Next, make a `GET` request to the `/api/status` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response should show that the Orders have an `IN_PROGRESS` status, In case you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
 
@@ -332,9 +332,9 @@ Next, make a `GET` request to the `/api/status` endpoint. To make this request, 
 ]
 ----
 
-*Check READY Order Status*
+*Check COMPLETED Job Inventory*
 
-Click `Execute` again and you will see the response with a `READY` status. In case you see an `IN_PROGRESS` status then wait for a couple of seconds and click the `Execute` button again.
+Click `Execute` again and you will see the response with a `COMPLETED` status. In case you see an `IN_PROGRESS` status then wait for a couple of seconds and click the `Execute` button again.
 
 [source, role="no_copy"]
 ----
@@ -342,7 +342,7 @@ Click `Execute` again and you will see the response with a `READY` status. In ca
   {
     "item": "burger",
     "orderId": "0001",
-    "status": "READY",
+    "status": "COMPLETED",
     "tableId": "1",
     "type": "FOOD"
   }
