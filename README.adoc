@@ -49,7 +49,7 @@ The job manager application that you'll be working with consists of three import
 
 You'll update the `System`, `Job` and `Inventory` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
-image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
+image::reactive-messaging-job.png[Reactive system inventory,align="center"]
 
 The `Gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend microservices on the caller's behalf.
@@ -102,7 +102,7 @@ Open Liberty includes the `liberty-kafka` connector for sending and receiving 
 
 Detailed diagram with the MicroProfile Reactive Messaging channels, Apache Kafka topics and the interaction between them :
 
-image::reactive-messaging-job-detail.png[Reactive restaurant detail,align="center"]
+image::reactive-messaging-job-detail.png[Reactive system inventory detail,align="center"]
 
 ---
 
