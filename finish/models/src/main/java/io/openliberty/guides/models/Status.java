@@ -13,8 +13,7 @@
 package io.openliberty.guides.models;
 
 public enum Status {
-    NEW,            // The order has just been sent
-    IN_PROGRESS,    // The order has reached the kitchen/bar service via Kafka
-    READY,          // The order is ready to be picked up by the servingWindow service
-    COMPLETED;      // The order has been picked up, this is the final status.
+    NEW,            // The job has just been sent
+    IN_PROGRESS,    // The job has reached the system service via Kafka
+    COMPLETED;      // The job has been completed, this is the final status.
 }

@@ -11,9 +11,9 @@
 
     <modules>
         <module>models</module>
-        <module>kitchen</module>
-        <module>order</module>
-        <module>status</module>
-        <module>openLibertyCafe</module>
+        <module>system</module>
+        <module>job</module>
+        <module>inventory</module>
+        <module>gateway</module>
     </modules>
 </project>

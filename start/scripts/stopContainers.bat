@@ -1,3 +1,3 @@
-docker stop kitchen bar order status servingwindow openlibertycafe kafka zookeeper
+docker stop system job inventory gateway kafka zookeeper
 
 docker network rm reactive-app
