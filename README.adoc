@@ -51,7 +51,7 @@ You'll update the `System`, `Job` and `Inventory` microservices to use MicroProf
 
 image::reactive-messaging-restaurant.png[Reactive restaurant,align="center"]
 
-The `gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
+The `Gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend microservices on the caller's behalf.
 
 The `Job` microservice allows you to dispatch jobs that will be run by the `System` microservice
@@ -102,7 +102,7 @@ Open Liberty includes the `liberty-kafka` connector for sending and receiving 
 
 Detailed diagram with the MicroProfile Reactive Messaging channels, Apache Kafka topics and the interaction between them :
 
-image::reactive-messaging-restaurant-detail.png[Reactive restaurant detail,align="center"]
+image::reactive-messaging-job-detail.png[Reactive restaurant detail,align="center"]
 
 ---
 
@@ -130,9 +130,9 @@ system/microprofile-config.properties
 include::finish/system/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `System` microservice uses an outgoing stream [hotspot=foodOrderPublishStatus file=0]`foodOrderPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `Inventory` microservices can consume the messages.
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `System` microservice uses an outgoing stream [hotspot=jobPublishStatus file=0]`jobPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `Inventory` microservices can consume the messages.
 
-The `System` microservice listens to messages from an incoming stream [hotspot=foodOrderConsume file=0]`foodOrderConsume`, wherein the messages are sent by the `Job` microservice through the [hotspot=topic2 file=0]`foodTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly the [hotspot=deserializer2 file=0]`key.deserializer` and [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages.
+The `System` microservice listens to messages from an incoming stream [hotspot=jobConsume file=0]`jobConsume`, wherein the messages are sent by the `Job` microservice through the [hotspot=topic2 file=0]`jobTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly the [hotspot=deserializer2 file=0]`key.deserializer` and [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages.
 
 The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
 
@@ -148,34 +148,34 @@ The `Job` microservice uses the MicroProfile Reactive Messaging to send messages
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
-#Replace the `OrderResource` class.#
-`order/src/main/java/io/openliberty/guides/order/OrderResource.java`
+#Replace the `JobResource` class.#
+`job/src/main/java/io/openliberty/guides/job/JobResource.java`
 ----
 
-OrderResource.java
+JobResource.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/order/src/main/java/io/openliberty/guides/order/OrderResource.java[]
+include::finish/job/src/main/java/io/openliberty/guides/job/JobResource.java[]
 ----
 
-order/microprofile-config.properties
+job/microprofile-config.properties
 [source, Text, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/order/src/main/resources/META-INF/microprofile-config.properties[]
+include::finish/job/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Job` microservice creates orders when an order is sent in a [hotspot=postOrder file=0]`POST` request to the `/orders` endpoint. The [hotspot=createOrder file=0]`createOrder()` method receive a [hotspot=foodOrder file=0]`food` order and adds it to the [hotspot=fOrderQueue hotspot=bOrderQueue file=0]`FlowableEmitter`. We use [hotspot=takeF hotspot=takeB file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the `Publisher`. We return the `Publisher` from our [hotspot=OutgoingFood file=0]`@Outgoing("food")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=foodStream file=1]`food` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
+The `Job` microservice creates jobs when a job is sent in a [hotspot=postJob file=0]`POST` request to the `/jobs` endpoint. The [hotspot=createJob file=0]`createJob()` method receive a `job` and adds it to the [hotspot=jobQueue file=0]`FlowableEmitter`. We use [hotspot=takeF file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the `Publisher`. We return the `Publisher` from our [hotspot=OutgoingJob file=0]`@Outgoing("job")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=jobStream file=1]`job` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
 #Replace the Maven configuration file.#
-`order/pom.xml`
+`job/pom.xml`
 ---- 
 
 pom.xml
 [source, XML ,linenums,role="code_column"]
 ----
-include::finish/order/pom.xml[]
+include::finish/job/pom.xml[]
 ----
 
 In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api`, [hotspot=kafka file=2]`kafka-clients`, and [hotspot=rxjava file=2]`rxjava` dependencies to the [hotspot file=2]`pom.xml`
@@ -191,36 +191,36 @@ You will complete the `System` and `Inventory` microservices implementation in t
 //System
 [role="code_command hotspot file=0", subs="quotes"]
 ----
-#Replace the `KitchenService` class.#
-`kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenService.java`
+#Replace the `SystemService` class.#
+`system/src/main/java/io/openliberty/guides/system/SystemService.java`
 ----
-KitchenService.java
+SystemService.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/kitchen/src/main/java/io/openliberty/guides/kitchen/KitchenService.java[]
+include::finish/system/src/main/java/io/openliberty/guides/system/SystemService.java[]
 ----
 
-If the order is an item of food, `System` service receives an order on the [hotspot=foodOrderConsume file=0]`@Incoming("foodOrderConsume")` channel, processes it in [hotspot=initFoodOrder file=0]`receiveFoodOrder()` method and sends back an `IN_PROGRESS` status on the [hotspot=foodOrderPublishIntermediate file=0]`@Outgoing("foodOrderPublishStatus")` channel to Kafka over MicroProfile Reactive Messaging channels. After a while, a `COMPLETED` status will be sent to the [hotspot=foodOrder file=0]`@Outgoing("foodOrderPublishStatus")` channel.
+The `System` service receives a job on the [hotspot=jobConsume file=0]`@Incoming("jobConsume")` channel, processes it in [hotspot=initJob file=0]`receiveJob()` method and sends back an `IN_PROGRESS` status on the [hotspot=jobPublishIntermediate file=0]`@Outgoing("jobPublishStatus")` channel to Kafka over MicroProfile Reactive Messaging channels. After a while, a `COMPLETED` status will be sent to the [hotspot=jobPublishStatus file=0]`@Outgoing("jobPublishStatus")` channel.
 
 *Completing the Inventory microservice*
 
-//status
+//inventory
 [role="code_command hotspot file=1", subs="quotes"]
 ----
-#Replace the `StatusResource` class.#
-`status/src/main/java/io/openliberty/guides/status/StatusResource.java`
+#Replace the `InventoryResource` class.#
+`inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java`
 ----
 
-StatusResource.java
+InventoryResource.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/status/src/main/java/io/openliberty/guides/status/StatusResource.java[]
+include::finish/inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[]
 ----
 
-status/microprofile-config.properties
+inventory/microprofile-config.properties
 [source, Text, linenums, role='code_column hide_tags=copyright']
 ----
-include::finish/status/src/main/resources/META-INF/microprofile-config.properties[]
+include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
 The `Inventory` microservice receives the message from the `System`, and `Job` microservices over the [hotspot=updateStatus file=1]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=2]`microprofile-config.properties`.
@@ -268,10 +268,10 @@ Run the following commands to containerize the microservices:
 
 [role='command']
 ```
-docker build -t kitchen:1.0-SNAPSHOT kitchen/.
-docker build -t openlibertycafe:1.0-SNAPSHOT openLibertyCafe/.
-docker build -t order:1.0-SNAPSHOT order/.
-docker build -t status:1.0-SNAPSHOT status/.
+docker build -t system:1.0-SNAPSHOT system/.
+docker build -t inventory:1.0-SNAPSHOT inventory/.
+docker build -t job:1.0-SNAPSHOT job/.
+docker build -t gateway:1.0-SNAPSHOT gateway/.
 ```
 
 Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
@@ -296,14 +296,14 @@ include::{common-includes}/os-tabs.adoc[]
 
 == Trying the application
 
-Once the application is up and running, you can access the application by making requests to the `OpenLibertyCafe` endpoint using OpenAPI.
+Once the application is up and running, you can access the application by making requests to the `Gateway` endpoint using OpenAPI.
 
 The services may take some time to become available. Check out the service that you created at the
 http://localhost:9080/openapi/ui[^] URL.
 
 *Place Orders*
 
-Make a `POST` request to the `/api/orders` endpoint. To make this request, expand the `POST` endpoint on the UI and click the *Try it out button*. Copy the following example input into the text box, and then click the `Execute` button. The `POST` request adds a new `food` Job.
+Make a `POST` request to the `/api/jobs` endpoint. To make this request, expand the `POST` endpoint on the UI and click the *Try it out button*. Copy the following example input into the text box, and then click the `Execute` button. The `POST` request adds a new `food` Job.
 
 [source, role='command']
 ----
@@ -315,9 +315,9 @@ Make a `POST` request to the `/api/orders` endpoint. To make this request, expan
 }
 ----
 
-*Check IN_PROGRESS Job Inventory*
+*Check IN_PROGRESS Job Status*
 
-Next, make a `GET` request to the `/api/status` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response should show that the Orders have an `IN_PROGRESS` status, In case you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
+Next, make a `GET` request to the `/api/inventory` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response should show that the Orders have an `IN_PROGRESS` status, In case you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
 
 [source, role="no_copy"]
 ----
@@ -332,7 +332,7 @@ Next, make a `GET` request to the `/api/status` endpoint. To make this request, 
 ]
 ----
 
-*Check COMPLETED Job Inventory*
+*Check COMPLETED Job Status*
 
 Click `Execute` again and you will see the response with a `COMPLETED` status. In case you see an `IN_PROGRESS` status then wait for a couple of seconds and click the `Execute` button again.
 
