@@ -1,5 +1,5 @@
 #!/bin/bash
 
-docker stop kitchen order status openlibertycafe kafka zookeeper
+docker stop system job inventory gateway kafka zookeeper
 
 docker network rm reactive-app
