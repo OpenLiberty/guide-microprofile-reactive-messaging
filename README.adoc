@@ -299,9 +299,9 @@ Once the application is up and running, you can access the application by making
 The services may take some time to become available. Check out the service that you created at the
 http://localhost:9080/openapi/ui[^] URL.
 
-*Place Orders*
+*Place Job orders*
 
-Make a `POST` request to the `/api/jobs` endpoint. To make this request, expand the `POST` endpoint on the UI and click the *Try it out button*. Copy the following example input into the text box, and then click the `Execute` button. The `POST` request adds a new `food` Job.
+Make a `POST` request to the `/api/jobs` endpoint. To make this request, expand the `POST` endpoint on the UI and click the *Try it out button*. Copy the following example input into the text box, and then click the `Execute` button. The `POST` request adds a new job.
 
 [source, role='command']
 ----
@@ -314,7 +314,7 @@ Make a `POST` request to the `/api/jobs` endpoint. To make this request, expand 
 
 *Check IN_PROGRESS Job Status*
 
-Next, make a `GET` request to the `api/inventory/jobs` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response should show that the Orders have an `IN_PROGRESS` status, In case you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
+Next, make a `GET` request to the `api/inventory/jobs` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the jobs. The response should show that the jobs have an `IN_PROGRESS` status, In case you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
 
 [source, role="no_copy"]
 ----
