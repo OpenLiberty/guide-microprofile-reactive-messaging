@@ -54,13 +54,11 @@ image::reactive-messaging-job.png[Reactive system inventory,align="center"]
 The `Gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
 It communicates with the backend microservices on the caller's behalf.
 
-The `Job` microservice allows you to dispatch jobs that will be run by the `System` microservice
+The `Job` microservice allows you to dispatch jobs that will be run by the `System` microservice. It also consumes the request, produces job messages, and sends them to Kafka on the `job` channel.
 
-The `Job` microservice consumes the request, produces job messages, and sends them to Kafka on the `job` channel.
+A job begins with a `NEW` status. The `System` microservice illustrate how to handle the job as a real system. It consumes, processes the job and update the status to `IN_PROGRESS` and `COMPLETED` consecutively. There’s a sleep operation in between each status to represent the job processing time, and the status updates are reported back to the `Inventory` microservice via reactive messages on the Kafka.
 
-A job begins with a `NEW` status. The `System` microservices illustrate how to handle the jobs as a real system. It consume and process the job and update the status to `IN_PROGRESS` and `COMPLETED` consecutively. There’s a sleep operation in between each status to represent the job processing time, and the status updates are reported back to the `Inventory` microservice via reactive messages on the Kafka.
-
-The `Inventory` microservice receives status updates and provides queries for the user. All the jobs are persisted here. Because persisting data is not the focus of this guide, the `Inventory` microservice simply uses a Map object to store the data.
+The `Inventory` microservice receives status updates and provides queries for the user. All the jobs metadata are persisted here. Because persisting data is not the focus of this guide, the `Inventory` microservice simply uses a Map object to store the data.
 
 // =================================================================================================
 // Prerequisites
@@ -132,7 +130,7 @@ include::finish/system/src/main/resources/META-INF/microprofile-config.propertie
 
 The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `System` microservice uses an outgoing stream [hotspot=jobPublishStatus file=0]`jobPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `Inventory` microservices can consume the messages.
 
-The `System` microservice listens to messages from an incoming stream [hotspot=jobConsume file=0]`jobConsume`, wherein the messages are sent by the `Job` microservice through the [hotspot=topic2 file=0]`jobTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly the [hotspot=deserializer2 file=0]`key.deserializer` and [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages.
+The `System` microservice listens to messages from an [hotspot=jobConsume file=0]`jobConsume` incoming stream, wherein the messages are sent by the `Job` microservice through the [hotspot=topic2 file=0]`jobTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly the [hotspot=deserializer2 file=0]`key.deserializer` and [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages.
 
 The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
 
@@ -164,7 +162,7 @@ job/microprofile-config.properties
 include::finish/job/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Job` microservice creates jobs when a job is sent in a [hotspot=postJob file=0]`POST` request to the `/jobs` endpoint. The [hotspot=createJob file=0]`createJob()` method receive a `job` and adds it to the [hotspot=jobQueue file=0]`FlowableEmitter`. We use [hotspot=takeF file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the `Publisher`. We return the `Publisher` from our [hotspot=OutgoingJob file=0]`@Outgoing("job")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=jobStream file=1]`job` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
+The `Job` microservice creates jobs when a job is sent in a [hotspot=postJob file=0]`POST` request to the `/jobs` endpoint. The [hotspot=createJob file=0]`createJob()` method receives a `job` and adds it to the [hotspot=jobQueue file=0]`FlowableEmitter`. We use [hotspot=takeF file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the `Publisher`. We return the `Publisher` from our [hotspot=OutgoingJob file=0]`@Outgoing("job")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=jobStream file=1]`job` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
@@ -231,13 +229,13 @@ To use MicroProfile Reactive Messaging, we must enable the feature in the server
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
-#Replace the kitchen server.xml configuration file.#
-`kitchen/src/main/liberty/config/server.xml`
+#Replace the system server.xml configuration file.#
+`system/src/main/liberty/config/server.xml`
 ----
 server.xml
 [source,xml,linenums,role="code_column"]
 ----
-include::finish/kitchen/src/main/liberty/config/server.xml[]
+include::finish/system/src/main/liberty/config/server.xml[]
 ----
 
 Configure the server to enable MicroProfile Reactive Messaging by adding [hotspot=featureMP file=0]`mpReactiveMessaging-1.0` feature element to the [hotspot file=0]`server.xml`.
