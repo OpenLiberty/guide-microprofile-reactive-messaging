@@ -306,26 +306,24 @@ Make a `POST` request to the `/api/jobs` endpoint. To make this request, expand 
 [source, role='command']
 ----
 {
-  "tableId": "1",
-  "foodList": [
-    "burger"
+  "taskList": [
+    "Job1"
   ]
 }
 ----
 
 *Check IN_PROGRESS Job Status*
 
-Next, make a `GET` request to the `/api/inventory` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response should show that the Orders have an `IN_PROGRESS` status, In case you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
+Next, make a `GET` request to the `api/inventory/jobs` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the Orders. The response should show that the Orders have an `IN_PROGRESS` status, In case you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
 
 [source, role="no_copy"]
 ----
 [
   {
-    "item": "burger",
-    "orderId": "0001",
+    "hostId": "ebf3a1801bf0",
+    "jobId": "0001",
     "status": "IN_PROGRESS",
-    "tableId": "1",
-    "type": "FOOD"
+    "taskDesc": "Job1"
   }
 ]
 ----
@@ -338,11 +336,10 @@ Click `Execute` again and you will see the response with a `COMPLETED` status. I
 ----
 [
   {
-    "item": "burger",
-    "orderId": "0001",
+    "hostId": "ebf3a1801bf0",
+    "jobId": "0001",
     "status": "COMPLETED",
-    "tableId": "1",
-    "type": "FOOD"
+    "taskDesc": "Job1"
   }
 ]
 ----
