@@ -244,7 +244,7 @@ The rest of the microservices have [hotspot file=0]`server.xml` already configur
 
 == Building the application
 
-You will build and run the `System`, `Job`, `OpenLibertyCafe`, and `Inventory` microservices in Docker containers.
+You will build and run the `System`, `Job`, `Inventory`, and `Gateway` microservices in Docker containers.
 
 Start your Docker environment.
 
@@ -267,8 +267,8 @@ Run the following commands to containerize the microservices:
 [role='command']
 ```
 docker build -t system:1.0-SNAPSHOT system/.
-docker build -t inventory:1.0-SNAPSHOT inventory/.
 docker build -t job:1.0-SNAPSHOT job/.
+docker build -t inventory:1.0-SNAPSHOT inventory/.
 docker build -t gateway:1.0-SNAPSHOT gateway/.
 ```
 
