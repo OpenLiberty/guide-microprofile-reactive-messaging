@@ -12,8 +12,6 @@
     <modules>
         <module>models</module>
         <module>system</module>
-        <module>job</module>
         <module>inventory</module>
-        <module>gateway</module>
     </modules>
 </project>

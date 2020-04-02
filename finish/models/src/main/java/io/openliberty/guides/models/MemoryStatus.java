@@ -20,47 +20,41 @@ import javax.json.bind.JsonbBuilder;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serializer;
 
-public class Job {
-	
-	private static final Jsonb jsonb = JsonbBuilder.create();
-	
-    public String jobId;
-    public String hostId;
-    public String taskDesc;
-    public Status status;
+public class MemoryStatus {
 
-    public Job(String jobId,
-                 String hostId,
-                 String taskDesc,
-                 Status status){
-        this.jobId = jobId;
+    private static final Jsonb jsonb = JsonbBuilder.create();
+
+    public String hostId;
+    public Long memoryUsed;
+    public Long memoryMax;
+    
+    public MemoryStatus(String hostId, Long memoryUsed, Long memoryMax) {
         this.hostId = hostId;
-        this.taskDesc = taskDesc;
-        this.status = status;
+        this.memoryUsed = memoryUsed;
+        this.memoryMax = memoryMax;
     }
 
-    public Job() {
+    public MemoryStatus() {
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Job)) return false;
-        Job job = (Job) o;
-        return Objects.equals(jobId, job.jobId)
-                && Objects.equals(hostId, job.hostId)
-                && Objects.equals(taskDesc, job.taskDesc)
-                && Objects.equals(status, job.status);
+        if (!(o instanceof MemoryStatus)) return false;
+        MemoryStatus m = (MemoryStatus) o;
+        return Objects.equals(hostId, m.hostId)
+                && Objects.equals(memoryUsed, m.memoryUsed)
+                && Objects.equals(memoryMax, m.memoryMax);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(jobId, hostId, taskDesc, status);
+        return Objects.hash(hostId, memoryUsed, memoryMax);
     }
     
     @Override
     public String toString() {
-    	return "Job: " + jsonb.toJson(this);
+        return "MemoryUsage: " + jsonb.toJson(this);
     }
     
     public static class JsonbSerializer implements Serializer<Object> {
@@ -70,12 +64,12 @@ public class Job {
         }
     }
       
-    public static class JobDeserializer implements Deserializer<Job> {
+    public static class MemoryStatusDeserializer implements Deserializer<MemoryStatus> {
         @Override
-        public Job deserialize(String topic, byte[] data) {
+        public MemoryStatus deserialize(String topic, byte[] data) {
             if (data == null)
                 return null;
-            return jsonb.fromJson(new String(data), Job.class);
+            return jsonb.fromJson(new String(data), MemoryStatus.class);
         }
     }
 }

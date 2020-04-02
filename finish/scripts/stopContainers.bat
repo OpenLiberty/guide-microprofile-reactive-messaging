@@ -1,3 +1,3 @@
-docker stop system job inventory gateway kafka zookeeper
+docker stop system inventory kafka zookeeper
 
 docker network rm reactive-app

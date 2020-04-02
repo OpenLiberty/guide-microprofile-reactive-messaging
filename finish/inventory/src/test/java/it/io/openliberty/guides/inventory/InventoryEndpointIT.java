@@ -12,117 +12,88 @@
 // end::copyright[]
 package it.io.openliberty.guides.inventory;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Properties;
 
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
+import org.microshed.testing.kafka.KafkaConsumerConfig;
 import org.microshed.testing.kafka.KafkaProducerConfig;
 
 import io.openliberty.guides.inventory.InventoryResource;
-import io.openliberty.guides.models.Job;
-import io.openliberty.guides.models.Job.JsonbSerializer;
-import io.openliberty.guides.models.Status;
+import io.openliberty.guides.models.CpuUsage;
+import io.openliberty.guides.models.CpuUsage.CpuUsageDeserializer;
+import io.openliberty.guides.models.CpuUsage.JsonbSerializer;
+import io.openliberty.guides.models.MemoryStatus;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
 @TestMethodOrder(OrderAnnotation.class)
 public class InventoryEndpointIT {
-	
+    
     @RESTClient
     public static InventoryResource inventoryResource;
 
     @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
-    public static KafkaProducer<String, Job> producer;
+    public static KafkaProducer<String, CpuUsage> cpuProducer;
 
-    private static ArrayList<Job> jobList = new ArrayList<Job>();
+    @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
+    public static KafkaProducer<String, MemoryStatus> mempryProducer;
 
-    @BeforeAll
-    public static void setup() {
-        // init test data
-    	jobList.add(new Job("0001", "127.0.0.1", "task desc 1", Status.NEW));
-    	jobList.add(new Job("0002", "127.0.0.2", "task desc 2", Status.NEW));
-    	jobList.add(new Job("0003", "127.0.0.1", "task desc 3", Status.NEW));
-    }
-    
+    @KafkaConsumerConfig(valueDeserializer = CpuUsageDeserializer.class, 
+            groupId = "cpu-status", topics = "cpuStatusTopic", 
+            properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
+        public static KafkaConsumer<String, CpuUsage> cpuConsumer;
+
     @AfterAll
     public static void cleanup() {
-    	inventoryResource.resetJob();
+        inventoryResource.resetSystems();
     }
 
     @Test
-    @Order(1)
-    public void testGetJobList() throws InterruptedException {
-        for (int i = 0; i < jobList.size(); i++) {
-        	producer.send(new ProducerRecord<String, Job>("statusTopic", jobList.get(i)));
-        }
-        Thread.sleep(10000);
-        Response response = inventoryResource.getJobsList();
-        ArrayList<Job> jobs = response.readEntity(new GenericType<ArrayList<Job>>() {});
+    public void testCpuUsage() throws InterruptedException {
+        CpuUsage c = new CpuUsage("localhost", new Double(1.1));
+        cpuProducer.send(new ProducerRecord<String, CpuUsage>("cpuStatusTopic", c));
+        Thread.sleep(5000);
+        Response response = inventoryResource.getSystems();
+        List<Properties> systems = response.readEntity(new GenericType<List<Properties>>() {});
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
-        Assertions.assertEquals(jobList.size(), jobs.size());
-        for (Job job : jobList) {
-        	System.out.println(job.jobId + "," +  job.status);
-            Assertions.assertTrue(jobs.contains(job),
-                "Job " + job.jobId + " not found in response");
+        Assertions.assertEquals(systems.size(), 1);
+        for (Properties system : systems) {
+            Assertions.assertEquals(c.hostId, system.get("hostname"), "HostId not match!");
+            BigDecimal cpu = (BigDecimal) system.get("cpuUsage");;
+			Assertions.assertEquals(c.cpuUsage.doubleValue(), cpu.doubleValue(), "CPU Usage not match!");
         }
     }
 
     @Test
-    @Order(2)
-    public void testGetJobListByHostId() {
-        String hostId = jobList.get(0).hostId;
-        Response response = inventoryResource.getJobsList(hostId);
-        ArrayList<Job> jobs = response.readEntity(new GenericType<ArrayList<Job>>() {});
+    public void testMemoryUsage() throws InterruptedException {
+        MemoryStatus m = new MemoryStatus("localhost", new Long(100), new Long(1000));
+        mempryProducer.send(new ProducerRecord<String, MemoryStatus>("memoryStatusTopic", m));
+        Thread.sleep(5000);
+        Response response = inventoryResource.getSystem("localhost");
+        Properties system = response.readEntity(new GenericType<Properties>() {});
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
-        Assertions.assertEquals(2, jobs.size());
-        for (Job job : jobs) {
-        	Assertions.assertEquals(hostId, job.hostId);
-        }
-    }
-
-    @Test
-    @Order(3)
-    public void testGetJob() throws InterruptedException {
-        Job job = jobList.get(1);
-        Response response = inventoryResource.getJob(job.jobId);
-        Assertions.assertEquals(200, response.getStatus(),
-                "Response should be 200");
-        Assertions.assertEquals(job, response.readEntity(Job.class),
-                "Job " + job.jobId + " from response does not match");
-    }
-
-    @Test
-    @Order(4)
-    public void testUpdateJob() throws InterruptedException {
-        Job job = jobList.get(0);
-        job.status = Status.IN_PROGRESS;
-        producer.send(new ProducerRecord<String, Job>("statusTopic", job));
-        Thread.sleep(1000);
-        Response response = inventoryResource.getJob(job.jobId);
-        Assertions.assertEquals(job, response.readEntity(Job.class),
-                "Job " + job.jobId + " from response does not match");
-    }
-
-    @Test
-    @Order(5)
-    public void testJobDNE() {
-        Response res = inventoryResource.getJob("openliberty");
-        Assertions.assertEquals(404, res.getStatus(),
-                "Response should be 404");
+        Assertions.assertEquals(m.hostId, system.get("hostname"),  "HostId not match!");
+        BigDecimal used = (BigDecimal) system.get("memoryUsed");
+        BigDecimal max = (BigDecimal) system.get("memoryMax");
+        Assertions.assertEquals(m.memoryUsed.longValue(), used.longValue(), "MemoryUsed not match!");
+        Assertions.assertEquals(m.memoryMax.longValue(), max.longValue(), "MemoryMax not match!");
     }
 }

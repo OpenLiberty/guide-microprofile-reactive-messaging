@@ -27,32 +27,18 @@ docker run -d \
 
 docker run -d \
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
+  -p 9083:9083 \
   --network=$NETWORK \
   --name=system \
   --rm \
   system:1.0-SNAPSHOT &
-
+ 
 docker run -d \
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
-  --network=$NETWORK \
-  --name=job \
-  --rm \
-  job:1.0-SNAPSHOT &
-  
-docker run -d \
-  -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=$KAFKA_SERVER \
+  -p 9085:9085 \
   --network=$NETWORK \
   --name=inventory \
   --rm \
   inventory:1.0-SNAPSHOT &
-
-docker run -d \
-  -e JobClient_mp_rest_url=$JOB_SERVICE_URL \
-  -e InventoryClient_mp_rest_url=$INVENTORY_SERVICE_URL \
-  -p 9080:9080 \
-  --network=$NETWORK \
-  --name=gateway \
-  --rm \
-  gateway:1.0-SNAPSHOT &
   
 wait
