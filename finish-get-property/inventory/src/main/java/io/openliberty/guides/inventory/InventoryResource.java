@@ -32,7 +32,7 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.reactivestreams.Publisher;
 
-import io.openliberty.guides.models.CpuUsage;
+import io.openliberty.guides.models.SystemLoad;
 import io.openliberty.guides.models.MemoryStatus;
 import io.openliberty.guides.models.PropertyMessage;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
@@ -101,17 +101,17 @@ public class InventoryResource {
                 .build();
     }
     
-    // tag::cpuStatus[]
-    @Incoming("cpuStatus")
-    // end::cpuStatus[]
-    public void updateStatus(CpuUsage c)  {
-        String hostId = c.hostId;
+    // tag::systemLoad[]
+    @Incoming("systemLoad")
+    // end::systemLoad[]
+    public void updateStatus(SystemLoad s)  {
+        String hostId = s.hostId;
         if (manager.getSystem(hostId).isPresent()) {
-            manager.updateCpuStatus(hostId, c.cpuUsage);
-            logger.info("Host " + hostId + " was updated: " + c);
+            manager.updateCpuStatus(hostId, s.systemLoad);
+            logger.info("Host " + hostId + " was updated: " + s);
         } else {
-            manager.addSystem(hostId, c.cpuUsage);
-            logger.info("Host " + hostId + " was added: " + c);
+            manager.addSystem(hostId, s.systemLoad);
+            logger.info("Host " + hostId + " was added: " + s);
         }
     }
     

@@ -26,7 +26,7 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.reactivestreams.Publisher;
 
-import io.openliberty.guides.models.CpuUsage;
+import io.openliberty.guides.models.SystemLoad;
 import io.openliberty.guides.models.MemoryStatus;
 import io.openliberty.guides.models.PropertyMessage;
 import io.reactivex.rxjava3.core.Flowable;
@@ -51,12 +51,12 @@ public class SystemService {
         return hostname;
     }
     
-    // tag::publishCpuUsage[]
-    @Outgoing("cpuStatus")
-    // end::publishCpuUsage[]
-    public Publisher<CpuUsage> sendCpuUsage() {
+    // tag::publishSystemLoad[]
+    @Outgoing("systemLoad")
+    // end::publishSystemLoad[]
+    public Publisher<SystemLoad> sendSystemLoad() {
         return Flowable.interval(15, TimeUnit.SECONDS)
-                .map((interavl -> new CpuUsage(getHostname(), new Double(osMean.getSystemLoadAverage()))));
+                .map((interavl -> new SystemLoad(getHostname(), new Double(osMean.getSystemLoadAverage()))));
     }
 
     // tag::publishMemoryUsage[]

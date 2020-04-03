@@ -32,8 +32,8 @@ import org.microshed.testing.jupiter.MicroShedTest;
 import org.microshed.testing.kafka.KafkaConsumerConfig;
 import org.microshed.testing.kafka.KafkaProducerConfig;
 
-import io.openliberty.guides.models.CpuUsage;
-import io.openliberty.guides.models.CpuUsage.CpuUsageDeserializer;
+import io.openliberty.guides.models.SystemLoad;
+import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 import io.openliberty.guides.models.MemoryStatus;
 import io.openliberty.guides.models.MemoryStatus.MemoryStatusDeserializer;
 import io.openliberty.guides.models.PropertyMessage;
@@ -45,10 +45,10 @@ public class SystemServiceIT {
 
     private static final long POLL_TIMEOUT = 30 * 1000;
 
-    @KafkaConsumerConfig(valueDeserializer = CpuUsageDeserializer.class, 
-        groupId = "cpu-status", topics = "cpuStatusTopic", 
+    @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class, 
+        groupId = "system-load-status", topics = "systemLoadTopic", 
         properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
-    public static KafkaConsumer<String, CpuUsage> cpuConsumer;
+    public static KafkaConsumer<String, SystemLoad> systemLoadConsumer;
 
     @KafkaConsumerConfig(valueDeserializer = MemoryStatusDeserializer.class, 
         groupId = "memory-status", topics = "memoryStatusTopic", 
@@ -69,16 +69,16 @@ public class SystemServiceIT {
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
-            ConsumerRecords<String, CpuUsage> records = cpuConsumer.poll(Duration.ofMillis(3000));
+            ConsumerRecords<String, SystemLoad> records = systemLoadConsumer.poll(Duration.ofMillis(3000));
             System.out.println("Polled " + records.count() + " records from Kafka:");
-            for (ConsumerRecord<String, CpuUsage> record : records) {
-                CpuUsage c = record.value();
-                System.out.println(c);
-                assertNotNull(c.hostId);
-                assertNotNull(c.cpuUsage);
+            for (ConsumerRecord<String, SystemLoad> record : records) {
+                SystemLoad s = record.value();
+                System.out.println(s);
+                assertNotNull(s.hostId);
+                assertNotNull(s.systemLoad);
                 recordsProcessed++;
             }
-            cpuConsumer.commitAsync();
+            systemLoadConsumer.commitAsync();
             if (recordsProcessed > 0)
                 break;
             elapsedTime = System.currentTimeMillis() - startTime;
@@ -102,7 +102,7 @@ public class SystemServiceIT {
                 assertNotNull(m.memoryMax);
                 recordsProcessed++;
             }
-            cpuConsumer.commitAsync();
+            systemLoadConsumer.commitAsync();
             if (recordsProcessed > 0)
                 break;
             elapsedTime = System.currentTimeMillis() - startTime;
@@ -128,7 +128,7 @@ public class SystemServiceIT {
                 assertNotNull(pm.value);
                 recordsProcessed++;
             }
-            cpuConsumer.commitAsync();
+            systemLoadConsumer.commitAsync();
             if (recordsProcessed > 0)
                 break;
             elapsedTime = System.currentTimeMillis() - startTime;

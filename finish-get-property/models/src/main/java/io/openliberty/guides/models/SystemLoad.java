@@ -20,38 +20,38 @@ import javax.json.bind.JsonbBuilder;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serializer;
 
-public class CpuUsage {
+public class SystemLoad {
 
     private static final Jsonb jsonb = JsonbBuilder.create();
 
     public String hostId;
-    public Double cpuUsage;
+    public Double systemLoad;
         
-    public CpuUsage(String hostId, Double cpuUsage) {
+    public SystemLoad(String hostId, Double systemLoad) {
         this.hostId = hostId;
-        this.cpuUsage = cpuUsage;
+        this.systemLoad = systemLoad;
     }
 
-    public CpuUsage() {
+    public SystemLoad() {
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CpuUsage)) return false;
-        CpuUsage c = (CpuUsage) o;
-        return Objects.equals(hostId, c.hostId)
-                && Objects.equals(cpuUsage, c.cpuUsage);
+        if (!(o instanceof SystemLoad)) return false;
+        SystemLoad s = (SystemLoad) o;
+        return Objects.equals(hostId, s.hostId)
+                && Objects.equals(systemLoad, s.systemLoad);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(hostId, cpuUsage);
+        return Objects.hash(hostId, systemLoad);
     }
     
     @Override
     public String toString() {
-        return "CpuUsage: " + jsonb.toJson(this);
+        return "SystemLoad: " + jsonb.toJson(this);
     }
     
     public static class JsonbSerializer implements Serializer<Object> {
@@ -61,12 +61,12 @@ public class CpuUsage {
         }
     }
       
-    public static class CpuUsageDeserializer implements Deserializer<CpuUsage> {
+    public static class SystemLoadDeserializer implements Deserializer<SystemLoad> {
         @Override
-        public CpuUsage deserialize(String topic, byte[] data) {
+        public SystemLoad deserialize(String topic, byte[] data) {
             if (data == null)
                 return null;
-            return jsonb.fromJson(new String(data), CpuUsage.class);
+            return jsonb.fromJson(new String(data), SystemLoad.class);
         }
     }
 }

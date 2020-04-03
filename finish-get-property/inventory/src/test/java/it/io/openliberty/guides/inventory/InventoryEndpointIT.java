@@ -42,8 +42,8 @@ import org.microshed.testing.kafka.KafkaConsumerConfig;
 import org.microshed.testing.kafka.KafkaProducerConfig;
 
 import io.openliberty.guides.inventory.InventoryResource;
-import io.openliberty.guides.models.CpuUsage;
-import io.openliberty.guides.models.CpuUsage.JsonbSerializer;
+import io.openliberty.guides.models.SystemLoad;
+import io.openliberty.guides.models.SystemLoad.JsonbSerializer;
 import io.openliberty.guides.models.MemoryStatus;
 
 @MicroShedTest
@@ -57,7 +57,7 @@ public class InventoryEndpointIT {
     public static InventoryResource inventoryResource;
 
     @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
-    public static KafkaProducer<String, CpuUsage> cpuProducer;
+    public static KafkaProducer<String, SystemLoad> systemLoadProducer;
 
     @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
     public static KafkaProducer<String, MemoryStatus> mempryProducer;
@@ -73,9 +73,9 @@ public class InventoryEndpointIT {
     }
 
     @Test
-    public void testCpuUsage() throws InterruptedException {
-        CpuUsage c = new CpuUsage("localhost", new Double(1.1));
-        cpuProducer.send(new ProducerRecord<String, CpuUsage>("cpuStatusTopic", c));
+    public void testSystemLoad() throws InterruptedException {
+        SystemLoad s = new SystemLoad("localhost", new Double(1.1));
+        systemLoadProducer.send(new ProducerRecord<String, SystemLoad>("systemLoadTopic", s));
         Thread.sleep(5000);
         Response response = inventoryResource.getSystems();
         List<Properties> systems = response.readEntity(new GenericType<List<Properties>>() {});
@@ -83,9 +83,9 @@ public class InventoryEndpointIT {
                 "Response should be 200");
         Assertions.assertEquals(systems.size(), 1);
         for (Properties system : systems) {
-            Assertions.assertEquals(c.hostId, system.get("hostname"), "HostId not match!");
-            BigDecimal cpu = (BigDecimal) system.get("cpuUsage");;
-			Assertions.assertEquals(c.cpuUsage.doubleValue(), cpu.doubleValue(), "CPU Usage not match!");
+            Assertions.assertEquals(s.hostId, system.get("hostname"), "HostId not match!");
+            BigDecimal systemLoad = (BigDecimal) system.get("systemLoad");;
+			Assertions.assertEquals(s.systemLoad.doubleValue(), systemLoad.doubleValue(), "System load not match!");
         }
     }
 
