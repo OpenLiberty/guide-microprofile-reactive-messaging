@@ -86,9 +86,11 @@ public class InventoryResource {
     @Path("/systems/{propertyName}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystemProperty(@PathParam("propertyName") String propertyName) {
+    	logger.info("getSystemProperty: " + propertyName);
     	property.onNext(propertyName);
         return Response
                    .status(Response.Status.OK)
+                   .entity(propertyName)
                    .build();
     }
     

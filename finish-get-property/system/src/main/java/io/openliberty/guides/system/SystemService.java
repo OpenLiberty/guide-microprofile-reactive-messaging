@@ -72,13 +72,15 @@ public class SystemService {
 
     @Incoming("getProperty")
     @Outgoing("setProperty")
-    public Publisher<PropertyMessage> sendProperty(String property) {
-    	logger.info("sendProperty: " + property);
-        return Flowable.interval(15, TimeUnit.SECONDS)
-                .map((interavl -> {
-                    return new PropertyMessage(getHostname(), 
-                    		property, 
-                            System.getProperty(property, "unknown"));}));
-    }
-    
+    public PropertyMessage sendProperty(String propertyName) {
+    	logger.info("sendProperty: " + propertyName);
+    	String propertyValue = System.getProperty(propertyName);
+    	if (propertyValue == null) {
+    		logger.warning(propertyName + " is not System property.");
+    		return null;
+    	}
+        return new PropertyMessage(getHostname(), 
+        		    propertyName, 
+                    System.getProperty(propertyName, "unknown"));
+    }    
 }
