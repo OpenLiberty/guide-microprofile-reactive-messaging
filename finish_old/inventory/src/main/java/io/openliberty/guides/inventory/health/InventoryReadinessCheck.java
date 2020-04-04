@@ -10,7 +10,7 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.system.health;
+package io.openliberty.guides.inventory.health;
 
 import java.util.Collection;
 import java.util.Properties;
@@ -30,16 +30,16 @@ import org.eclipse.microprofile.health.Readiness;
 
 @Readiness
 @ApplicationScoped
-public class SystemReadinessCheck implements HealthCheck {
+public class InventoryReadinessCheck implements HealthCheck {
 
-    private static Logger logger = Logger.getLogger(SystemReadinessCheck.class.getName());
+    private static Logger logger = Logger.getLogger(InventoryReadinessCheck.class.getName());
     
     @Inject
     @ConfigProperty(name = "mp.messaging.connector.liberty-kafka.bootstrap.servers")
     String kafkaServer;
     
     @Inject
-    @ConfigProperty(name = "mp.messaging.incoming.getProperty.group.id")
+    @ConfigProperty(name = "mp.messaging.incoming.cpuStatus.group.id")
     String groupId;
     
     @Override

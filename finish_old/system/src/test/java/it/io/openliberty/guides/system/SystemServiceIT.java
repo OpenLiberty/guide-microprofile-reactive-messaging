@@ -12,7 +12,6 @@
 // end::copyright[]
 package it.io.openliberty.guides.system;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,21 +22,15 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.Test;
 import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jupiter.MicroShedTest;
 import org.microshed.testing.kafka.KafkaConsumerConfig;
-import org.microshed.testing.kafka.KafkaProducerConfig;
 
-import io.openliberty.guides.models.SystemLoad;
-import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
+import io.openliberty.guides.models.CpuUsage;
+import io.openliberty.guides.models.CpuUsage.CpuUsageDeserializer;
 import io.openliberty.guides.models.MemoryStatus;
 import io.openliberty.guides.models.MemoryStatus.MemoryStatusDeserializer;
-import io.openliberty.guides.models.PropertyMessage;
-import io.openliberty.guides.models.PropertyMessage.PropertyMessageDeserializer;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
@@ -45,23 +38,16 @@ public class SystemServiceIT {
 
     private static final long POLL_TIMEOUT = 30 * 1000;
 
-    @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class, 
-        groupId = "system-load-status", topics = "systemLoadTopic", 
+    @KafkaConsumerConfig(valueDeserializer = CpuUsageDeserializer.class, 
+        groupId = "cpu-status", topics = "cpuStatusTopic", 
         properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
-    public static KafkaConsumer<String, SystemLoad> systemLoadConsumer;
+    public static KafkaConsumer<String, CpuUsage> cpuConsumer;
 
     @KafkaConsumerConfig(valueDeserializer = MemoryStatusDeserializer.class, 
         groupId = "memory-status", topics = "memoryStatusTopic", 
         properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
     public static KafkaConsumer<String, MemoryStatus> memoryConsumer;
     
-    @KafkaConsumerConfig(valueDeserializer = PropertyMessageDeserializer.class, 
-        groupId = "property-name", topics = "propertyMessageTopic", 
-        properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
-    public static KafkaConsumer<String, PropertyMessage> propertyConsumer;
-    
-    @KafkaProducerConfig(valueSerializer = StringSerializer.class)
-    public static KafkaProducer<String, String> propertyProducer;
     
     @Test
     public void testCpuStatus() throws IOException, InterruptedException {
@@ -69,16 +55,16 @@ public class SystemServiceIT {
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
-            ConsumerRecords<String, SystemLoad> records = systemLoadConsumer.poll(Duration.ofMillis(3000));
+            ConsumerRecords<String, CpuUsage> records = cpuConsumer.poll(Duration.ofMillis(3000));
             System.out.println("Polled " + records.count() + " records from Kafka:");
-            for (ConsumerRecord<String, SystemLoad> record : records) {
-                SystemLoad s = record.value();
-                System.out.println(s);
-                assertNotNull(s.hostId);
-                assertNotNull(s.systemLoad);
+            for (ConsumerRecord<String, CpuUsage> record : records) {
+                CpuUsage c = record.value();
+                System.out.println(c);
+                assertNotNull(c.hostId);
+                assertNotNull(c.cpuUsage);
                 recordsProcessed++;
             }
-            systemLoadConsumer.commitAsync();
+            cpuConsumer.commitAsync();
             if (recordsProcessed > 0)
                 break;
             elapsedTime = System.currentTimeMillis() - startTime;
@@ -102,33 +88,7 @@ public class SystemServiceIT {
                 assertNotNull(m.memoryMax);
                 recordsProcessed++;
             }
-            systemLoadConsumer.commitAsync();
-            if (recordsProcessed > 0)
-                break;
-            elapsedTime = System.currentTimeMillis() - startTime;
-        }
-        assertTrue(recordsProcessed > 0, "No records processed");
-    }
-    
-    @Test
-    public void testPropertyMessage() throws IOException, InterruptedException {
-        propertyProducer.send(new ProducerRecord<String, String>("propertyNameTopic", "os.name"));
-        
-        int recordsProcessed = 0;
-        long startTime = System.currentTimeMillis();
-        long elapsedTime = 0;
-        while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
-            ConsumerRecords<String, PropertyMessage> records = propertyConsumer.poll(Duration.ofMillis(3000));
-            System.out.println("Polled " + records.count() + " records from Kafka:");
-            for (ConsumerRecord<String, PropertyMessage> record : records) {
-            	PropertyMessage pm = record.value();
-                System.out.println(pm);
-                assertNotNull(pm.hostId);
-                assertEquals("os.name", pm.key);
-                assertNotNull(pm.value);
-                recordsProcessed++;
-            }
-            systemLoadConsumer.commitAsync();
+            cpuConsumer.commitAsync();
             if (recordsProcessed > 0)
                 break;
             elapsedTime = System.currentTimeMillis() - startTime;

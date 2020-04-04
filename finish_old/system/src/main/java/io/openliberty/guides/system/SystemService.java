@@ -18,23 +18,18 @@ import java.lang.management.OperatingSystemMXBean;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.reactivestreams.Publisher;
 
-import io.openliberty.guides.models.SystemLoad;
+import io.openliberty.guides.models.CpuUsage;
 import io.openliberty.guides.models.MemoryStatus;
-import io.openliberty.guides.models.PropertyMessage;
 import io.reactivex.rxjava3.core.Flowable;
 
 @ApplicationScoped
 public class SystemService {
-	
-	private static Logger logger = Logger.getLogger(SystemService.class.getName());
     
     private static final MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
     private static final OperatingSystemMXBean osMean = ManagementFactory.getOperatingSystemMXBean();
@@ -51,12 +46,12 @@ public class SystemService {
         return hostname;
     }
     
-    // tag::publishSystemLoad[]
-    @Outgoing("systemLoad")
-    // end::publishSystemLoad[]
-    public Publisher<SystemLoad> sendSystemLoad() {
+    // tag::publishCpuUsage[]
+    @Outgoing("cpuStatus")
+    // end::publishCpuUsage[]
+    public Publisher<CpuUsage> sendCpuUsage() {
         return Flowable.interval(15, TimeUnit.SECONDS)
-                .map((interavl -> new SystemLoad(getHostname(), new Double(osMean.getSystemLoadAverage()))));
+                .map((interavl -> new CpuUsage(getHostname(), new Double(osMean.getSystemLoadAverage()))));
     }
 
     // tag::publishMemoryUsage[]
@@ -70,17 +65,4 @@ public class SystemService {
                             new Long(memBean.getHeapMemoryUsage().getMax()));}));
     }
 
-    @Incoming("getProperty")
-    @Outgoing("setProperty")
-    public PropertyMessage sendProperty(String propertyName) {
-    	logger.info("sendProperty: " + propertyName);
-    	String propertyValue = System.getProperty(propertyName);
-    	if (propertyValue == null) {
-    		logger.warning(propertyName + " is not System property.");
-    		return null;
-    	}
-        return new PropertyMessage(getHostname(), 
-        		    propertyName, 
-                    System.getProperty(propertyName, "unknown"));
-    }    
 }

@@ -12,11 +12,7 @@
 // end::copyright[]
 package it.io.openliberty.guides.inventory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.List;
 import java.util.Properties;
 
@@ -24,12 +20,9 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -42,30 +35,29 @@ import org.microshed.testing.kafka.KafkaConsumerConfig;
 import org.microshed.testing.kafka.KafkaProducerConfig;
 
 import io.openliberty.guides.inventory.InventoryResource;
-import io.openliberty.guides.models.SystemLoad;
-import io.openliberty.guides.models.SystemLoad.JsonbSerializer;
+import io.openliberty.guides.models.CpuUsage;
+import io.openliberty.guides.models.CpuUsage.CpuUsageDeserializer;
+import io.openliberty.guides.models.CpuUsage.JsonbSerializer;
 import io.openliberty.guides.models.MemoryStatus;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
 @TestMethodOrder(OrderAnnotation.class)
 public class InventoryEndpointIT {
-	
-	private static final long POLL_TIMEOUT = 30 * 1000;
     
     @RESTClient
     public static InventoryResource inventoryResource;
 
     @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
-    public static KafkaProducer<String, SystemLoad> systemLoadProducer;
+    public static KafkaProducer<String, CpuUsage> cpuProducer;
 
     @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
     public static KafkaProducer<String, MemoryStatus> mempryProducer;
 
-    @KafkaConsumerConfig(valueDeserializer = StringDeserializer.class, 
-            groupId = "property-name", topics = "propertyNameTopic", 
+    @KafkaConsumerConfig(valueDeserializer = CpuUsageDeserializer.class, 
+            groupId = "cpu-status", topics = "cpuStatusTopic", 
             properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
-        public static KafkaConsumer<String, String> propertyConsumer;
+        public static KafkaConsumer<String, CpuUsage> cpuConsumer;
 
     @AfterAll
     public static void cleanup() {
@@ -73,9 +65,9 @@ public class InventoryEndpointIT {
     }
 
     @Test
-    public void testSystemLoad() throws InterruptedException {
-        SystemLoad s = new SystemLoad("localhost", new Double(1.1));
-        systemLoadProducer.send(new ProducerRecord<String, SystemLoad>("systemLoadTopic", s));
+    public void testCpuUsage() throws InterruptedException {
+        CpuUsage c = new CpuUsage("localhost", new Double(1.1));
+        cpuProducer.send(new ProducerRecord<String, CpuUsage>("cpuStatusTopic", c));
         Thread.sleep(5000);
         Response response = inventoryResource.getSystems();
         List<Properties> systems = response.readEntity(new GenericType<List<Properties>>() {});
@@ -83,9 +75,9 @@ public class InventoryEndpointIT {
                 "Response should be 200");
         Assertions.assertEquals(systems.size(), 1);
         for (Properties system : systems) {
-            Assertions.assertEquals(s.hostId, system.get("hostname"), "HostId not match!");
-            BigDecimal systemLoad = (BigDecimal) system.get("systemLoad");;
-			Assertions.assertEquals(s.systemLoad.doubleValue(), systemLoad.doubleValue(), "System load not match!");
+            Assertions.assertEquals(c.hostId, system.get("hostname"), "HostId not match!");
+            BigDecimal cpu = (BigDecimal) system.get("cpuUsage");;
+			Assertions.assertEquals(c.cpuUsage.doubleValue(), cpu.doubleValue(), "CPU Usage not match!");
         }
     }
 
@@ -103,30 +95,5 @@ public class InventoryEndpointIT {
         BigDecimal max = (BigDecimal) system.get("memoryMax");
         Assertions.assertEquals(m.memoryUsed.longValue(), used.longValue(), "MemoryUsed not match!");
         Assertions.assertEquals(m.memoryMax.longValue(), max.longValue(), "MemoryMax not match!");
-    }
-    
-    @Test
-    public void testGetProperty() {
-    	 Response response = inventoryResource.getSystemProperty("os.name");
-         Assertions.assertEquals(200, response.getStatus(),
-                 "Response should be 200");
-         int recordsProcessed = 0;
-         long startTime = System.currentTimeMillis();
-         long elapsedTime = 0;
-         while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
-             ConsumerRecords<String, String> records = propertyConsumer.poll(Duration.ofMillis(3000));
-             System.out.println("Polled " + records.count() + " records from Kafka:");
-             for (ConsumerRecord<String, String> record : records) {
-                 String p = record.value();
-                 System.out.println(p);
-                 assertEquals("os.name", p);
-                 recordsProcessed++;
-             }
-             propertyConsumer.commitAsync();
-             if (recordsProcessed > 0)
-                 break;
-             elapsedTime = System.currentTimeMillis() - startTime;
-         }
-         assertTrue(recordsProcessed > 0, "No records processed");
     }
 }
