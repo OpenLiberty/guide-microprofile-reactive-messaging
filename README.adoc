@@ -177,28 +177,28 @@ include::finish/system/pom.xml[]
 
 In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api`, [hotspot=kafka file=2]`kafka-clients`, and [hotspot=rxjava file=2]`rxjava` dependencies to the [hotspot file=2]`pom.xml`
 
-// == Building the Inventory microservice
+== Building the Inventory microservice
 
-// //inventory
-// [role="code_command hotspot file=1", subs="quotes"]
-// ----
-// #Replace the `InventoryResource` class.#
-// `inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java`
-// ----
+//inventory
+[role="code_command hotspot file=1", subs="quotes"]
+----
+#Replace the `InventoryResource` class.#
+`inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java`
+----
 
-// InventoryResource.java
-// [source, Java, linenums, role='code_column hide_tags=copyright']
-// ----
-// include::finish/inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[]
-// ----
+InventoryResource.java
+[source, Java, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[]
+----
 
-// inventory/microprofile-config.properties
-// [source, Text, linenums, role='code_column hide_tags=copyright']
-// ----
-// include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
-// ----
+inventory/microprofile-config.properties
+[source, Text, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
+----
 
-// The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=1]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=2]`microprofile-config.properties`.
+The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=1]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=2]`microprofile-config.properties`.
  
 == Configuring the server
 
