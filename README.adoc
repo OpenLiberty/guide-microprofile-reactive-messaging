@@ -45,20 +45,17 @@ https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that ma
 === What is asynchronous programming?
 Imagine asynchronous programming as a restaurant. After you're seated, a waitstaff takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waitstaff may take more orders or serve other tables. After your food is ready, your waitstaff brings out the food to your table. However, in a synchronous model, the waitstaff must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-The job manager application that you'll be working with consists of three important microservices : `System`, `Job`, and `Inventory`. It also uses Kafka to enable reactive messaging communication between the Producer and Consumer microservices over the messaging channels.
+You can perform lengthy operations, such as input/output (I/O), without blocking with asynchronous methods. The I/O operation can occur in the background and a callback notifies the caller to continue its computation when the original request is complete. As a result, the original thread frees up so it can handle other work rather than wait for the I/O to complete. Revisiting the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables.
 
-You'll update the `System`, `Job` and `Inventory` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
+In the context of REST clients, HTTP request calls can be time consuming. The network might be slow, or maybe the upstream service is overwhelmed and can’t respond quickly. These lengthy operations can block the execution of your thread when it’s in use and prevent other work from being completed.
 
-image::reactive-messaging-job.png[Reactive system inventory,align="center"]
+The application that you will be working with consists of two microservices, `System`, and `Inventory`. The `System` microservice sends the system load average data to the `Inventory` microservice every 15 seconds. The `Inventory` microservice keeps an updated list of all the `System` hostnames and their CPU usage properties.
 
-The `Gateway` microservice is a https://microservices.io/patterns/apigateway.html#variation-backends-for-frontends[backend for frontend^] service.
-It communicates with the backend microservices on the caller's behalf.
+You'll update the `System`, and `Inventory` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
-The `Job` microservice allows you to dispatch jobs that will be run by the `System` microservice. It also consumes the request, produces job messages, and sends them to Kafka on the `job` channel.
+image::reactive-messaging-system-inventory.png[Reactive system inventory,align="center"]
 
-A job begins with a `NEW` status. The `System` microservice illustrate how to handle the job as a real system. It consumes, processes the job and update the status to `IN_PROGRESS` and `COMPLETED` consecutively. There’s a sleep operation in between each status to represent the job processing time, and the status updates are reported back to the `Inventory` microservice via reactive messages on the Kafka.
-
-The `Inventory` microservice receives status updates and provides queries for the user. All the jobs metadata are persisted here. Because persisting data is not the focus of this guide, the `Inventory` microservice simply uses a Map object to store the data.
+The `Inventory` microservice receives status updates and provides queries for the user. The `System` metadata are persisted here. Because persisting data is not the focus of this guide, the `Inventory` microservice simply uses a Map object to store the data.
 
 // =================================================================================================
 // Prerequisites
@@ -87,11 +84,11 @@ A channel is a bridge for transporting messages between different parts of the r
 
 *@Outgoing* 
 
-`@Outgoing` is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute. For example, `@Outgoing("job")`
+`@Outgoing` is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute. For example, `@Outgoing("cpuStatus")`
 
 *@Incoming*
 
-`@Incoming` is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute. For example, `@Incoming("jobConsume")`
+`@Incoming` is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute. For example, `@Incoming("cpuStatus")`
 
 *Connector*
 
@@ -100,13 +97,13 @@ Open Liberty includes the `liberty-kafka` connector for sending and receiving 
 
 Detailed diagram with the MicroProfile Reactive Messaging channels, Apache Kafka topics and the interaction between them :
 
-image::reactive-messaging-job-detail.png[Reactive system inventory detail,align="center"]
+image::reactive-messaging-system-inventory-detail.png[Reactive system inventory detail,align="center"]
 
 ---
 
-=== Configuring MicroProfile Reactive Messaging connectors
+== Configuring MicroProfile Reactive Messaging connectors
 
-Navigate to the `start` directory to begin. Most of the code is already provided for use.
+Navigate to the `start` directory to begin. 
 
 In order to configure the MicroProfile Reactive Messaging connectors, we need to format the configuration keys as follows :
 
@@ -114,7 +111,7 @@ In order to configure the MicroProfile Reactive Messaging connectors, we need to
 - `mp.messaging.[incoming.|outgoing.].` :- Applies to a particular channel
 - Each channel which is to be connected using a connector must have the connector property defined to say which connector to use
 
-Each of the three microservices `System`, `Job`, and `Inventory` contain `microprofile-config.properties`
+Both the microservices `System`, and `Inventory` contain `microprofile-config.properties`
 file. MicroProfile Reactive Messaging uses connectors to connect certain channels to Apache Kafka and setting options on those connectors.
 
 [role="code_command hotspot file=0", subs="quotes"]
@@ -128,19 +125,23 @@ system/microprofile-config.properties
 include::finish/system/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `System` microservice uses an outgoing stream [hotspot=jobPublishStatus file=0]`jobPublishStatus` to send messages to the [hotspot=topic1 file=0]`statusTopic` topic in the Kafka messaging-broker, so that the `Inventory` microservices can consume the messages.
+inventory/microprofile-config.properties
+[source, text, linenums, role='code_column']
+----
+include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
+----
 
-The `System` microservice listens to messages from an incoming stream [hotspot=jobConsume file=0]`jobConsume`, wherein the messages are sent by the `Job` microservice through the [hotspot=topic2 file=0]`jobTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 hotspot=serializerVal2 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly the [hotspot=deserializer2 file=0]`key.deserializer` and [hotspot=deserializerVal2 file=0]`value.deserializer` properties define how to deserialize the messages.
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `System` microservice uses an outgoing stream [hotspot=cpuStatus file=0]`cpuStatus` to send messages to the [hotspot=topic1 file=0]`cpuStatusTopic` topic in the Kafka messaging-broker, so that the `Inventory` microservices can consume the messages.
 
-The [hotspot=group file=0]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
+The `Inventory` microservice listens to messages from an incoming stream [hotspot=cpuStatus file=0]`cpuStatus`, wherein the messages are sent by the `System` microservice through the [hotspot=topic1 file=0]`cpuStatusTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages.
 
-The rest of the microservices use similar `microprofile-config.properties` configuration to define their required incoming and outgoing streams.
+The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
 
-image::reactive-messaging-keyconcepts.png[Reactive key concepts,align="center"]
+The `Inventory` microservices use similar `microprofile-config.properties` configuration to define it's required incoming stream.
 
 ---
 
-=== Building the Job microservice
+== Building the Job microservice
 
 The `Job` microservice uses the MicroProfile Reactive Messaging to send messages to the `System` microservice over Kafka.
 
@@ -180,7 +181,7 @@ In order to develop the MicroProfile Reactive Messaging application using Maven,
 
 ---
 
-=== Completing the System and Inventory microservices
+== Completing the System and Inventory microservices
 
 You will complete the `System` and `Inventory` microservices implementation in this section.
 

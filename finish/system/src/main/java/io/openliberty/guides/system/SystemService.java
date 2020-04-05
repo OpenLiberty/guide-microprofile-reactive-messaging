@@ -48,7 +48,7 @@ public class SystemService {
     // end::publishCpuUsage[]
     public Publisher<CpuUsage> sendCpuUsage() {
         return Flowable.interval(15, TimeUnit.SECONDS)
-                .map((interavl -> new CpuUsage(getHostname(), new Double(osMean.getSystemLoadAverage()))));
+                .map((interval -> new CpuUsage(getHostname(), new Double(osMean.getSystemLoadAverage()))));
     }
 
 }
