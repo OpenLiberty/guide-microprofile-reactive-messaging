@@ -33,16 +33,6 @@ public class InventoryManager {
             systems.put(hostId, p);
         }
     }
-    
-    public void addSystem(String hostId, Long memoryUsed, Long memoryMax) {
-        if (!systems.containsKey(hostId)) {
-            Properties p = new Properties();
-            p.put("hostname", hostId);
-            p.put("memoryUsed", memoryUsed);
-            p.put("memoryMax", memoryMax);
-            systems.put(hostId, p);
-        }
-    }
 
     public void updateCpuStatus(String hostId, Double cpuUsage) {
         Optional<Properties> p = getSystem(hostId);
@@ -52,16 +42,6 @@ public class InventoryManager {
         }
     }
 
-    public void updateMemoryStatus(String hostId, Long memoryUsed, Long memoryMax) {
-        Optional<Properties> p = getSystem(hostId);
-        if (p.isPresent()) {
-            if (p.get().getProperty(hostId) == null && hostId != null) {
-                p.get().put("memoryUsed", memoryUsed);
-                p.get().put("memoryMax", memoryMax);
-            }
-        }
-    }
-    
     public Optional<Properties> getSystem(String hostId) {
         Properties p = systems.get(hostId);
         return Optional.ofNullable(p);
