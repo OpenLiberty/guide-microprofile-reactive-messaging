@@ -43,12 +43,16 @@ public class SystemService {
         return hostname;
     }
 
+    // tag::sendCpuUsage[]
     // tag::publishCpuUsage[]
     @Outgoing("cpuStatus")
     // end::publishCpuUsage[]
     public Publisher<CpuUsage> sendCpuUsage() {
+        // tag::flowableInterval[]
         return Flowable.interval(15, TimeUnit.SECONDS)
                 .map((interval -> new CpuUsage(getHostname(), new Double(osMean.getSystemLoadAverage()))));
+        // end::flowableInterval[]
     }
+    // end::sendCpuUsage[]
 
 }

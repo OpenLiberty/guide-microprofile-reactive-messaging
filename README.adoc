@@ -141,67 +141,49 @@ The `Inventory` microservices use similar `microprofile-config.properties` confi
 
 ---
 
-== Building the Job microservice
+== Building the System microservice
 
-The `Job` microservice uses the MicroProfile Reactive Messaging to send messages to the `System` microservice over Kafka.
+The `System` microservice uses the MicroProfile Reactive Messaging to send CPU usage messages to the `Inventory` microservice over Kafka.
 
-[role="code_command hotspot file=0", subs="quotes"]
-----
-#Replace the `JobResource` class.#
-`job/src/main/java/io/openliberty/guides/job/JobResource.java`
-----
-
-JobResource.java
-[source, Java, linenums, role='code_column hide_tags=copyright']
-----
-include::finish/job/src/main/java/io/openliberty/guides/job/JobResource.java[]
-----
-
-job/microprofile-config.properties
-[source, Text, linenums, role='code_column hide_tags=copyright']
-----
-include::finish/job/src/main/resources/META-INF/microprofile-config.properties[]
-----
-
-The `Job` microservice creates jobs when a job is sent in a [hotspot=postJob file=0]`POST` request to the `/jobs` endpoint. The [hotspot=createJob file=0]`createJob()` method receives a `job` and adds it to the [hotspot=jobQueue file=0]`FlowableEmitter`. We use [hotspot=takeF file=0]`Flowable.create()` from rxJava to create a Publisher and an associated emitter. Objects we send to the emitter will be sent to the `Publisher`. We return the `Publisher` from our [hotspot=OutgoingJob file=0]`@Outgoing("job")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=jobStream file=1]`job` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
-
-[role="code_command hotspot file=2", subs="quotes"]
-----
-#Replace the Maven configuration file.#
-`job/pom.xml`
----- 
-
-pom.xml
-[source, XML ,linenums,role="code_column"]
-----
-include::finish/job/pom.xml[]
-----
-
-In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api`, [hotspot=kafka file=2]`kafka-clients`, and [hotspot=rxjava file=2]`rxjava` dependencies to the [hotspot file=2]`pom.xml`
-
----
-
-== Completing the System and Inventory microservices
-
-You will complete the `System` and `Inventory` microservices implementation in this section.
-
-*Completing the System microservice*
-
-//System
 [role="code_command hotspot file=0", subs="quotes"]
 ----
 #Replace the `SystemService` class.#
 `system/src/main/java/io/openliberty/guides/system/SystemService.java`
 ----
+
 SystemService.java
 [source, Java, linenums, role='code_column hide_tags=copyright']
 ----
 include::finish/system/src/main/java/io/openliberty/guides/system/SystemService.java[]
 ----
 
-The `System` service receives a job on the [hotspot=jobConsume file=0]`@Incoming("jobConsume")` channel, processes it in [hotspot=initJob file=0]`receiveJob()` method and sends back an `IN_PROGRESS` status on the [hotspot=jobPublishIntermediate file=0]`@Outgoing("jobPublishStatus")` channel to Kafka over MicroProfile Reactive Messaging channels. After a while, a `COMPLETED` status will be sent to the [hotspot=jobPublishStatus file=0]`@Outgoing("jobPublishStatus")` channel.
+system/microprofile-config.properties
+[source, Text, linenums, role='code_column hide_tags=copyright']
+----
+include::finish/system/src/main/resources/META-INF/microprofile-config.properties[]
+----
 
-*Completing the Inventory microservice*
+The `System` microservice calculates the average system load for the last minute every fifteen seconds. The average system load for a system is calculated by taking the sum of the count of runnable items queued to the available processors and the count of runnable items running on the available processors averaged over a period of time.
+
+The [hotspot=sendCpuUsage file=0]`sendCpuUsage()` method creates a CPU usage statistics for a host system every fifteen seconds. We use [hotspot=flowableInterval file=0]`Flowable.interval()` from rxJava to create a Publisher. We return the `Publisher` from our [hotspot=publishCpuUsage file=0]`@Outgoing("cpuStatus")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=cpuStatus file=1]`cpuStatus` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
+
+[role="code_command hotspot file=2", subs="quotes"]
+----
+#Replace the Maven configuration file.#
+`system/pom.xml`
+---- 
+
+pom.xml
+[source, XML ,linenums,role="code_column"]
+----
+include::finish/system/pom.xml[]
+----
+
+In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api`, [hotspot=kafka file=2]`kafka-clients`, and [hotspot=rxjava file=2]`rxjava` dependencies to the [hotspot file=2]`pom.xml`
+
+---
+
+== Building the Inventory microservice
 
 //inventory
 [role="code_command hotspot file=1", subs="quotes"]
@@ -222,7 +204,7 @@ inventory/microprofile-config.properties
 include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Inventory` microservice receives the message from the `System`, and `Job` microservices over the [hotspot=updateStatus file=1]`@Incoming("updateStatus")` channel with its properties defined in the [hotspot=updateStatus file=2]`microprofile-config.properties`.
+The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=1]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=2]`microprofile-config.properties`.
  
 == Configuring the server
 
@@ -241,11 +223,11 @@ include::finish/system/src/main/liberty/config/server.xml[]
 
 Configure the server to enable MicroProfile Reactive Messaging by adding [hotspot=featureMP file=0]`mpReactiveMessaging-1.0` feature element to the [hotspot file=0]`server.xml`.
 
-The rest of the microservices have [hotspot file=0]`server.xml` already configured.
+The `Inventory` microservice has [hotspot file=0]`server.xml` already configured.
 
 == Building the application
 
-You will build and run the `System`, `Job`, `Inventory`, and `Gateway` microservices in Docker containers.
+You will build and run the `System`, and `Inventory` microservices in Docker containers.
 
 Start your Docker environment.
 
@@ -268,9 +250,7 @@ Run the following commands to containerize the microservices:
 [role='command']
 ```
 docker build -t system:1.0-SNAPSHOT system/.
-docker build -t job:1.0-SNAPSHOT job/.
 docker build -t inventory:1.0-SNAPSHOT inventory/.
-docker build -t gateway:1.0-SNAPSHOT gateway/.
 ```
 
 Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project.
