@@ -99,9 +99,7 @@ Detailed diagram with the MicroProfile Reactive Messaging channels, Apache Kafka
 
 image::reactive-messaging-system-inventory-detail.png[Reactive system inventory detail,align="center"]
 
----
-
-== Configuring MicroProfile Reactive Messaging connectors
+== Configuring the MicroProfile Reactive Messaging connectors
 
 Navigate to the `start` directory to begin. 
 
@@ -139,72 +137,70 @@ The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer gro
 
 The `Inventory` microservices use similar `microprofile-config.properties` configuration to define it's required incoming stream.
 
----
+// == Building the System microservice
 
-== Building the System microservice
+// The `System` microservice uses the MicroProfile Reactive Messaging to send CPU usage messages to the `Inventory` microservice over Kafka.
 
-The `System` microservice uses the MicroProfile Reactive Messaging to send CPU usage messages to the `Inventory` microservice over Kafka.
+// [role="code_command hotspot file=0", subs="quotes"]
+// ----
+// #Replace the `SystemService` class.#
+// `system/src/main/java/io/openliberty/guides/system/SystemService.java`
+// ----
 
-[role="code_command hotspot file=0", subs="quotes"]
-----
-#Replace the `SystemService` class.#
-`system/src/main/java/io/openliberty/guides/system/SystemService.java`
-----
+// SystemService.java
+// [source, Java, linenums, role='code_column hide_tags=copyright']
+// ----
+// include::finish/system/src/main/java/io/openliberty/guides/system/SystemService.java[]
+// ----
 
-SystemService.java
-[source, Java, linenums, role='code_column hide_tags=copyright']
-----
-include::finish/system/src/main/java/io/openliberty/guides/system/SystemService.java[]
-----
+// system/microprofile-config.properties
+// [source, Text, linenums, role='code_column hide_tags=copyright']
+// ----
+// include::finish/system/src/main/resources/META-INF/microprofile-config.properties[]
+// ----
 
-system/microprofile-config.properties
-[source, Text, linenums, role='code_column hide_tags=copyright']
-----
-include::finish/system/src/main/resources/META-INF/microprofile-config.properties[]
-----
+// The `System` microservice calculates the average system load for the last minute every fifteen seconds. The average system load for a system is calculated by taking the sum of the count of runnable items queued to the available processors and the count of runnable items running on the available processors averaged over a period of time.
 
-The `System` microservice calculates the average system load for the last minute every fifteen seconds. The average system load for a system is calculated by taking the sum of the count of runnable items queued to the available processors and the count of runnable items running on the available processors averaged over a period of time.
+// The [hotspot=sendCpuUsage file=0]`sendCpuUsage()` method creates a CPU usage statistics for a host system every fifteen seconds. We use [hotspot=flowableInterval file=0]`Flowable.interval()` from rxJava to create a Publisher. We return the `Publisher` from our [hotspot=publishCpuUsage file=0]`@Outgoing("cpuStatus")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=cpuStatus file=1]`cpuStatus` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
 
-The [hotspot=sendCpuUsage file=0]`sendCpuUsage()` method creates a CPU usage statistics for a host system every fifteen seconds. We use [hotspot=flowableInterval file=0]`Flowable.interval()` from rxJava to create a Publisher. We return the `Publisher` from our [hotspot=publishCpuUsage file=0]`@Outgoing("cpuStatus")` channel, which is configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=cpuStatus file=1]`cpuStatus` stream and MicroProfile Reactive Messaging takes care of assigning the publisher to the channel.
+// [role="code_command hotspot file=2", subs="quotes"]
+// ----
+// #Replace the Maven configuration file.#
+// `system/pom.xml`
+// ---- 
 
-[role="code_command hotspot file=2", subs="quotes"]
-----
-#Replace the Maven configuration file.#
-`system/pom.xml`
----- 
+// pom.xml
+// [source, XML ,linenums,role="code_column"]
+// ----
+// include::finish/system/pom.xml[]
+// ----
 
-pom.xml
-[source, XML ,linenums,role="code_column"]
-----
-include::finish/system/pom.xml[]
-----
+// In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api`, [hotspot=kafka file=2]`kafka-clients`, and [hotspot=rxjava file=2]`rxjava` dependencies to the [hotspot file=2]`pom.xml`
 
-In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api`, [hotspot=kafka file=2]`kafka-clients`, and [hotspot=rxjava file=2]`rxjava` dependencies to the [hotspot file=2]`pom.xml`
+// ---
 
----
+// == Building the Inventory microservice
 
-== Building the Inventory microservice
+// //inventory
+// [role="code_command hotspot file=1", subs="quotes"]
+// ----
+// #Replace the `InventoryResource` class.#
+// `inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java`
+// ----
 
-//inventory
-[role="code_command hotspot file=1", subs="quotes"]
-----
-#Replace the `InventoryResource` class.#
-`inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java`
-----
+// InventoryResource.java
+// [source, Java, linenums, role='code_column hide_tags=copyright']
+// ----
+// include::finish/inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[]
+// ----
 
-InventoryResource.java
-[source, Java, linenums, role='code_column hide_tags=copyright']
-----
-include::finish/inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java[]
-----
+// inventory/microprofile-config.properties
+// [source, Text, linenums, role='code_column hide_tags=copyright']
+// ----
+// include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
+// ----
 
-inventory/microprofile-config.properties
-[source, Text, linenums, role='code_column hide_tags=copyright']
-----
-include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
-----
-
-The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=1]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=2]`microprofile-config.properties`.
+// The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=1]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=2]`microprofile-config.properties`.
  
 == Configuring the server
 
