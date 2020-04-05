@@ -20,8 +20,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.ConsumerGroupListing;
-import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
+import org.apache.kafka.clients.admin.ListTopicsResult;
+import org.apache.kafka.clients.admin.TopicListing;
 import org.apache.kafka.common.KafkaFuture;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.health.HealthCheck;
@@ -39,8 +39,8 @@ public class SystemReadinessCheck implements HealthCheck {
     String kafkaServer;
     
     @Inject
-    @ConfigProperty(name = "mp.messaging.incoming.getProperty.group.id")
-    String groupId;
+    @ConfigProperty(name = "mp.messaging.outgoing.cpuStatus.topic")
+    String cpuStatusTopic;
     
     @Override
     public HealthCheckResponse call() {
@@ -61,13 +61,14 @@ public class SystemReadinessCheck implements HealthCheck {
     }
     
     private boolean checkIfBarConsumerGroupRegistered(AdminClient adminClient) {
-        ListConsumerGroupsResult groupsResult = adminClient.listConsumerGroups();
-        KafkaFuture<Collection<ConsumerGroupListing>> consumerGroupsFuture = groupsResult.valid();
+        ListTopicsResult topics = adminClient.listTopics();
+        KafkaFuture<Collection<TopicListing>> topicsFuture = topics.listings();
         try {
-            Collection<ConsumerGroupListing> consumerGroups = consumerGroupsFuture.get();
-            for (ConsumerGroupListing g : consumerGroups)
-                logger.info("groupId: " + g.groupId());
-            return consumerGroups.stream().anyMatch(group -> group.groupId().equals(groupId));
+            Collection<TopicListing> topicList = topicsFuture.get();
+            for (TopicListing t : topicList)
+                logger.info("topic: " + t.name());
+            //topicList.stream().anyMatch(topic -> topic.equals(cpuStatusTopic));
+            return true;
         } catch (Exception e) {
             return false;
         }

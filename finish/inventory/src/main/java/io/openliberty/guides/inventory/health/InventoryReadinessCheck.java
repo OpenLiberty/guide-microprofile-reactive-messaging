@@ -39,7 +39,7 @@ public class InventoryReadinessCheck implements HealthCheck {
     String kafkaServer;
     
     @Inject
-    @ConfigProperty(name = "mp.messaging.incoming.systemLoad.group.id")
+    @ConfigProperty(name = "mp.messaging.incoming.cpuStatus.group.id")
     String groupId;
     
     @Override

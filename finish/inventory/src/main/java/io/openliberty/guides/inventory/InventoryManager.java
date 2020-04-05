@@ -25,11 +25,11 @@ public class InventoryManager {
 
     private Map<String, Properties> systems = Collections.synchronizedMap(new TreeMap<String, Properties>());
 
-    public void addSystem(String hostId, Double systemLoad) {
+    public void addSystem(String hostId, Double cpuUsage) {
         if (!systems.containsKey(hostId)) {
             Properties p = new Properties();
             p.put("hostname", hostId);
-            p.put("systemLoad", systemLoad);
+            p.put("cpuUsage", cpuUsage);
             systems.put(hostId, p);
         }
     }
@@ -44,20 +44,11 @@ public class InventoryManager {
         }
     }
 
-	public void addSystem(String hostId, String key, String value) {
-        if (!systems.containsKey(hostId)) {
-            Properties p = new Properties();
-            p.put("hostname", hostId);
-            p.put("key", value);
-            systems.put(hostId, p);
-        }
-	}
-	
-    public void updateCpuStatus(String hostId, Double systemLoad) {
+    public void updateCpuStatus(String hostId, Double cpuUsage) {
         Optional<Properties> p = getSystem(hostId);
         if (p.isPresent()) {
             if (p.get().getProperty(hostId) == null && hostId != null)
-                p.get().put("systemLoad", systemLoad);
+                p.get().put("cpuUsage", cpuUsage);
         }
     }
 
@@ -71,15 +62,6 @@ public class InventoryManager {
         }
     }
     
-	public void updatePropertyMessage(String hostId, String key, String value) {
-        Optional<Properties> p = getSystem(hostId);
-        if (p.isPresent()) {
-            if (p.get().getProperty(hostId) == null && hostId != null) {
-                p.get().put(key, value);
-            }
-        }
-	}
-	
     public Optional<Properties> getSystem(String hostId) {
         Properties p = systems.get(hostId);
         return Optional.ofNullable(p);
@@ -92,5 +74,4 @@ public class InventoryManager {
     public void resetSystems() {
         systems.clear();
     }
-
 }
