@@ -46,7 +46,7 @@ You will learn how to build reactive microservices using MicroProfile Reactive M
 
 Imagine asynchronous programming as a restaurant. After you're seated, a waitstaff takes your order. Then, you must wait a few minutes for your food to be prepared. While your food is being prepared, your waitstaff may take more orders or serve other tables. After your food is ready, your waitstaff brings out the food to your table. However, in a synchronous model, the waitstaff must wait for your food to be prepared before serving any other customers. This method blocks other customers from placing orders or receiving their food.
 
-You can perform lengthy operations, such as input/output (I/O), without blocking with asynchronous methods. The I/O operation can occur in the background and a callback notifies the caller to continue its computation when the original request is complete. As a result, the original thread frees up so it can handle other work rather than wait for the I/O to complete. Revisiting the restaurant analogy, food is prepared asynchronously in the kitchen and your waiter is freed up to attend to other tables.
+You can perform lengthy operations, such as input/output (I/O), without blocking with asynchronous methods. The I/O operation can occur in the background and a callback notifies the caller to continue its computation when the original request is complete. As a result, the original thread frees up so it can handle other work rather than wait for the I/O to complete. Revisiting the restaurant analogy, food is prepared asynchronously in the kitchen and your waitstaff is freed up to attend to other tables.
 
 In the context of REST clients, HTTP request calls can be time consuming. The network might be slow, or maybe the upstream service is overwhelmed and can’t respond quickly. These lengthy operations can block the execution of your thread when it’s in use and prevent other work from being completed.
 
@@ -59,7 +59,7 @@ https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/mi
 
 https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages. A Kafka producer is a client or a program, which produces the message and pushes them to a topic. A Kafka consumer is a client or a program, which consumes the published messages from a topic. We are using Kafka and zookeper container in this guide.
 
-The application that you will be working with consists of two microservices, `System`, and `Inventory`. The `System` microservice sends the system load average data to the `Inventory` microservice every 15 seconds. The `Inventory` microservice keeps an updated list of all the `System` hostnames and their CPU usage statistics.
+The application that you will be working with consists of two microservices, `System`, and `Inventory`. The `System` microservice sends the system load average data to the `Inventory` microservice every 15 seconds. The `Inventory` microservice keeps an updated list of all the `System` hostnames and their CPU data.
 
 You'll update the `System`, and `Inventory` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 

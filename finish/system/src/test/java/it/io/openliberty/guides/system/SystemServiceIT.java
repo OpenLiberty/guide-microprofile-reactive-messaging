@@ -27,8 +27,8 @@ import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jupiter.MicroShedTest;
 import org.microshed.testing.kafka.KafkaConsumerConfig;
 
-import io.openliberty.guides.models.CpuUsage;
-import io.openliberty.guides.models.CpuUsage.CpuUsageDeserializer;
+import io.openliberty.guides.models.SystemLoad;
+import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
@@ -36,10 +36,10 @@ public class SystemServiceIT {
 
     private static final long POLL_TIMEOUT = 30 * 1000;
 
-    @KafkaConsumerConfig(valueDeserializer = CpuUsageDeserializer.class, 
+    @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class, 
         groupId = "cpu-status", topics = "cpuStatusTopic", 
         properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
-    public static KafkaConsumer<String, CpuUsage> cpuConsumer;
+    public static KafkaConsumer<String, SystemLoad> cpuConsumer;
 
     @Test
     public void testCpuStatus() throws IOException, InterruptedException {
@@ -47,10 +47,10 @@ public class SystemServiceIT {
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
-            ConsumerRecords<String, CpuUsage> records = cpuConsumer.poll(Duration.ofMillis(3000));
+            ConsumerRecords<String, SystemLoad> records = cpuConsumer.poll(Duration.ofMillis(3000));
             System.out.println("Polled " + records.count() + " records from Kafka:");
-            for (ConsumerRecord<String, CpuUsage> record : records) {
-                CpuUsage c = record.value();
+            for (ConsumerRecord<String, SystemLoad> record : records) {
+                SystemLoad c = record.value();
                 System.out.println(c);
                 assertNotNull(c.hostId);
                 assertNotNull(c.cpuUsage);

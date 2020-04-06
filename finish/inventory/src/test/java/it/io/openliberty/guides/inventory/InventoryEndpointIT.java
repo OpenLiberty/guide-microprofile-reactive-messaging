@@ -35,9 +35,9 @@ import org.microshed.testing.kafka.KafkaConsumerConfig;
 import org.microshed.testing.kafka.KafkaProducerConfig;
 
 import io.openliberty.guides.inventory.InventoryResource;
-import io.openliberty.guides.models.CpuUsage;
-import io.openliberty.guides.models.CpuUsage.CpuUsageDeserializer;
-import io.openliberty.guides.models.CpuUsage.JsonbSerializer;
+import io.openliberty.guides.models.SystemLoad;
+import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
+import io.openliberty.guides.models.SystemLoad.JsonbSerializer;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
@@ -48,12 +48,12 @@ public class InventoryEndpointIT {
     public static InventoryResource inventoryResource;
 
     @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
-    public static KafkaProducer<String, CpuUsage> cpuProducer;
+    public static KafkaProducer<String, SystemLoad> cpuProducer;
 
-    @KafkaConsumerConfig(valueDeserializer = CpuUsageDeserializer.class, 
+    @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class, 
             groupId = "cpu-status", topics = "cpuStatusTopic", 
             properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
-    public static KafkaConsumer<String, CpuUsage> cpuConsumer;
+    public static KafkaConsumer<String, SystemLoad> cpuConsumer;
 
     @AfterAll
     public static void cleanup() {
@@ -62,8 +62,8 @@ public class InventoryEndpointIT {
 
     @Test
     public void testCpuUsage() throws InterruptedException {
-        CpuUsage c = new CpuUsage("localhost", new Double(1.1));
-        cpuProducer.send(new ProducerRecord<String, CpuUsage>("cpuStatusTopic", c));
+        SystemLoad c = new SystemLoad("localhost", new Double(1.1));
+        cpuProducer.send(new ProducerRecord<String, SystemLoad>("cpuStatusTopic", c));
         Thread.sleep(5000);
         Response response = inventoryResource.getSystems();
         List<Properties> systems = response.readEntity(new GenericType<List<Properties>>() {});

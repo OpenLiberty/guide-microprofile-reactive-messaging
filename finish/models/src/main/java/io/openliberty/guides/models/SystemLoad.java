@@ -20,26 +20,26 @@ import javax.json.bind.JsonbBuilder;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serializer;
 
-public class CpuUsage {
+public class SystemLoad {
 
     private static final Jsonb jsonb = JsonbBuilder.create();
 
     public String hostId;
     public Double cpuUsage;
         
-    public CpuUsage(String hostId, Double cpuUsage) {
+    public SystemLoad(String hostId, Double cpuUsage) {
         this.hostId = hostId;
         this.cpuUsage = cpuUsage;
     }
 
-    public CpuUsage() {
+    public SystemLoad() {
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CpuUsage)) return false;
-        CpuUsage c = (CpuUsage) o;
+        if (!(o instanceof SystemLoad)) return false;
+        SystemLoad c = (SystemLoad) o;
         return Objects.equals(hostId, c.hostId)
                 && Objects.equals(cpuUsage, c.cpuUsage);
     }
@@ -61,12 +61,12 @@ public class CpuUsage {
         }
     }
       
-    public static class CpuUsageDeserializer implements Deserializer<CpuUsage> {
+    public static class SystemLoadDeserializer implements Deserializer<SystemLoad> {
         @Override
-        public CpuUsage deserialize(String topic, byte[] data) {
+        public SystemLoad deserialize(String topic, byte[] data) {
             if (data == null)
                 return null;
-            return jsonb.fromJson(new String(data), CpuUsage.class);
+            return jsonb.fromJson(new String(data), SystemLoad.class);
         }
     }
 }

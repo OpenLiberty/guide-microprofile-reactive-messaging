@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
-import io.openliberty.guides.models.CpuUsage;
+import io.openliberty.guides.models.SystemLoad;
 
 
 @ApplicationScoped
@@ -85,14 +85,14 @@ public class InventoryResource {
     // tag::cpuStatus[]
     @Incoming("cpuStatus")
     // end::cpuStatus[]
-    public void updateStatus(CpuUsage c)  {
-        String hostId = c.hostId;
+    public void updateStatus(SystemLoad s)  {
+        String hostId = s.hostId;
         if (manager.getSystem(hostId).isPresent()) {
-            manager.updateCpuStatus(hostId, c.cpuUsage);
-            logger.info("Host " + hostId + " was updated: " + c);
+            manager.updateCpuStatus(hostId, s.cpuUsage);
+            logger.info("Host " + hostId + " was updated: " + s);
         } else {
-            manager.addSystem(hostId, c.cpuUsage);
-            logger.info("Host " + hostId + " was added: " + c);
+            manager.addSystem(hostId, s.cpuUsage);
+            logger.info("Host " + hostId + " was added: " + s);
         }
     }
 }

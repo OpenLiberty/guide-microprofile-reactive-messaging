@@ -25,20 +25,20 @@ public class InventoryManager {
 
     private Map<String, Properties> systems = Collections.synchronizedMap(new TreeMap<String, Properties>());
 
-    public void addSystem(String hostId, Double cpuUsage) {
+    public void addSystem(String hostId, Double systemLoad) {
         if (!systems.containsKey(hostId)) {
             Properties p = new Properties();
             p.put("hostname", hostId);
-            p.put("cpuUsage", cpuUsage);
+            p.put("systemLoad", systemLoad);
             systems.put(hostId, p);
         }
     }
 
-    public void updateCpuStatus(String hostId, Double cpuUsage) {
+    public void updateCpuStatus(String hostId, Double systemLoad) {
         Optional<Properties> p = getSystem(hostId);
         if (p.isPresent()) {
             if (p.get().getProperty(hostId) == null && hostId != null)
-                p.get().put("cpuUsage", cpuUsage);
+                p.get().put("systemLoad", systemLoad);
         }
     }
 
