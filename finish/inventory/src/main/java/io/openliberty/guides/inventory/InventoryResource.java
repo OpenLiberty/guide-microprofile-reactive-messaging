@@ -82,9 +82,9 @@ public class InventoryResource {
                 .build();
     }
 
-    // tag::cpuStatus[]
-    @Incoming("cpuStatus")
-    // end::cpuStatus[]
+    // tag::systemLoad[]
+    @Incoming("systemLoad")
+    // end::systemLoad[]
     public void updateStatus(SystemLoad s)  {
         String hostId = s.hostId;
         if (manager.getSystem(hostId).isPresent()) {
