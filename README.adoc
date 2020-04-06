@@ -114,7 +114,7 @@ file. MicroProfile Reactive Messaging uses connectors to connect certain channel
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
-#Create the microprofile-config.properties file.#
+#Create the System microprofile-config.properties file.#
 `system/src/main/resources/META-INF/microprofile-config.properties`
 ----
 system/microprofile-config.properties
@@ -133,7 +133,7 @@ The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.
 
 [role="code_command hotspot file=1", subs="quotes"]
 ----
-#Create the microprofile-config.properties file.#
+#Create the Inventory microprofile-config.properties file.#
 `inventory/src/main/resources/META-INF/microprofile-config.properties`
 ----
 The `Inventory` microservice listens to messages from an incoming stream [hotspot=cpuStatus file=1]`cpuStatus`, wherein the messages are sent by the `System` microservice through the [hotspot=topic1 file=0]`cpuStatusTopic` topic in the Kafka messaging-broker. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages.
