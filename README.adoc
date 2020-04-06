@@ -29,6 +29,15 @@ NOTE: This repository contains the guide documentation source. To view the guide
 
 Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
 
+// =================================================================================================
+// Prerequisites
+// =================================================================================================
+== Additional prerequisites
+
+You will build and run the  microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
+
+Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
+
 == What you'll learn
 
 You will learn how to build reactive microservices using MicroProfile Reactive Messaging. You'll also learn how to send messages between these microservices using Apache Kafka. 
@@ -57,15 +66,6 @@ You'll update the `System`, and `Inventory` microservices to use MicroProfile Re
 image::reactive-messaging-system-inventory.png[Reactive system inventory,align="center"]
 
 The `Inventory` microservice receives status updates and provides queries for the user. The `System` metadata are persisted here. Because persisting data is not the focus of this guide, the `Inventory` microservice simply uses a Map object to store the data.
-
-// =================================================================================================
-// Prerequisites
-// =================================================================================================
-== Additional prerequisites
-
-You will build and run the  microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
-
-Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
 // =================================================================================================
 // Getting started
