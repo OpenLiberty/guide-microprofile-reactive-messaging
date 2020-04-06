@@ -38,6 +38,8 @@ You will build and run the  microservices in Docker containers. You can learn mo
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
+The application also requires Apache Kafka however we will be using Kafka docker containers to reduce the installation and configuration.
+
 == What you'll learn
 
 You will learn how to build reactive microservices using MicroProfile Reactive Messaging. You'll also learn how to send messages between these microservices using Apache Kafka. 
@@ -57,7 +59,7 @@ https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/mi
 
 === What is Kafka?
 
-https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages. A Kafka producer is a client or a program, which produces the message and pushes them to a topic. A Kafka consumer is a client or a program, which consumes the published messages from a topic. We are using Kafka and zookeper container in this guide.
+https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages. A Kafka producer is a client or a program, which produces the message and pushes them to a topic. A Kafka consumer is a client or a program, which consumes the published messages from a topic.
 
 The application that you will be working with consists of two microservices, `System`, and `Inventory`. The `System` microservice sends the system load average data to the `Inventory` microservice every 15 seconds. The `Inventory` microservice keeps an updated list of all the `System` hostnames and their CPU data.
 
