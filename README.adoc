@@ -72,9 +72,7 @@ Install Docker by following the instructions on the official https://docs.docker
 [role='command']
 include::{common-includes}/gitclone.adoc[]
 
-== Creating a Reactive Messaging application
-
-=== Key Concepts
+== MicroProfile Reactive Messaging Key Concepts
 
 MicroProfile Reactive Messaging recommends a design to build reactive applications based on the following main concepts:
 
