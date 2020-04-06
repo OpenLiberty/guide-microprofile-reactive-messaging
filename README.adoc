@@ -273,14 +273,17 @@ include::{common-includes}/os-tabs.adoc[]
 
 Once the application is up and running, you can access the application by making a `@GET` request to the `Inventory` endpoint. 
 
-To access the `Inventory` microservice, see the http://localhost:9080/inventory/systems[^] URL, and you see the CPU usage properties for all the systems.
+To access the `Inventory` microservice, see the http://localhost:9085/inventory/systems[^] URL, and you see the CPU usage properties for all the systems.
 
 [source, role='command']
 ----
-
+{
+   "cpuUsage":2.25927734375,
+   "hostname":"Ankits-MacBook-Pro.local"
+}
 ----
 
-The `@GET` http://localhost:9080/inventory/system/{hostId}[^] microservice endpoint gives you the CPU usage properties for a particular host.
+The `@GET` http://localhost:9085/inventory/system/{hostId}[^] microservice endpoint gives you the CPU usage properties for a particular host.
 
 == Tearing down the environment
 
