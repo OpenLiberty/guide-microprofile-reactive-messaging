@@ -8,7 +8,7 @@
 //
 :projectid: microprofile-reactive-messaging
 :page-layout: guide-multipane
-:page-duration: 30 minutes
+:page-duration: 15 minutes
 :page-releasedate: 2020-04-13
 :page-guide-category: microprofile
 :page-essential: false
@@ -179,6 +179,8 @@ In order to develop the MicroProfile Reactive Messaging application using Maven,
 
 == Building the Inventory microservice
 
+The `Inventory` microservice stores the information about the CPU usage that runs on different systems.
+
 //inventory
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -198,7 +200,7 @@ inventory/microprofile-config.properties
 include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=0]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=1]`microprofile-config.properties`.
+The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=0]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=1]`microprofile-config.properties`. It's also a RESTful service that is served at the inventory/systems endpoint.
  
 == Configuring the server
 
@@ -269,55 +271,16 @@ include::{common-includes}/os-tabs.adoc[]
 
 == Trying the application
 
-Once the application is up and running, you can access the application by making requests to the `Gateway` endpoint using OpenAPI.
+Once the application is up and running, you can access the application by making a `@GET` request to the `Inventory` endpoint. 
 
-The services may take some time to become available. Check out the service that you created at the
-http://localhost:9080/openapi/ui[^] URL.
-
-*Place Job orders*
-
-Make a `POST` request to the `/api/jobs` endpoint. To make this request, expand the `POST` endpoint on the UI and click the *Try it out button*. Copy the following example input into the text box, and then click the `Execute` button. The `POST` request adds a new job.
+To access the `Inventory` microservice, see the http://localhost:9080/inventory/systems[^] URL, and you see the CPU usage properties for all the systems.
 
 [source, role='command']
 ----
-{
-  "taskList": [
-    "Job1"
-  ]
-}
+
 ----
 
-*Check IN_PROGRESS Job Status*
-
-Next, make a `GET` request to the `api/inventory/jobs` endpoint. To make this request, expand the `GET` endpoint on the UI, click the *Try it out button*, and then click the `Execute` button. The `GET` request returns information about the jobs. The response should show that the jobs have an `IN_PROGRESS` status, In case you see a `NEW` status then wait for a couple of seconds and click the `Execute` button again.
-
-[source, role="no_copy"]
-----
-[
-  {
-    "hostId": "ebf3a1801bf0",
-    "jobId": "0001",
-    "status": "IN_PROGRESS",
-    "taskDesc": "Job1"
-  }
-]
-----
-
-*Check COMPLETED Job Status*
-
-Click `Execute` again and you will see the response with a `COMPLETED` status. In case you see an `IN_PROGRESS` status then wait for a couple of seconds and click the `Execute` button again.
-
-[source, role="no_copy"]
-----
-[
-  {
-    "hostId": "ebf3a1801bf0",
-    "jobId": "0001",
-    "status": "COMPLETED",
-    "taskDesc": "Job1"
-  }
-]
-----
+The `@GET` http://localhost:9080/inventory/system/{hostId}[^] microservice endpoint gives you the CPU usage properties for a particular host.
 
 == Tearing down the environment
 
