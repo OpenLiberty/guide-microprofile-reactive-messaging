@@ -180,7 +180,7 @@ In order to develop the MicroProfile Reactive Messaging application using Maven,
 == Building the Inventory microservice
 
 //inventory
-[role="code_command hotspot file=1", subs="quotes"]
+[role="code_command hotspot file=0", subs="quotes"]
 ----
 #Replace the `InventoryResource` class.#
 `inventory/src/main/java/io/openliberty/guides/inventory/InventoryResource.java`
@@ -198,7 +198,7 @@ inventory/microprofile-config.properties
 include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=1]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=2]`microprofile-config.properties`.
+The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=0]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=1]`microprofile-config.properties`.
  
 == Configuring the server
 
