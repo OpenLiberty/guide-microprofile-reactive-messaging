@@ -49,7 +49,7 @@ You can perform lengthy operations, such as input/output (I/O), without blocking
 
 In the context of REST clients, HTTP request calls can be time consuming. The network might be slow, or maybe the upstream service is overwhelmed and can’t respond quickly. These lengthy operations can block the execution of your thread when it’s in use and prevent other work from being completed.
 
-The application that you will be working with consists of two microservices, `System`, and `Inventory`. The `System` microservice sends the system load average data to the `Inventory` microservice every 15 seconds. The `Inventory` microservice keeps an updated list of all the `System` hostnames and their CPU usage properties.
+The application that you will be working with consists of two microservices, `System`, and `Inventory`. The `System` microservice sends the system load average data to the `Inventory` microservice every 15 seconds. The `Inventory` microservice keeps an updated list of all the `System` hostnames and their CPU usage statistics.
 
 You'll update the `System`, and `Inventory` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
@@ -129,9 +129,14 @@ inventory/microprofile-config.properties
 include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `System` microservice uses an outgoing stream [hotspot=cpuStatus file=0]`cpuStatus` to send messages to the [hotspot=topic1 file=0]`cpuStatusTopic` topic in the Kafka messaging-broker, so that the `Inventory` microservices can consume the messages.
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `System` microservice uses an outgoing stream [hotspot=cpuStatus file=0]`cpuStatus` to send messages to the [hotspot=topic1 file=0]`cpuStatusTopic` topic in the Kafka messaging-broker, so that the `Inventory` microservices can consume the messages. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 file=0]`value.serializer` properties characterize how to serialize the messages.
 
-The `Inventory` microservice listens to messages from an incoming stream [hotspot=cpuStatus file=0]`cpuStatus`, wherein the messages are sent by the `System` microservice through the [hotspot=topic1 file=0]`cpuStatusTopic` topic in the Kafka messaging-broker. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 file=0]`value.serializer` properties characterize how to serialize the messages. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages.
+[role="code_command hotspot file=1", subs="quotes"]
+----
+#Create the microprofile-config.properties file.#
+`inventory/src/main/resources/META-INF/microprofile-config.properties`
+----
+The `Inventory` microservice listens to messages from an incoming stream [hotspot=cpuStatus file=1]`cpuStatus`, wherein the messages are sent by the `System` microservice through the [hotspot=topic1 file=0]`cpuStatusTopic` topic in the Kafka messaging-broker. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages.
 
 The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
 
@@ -200,7 +205,7 @@ inventory/microprofile-config.properties
 include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=0]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=1]`microprofile-config.properties`. It's also a RESTful service that is served at the inventory/systems endpoint.
+The `Inventory` microservice receives the message from the `System` microservices over the [hotspot=cpuStatus file=0]`@Incoming("cpuStatus")` channel with its properties defined in the [hotspot=cpuStatus file=1]`microprofile-config.properties`. It's also a RESTful service that is served at the `inventory/systems` endpoint.
  
 == Configuring the server
 
