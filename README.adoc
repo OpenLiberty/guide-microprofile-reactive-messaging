@@ -38,7 +38,7 @@ You will build and run the  microservices in Docker containers. You can learn mo
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
-The application also requires Apache Kafka however we will be using Kafka docker containers to reduce the installation and configuration.
+The application also requires Apache Kafka however you will be using Kafka docker containers to reduce the installation and configuration.
 
 == What you'll learn
 
@@ -169,7 +169,7 @@ The `Inventory` microservice receives the message from the `System` microservice
 
 == Configuring the MicroProfile Reactive Messaging connectors
 
-In order to configure the MicroProfile Reactive Messaging connectors, we need to format the configuration keys as follows :
+In order to configure the MicroProfile Reactive Messaging connectors, you need to format the configuration keys as follows :
 
 - `mp.messaging.connector.liberty-kafka.` :- Applies to all channels using the liberty-kafka connector
 - `mp.messaging.[incoming.|outgoing.].` :- Applies to a particular channel
@@ -197,6 +197,8 @@ include::finish/inventory/src/main/resources/META-INF/microprofile-config.proper
 
 The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `System` microservice uses an outgoing stream [hotspot=systemLoad file=0]`systemLoad` to send messages to the [hotspot=topic1 file=0]`systemLoadTopic` topic in the Kafka messaging-broker, so that the `Inventory` microservices can consume the messages. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 file=0]`value.serializer` properties characterize how to serialize the messages.
 
+The `Inventory` microservices use similar `microprofile-config.properties` configuration to define it's required incoming stream.
+
 [role="code_command hotspot file=1", subs="quotes"]
 ----
 #Create the Inventory microprofile-config.properties file.#
@@ -205,12 +207,10 @@ The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.
 The `Inventory` microservice listens to messages from an incoming stream [hotspot=systemLoad file=1]`systemLoad`, wherein the messages are sent by the `System` microservice through the [hotspot=topic1 file=0]`systemLoadTopic` topic in the Kafka messaging-broker. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages.
 
 The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
-
-The `Inventory` microservices use similar `microprofile-config.properties` configuration to define it's required incoming stream.
  
 == Configuring the server
 
-To use MicroProfile Reactive Messaging, we must enable the feature in the server.xml file for each service.
+To use MicroProfile Reactive Messaging, you must enable the feature in the server.xml file for each service.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -284,10 +284,12 @@ To access the `Inventory` microservice, use the http://localhost:9085/inventory/
 [source, role='command']
 ----
 {
-   "cpuUsage":2.25927734375,
+   "systemLoad":2.25927734375,
    "hostname":"Ankits-MacBook-Pro.local"
 }
 ----
+
+You can rerun the http://localhost:9085/inventory/systems[^] URL after fifteen seconds, and you will notice the CPU usage properties for all the systems have changed.
 
 The `@GET` http://localhost:9085/inventory/system/{hostId}[^] microservice endpoint gives you the CPU usage properties for a particular host.
 
