@@ -37,7 +37,7 @@ public class SystemServiceIT {
     private static final long POLL_TIMEOUT = 30 * 1000;
 
     @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class, 
-        groupId = "cpu-status", topics = "cpuStatusTopic", 
+        groupId = "system-load-status", topics = "systemLoadTopic", 
         properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
     public static KafkaConsumer<String, SystemLoad> cpuConsumer;
 

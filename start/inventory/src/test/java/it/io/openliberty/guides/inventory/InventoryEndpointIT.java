@@ -51,7 +51,7 @@ public class InventoryEndpointIT {
     public static KafkaProducer<String, SystemLoad> cpuProducer;
 
     @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class, 
-            groupId = "cpu-status", topics = "cpuStatusTopic", 
+            groupId = "system-load-status", topics = "systemLoadTopic", 
             properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
     public static KafkaConsumer<String, SystemLoad> cpuConsumer;
 
@@ -63,7 +63,7 @@ public class InventoryEndpointIT {
     @Test
     public void testCpuUsage() throws InterruptedException {
         SystemLoad c = new SystemLoad("localhost", new Double(1.1));
-        cpuProducer.send(new ProducerRecord<String, SystemLoad>("cpuStatusTopic", c));
+        cpuProducer.send(new ProducerRecord<String, SystemLoad>("systemLoadTopic", c));
         Thread.sleep(5000);
         Response response = inventoryResource.getSystems();
         List<Properties> systems = response.readEntity(new GenericType<List<Properties>>() {});
@@ -72,7 +72,7 @@ public class InventoryEndpointIT {
         Assertions.assertEquals(systems.size(), 1);
         for (Properties system : systems) {
             Assertions.assertEquals(c.hostId, system.get("hostname"), "HostId not match!");
-            BigDecimal cpu = (BigDecimal) system.get("cpuUsage");;
+            BigDecimal cpu = (BigDecimal) system.get("systemLoad");;
             Assertions.assertEquals(c.cpuUsage.doubleValue(), cpu.doubleValue(), "CPU Usage not match!");
         }
     }

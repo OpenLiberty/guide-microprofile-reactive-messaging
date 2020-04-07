@@ -38,10 +38,6 @@ public class SystemReadinessCheck implements HealthCheck {
     @ConfigProperty(name = "mp.messaging.connector.liberty-kafka.bootstrap.servers")
     String kafkaServer;
     
-    @Inject
-    @ConfigProperty(name = "mp.messaging.outgoing.cpuStatus.topic")
-    String cpuStatusTopic;
-    
     @Override
     public HealthCheckResponse call() {
         boolean up = isReady();
@@ -67,7 +63,6 @@ public class SystemReadinessCheck implements HealthCheck {
             Collection<TopicListing> topicList = topicsFuture.get();
             for (TopicListing t : topicList)
                 logger.info("topic: " + t.name());
-            //topicList.stream().anyMatch(topic -> topic.equals(cpuStatusTopic));
             return true;
         } catch (Exception e) {
             return false;
