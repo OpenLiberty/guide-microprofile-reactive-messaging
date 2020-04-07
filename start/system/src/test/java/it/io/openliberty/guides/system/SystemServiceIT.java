@@ -13,7 +13,6 @@
 package it.io.openliberty.guides.system;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -23,18 +22,13 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Test;
 import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jupiter.MicroShedTest;
 import org.microshed.testing.kafka.KafkaConsumerConfig;
-import org.microshed.testing.kafka.KafkaProducerConfig;
 
-import io.openliberty.guides.models.Job;
-import io.openliberty.guides.models.Job.JsonbSerializer;
-import io.openliberty.guides.models.Job.JobDeserializer;
-import io.openliberty.guides.models.Status;
+import io.openliberty.guides.models.SystemLoad;
+import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
@@ -42,42 +36,27 @@ public class SystemServiceIT {
 
     private static final long POLL_TIMEOUT = 30 * 1000;
 
-    @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
-    public static KafkaProducer<String, Job> producer;
-
-    @KafkaConsumerConfig(valueDeserializer = JobDeserializer.class, 
-        groupId = "update-status", topics = "statusTopic", 
+    @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class, 
+        groupId = "cpu-status", topics = "cpuStatusTopic", 
         properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
-    public static KafkaConsumer<String, Job> consumer;
+    public static KafkaConsumer<String, SystemLoad> cpuConsumer;
 
-    private static Job job;
-   
     @Test
-    public void testInitFoodOrder() throws IOException, InterruptedException {
-        job = new Job("0001", null, "tast desc 1", Status.NEW);
-        producer.send(new ProducerRecord<String, Job>("jobTopic", job));
-        verify(Status.IN_PROGRESS);
-        Thread.sleep(10000);
-        verify(Status.COMPLETED);
-    }
-        
-    private void verify(Status expectedStatus) {
+    public void testCpuStatus() throws IOException, InterruptedException {
         int recordsProcessed = 0;
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
-
         while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
-            ConsumerRecords<String, Job> records = consumer.poll(Duration.ofMillis(3000));
+            ConsumerRecords<String, SystemLoad> records = cpuConsumer.poll(Duration.ofMillis(3000));
             System.out.println("Polled " + records.count() + " records from Kafka:");
-            for (ConsumerRecord<String, Job> record : records) {
-                job = record.value();
-                System.out.println(job);
-                assertEquals("0001",job.jobId);
-                assertNotNull(job.hostId);
-                assertEquals(expectedStatus,job.status);
+            for (ConsumerRecord<String, SystemLoad> record : records) {
+                SystemLoad c = record.value();
+                System.out.println(c);
+                assertNotNull(c.hostId);
+                assertNotNull(c.cpuUsage);
                 recordsProcessed++;
             }
-            consumer.commitAsync();
+            cpuConsumer.commitAsync();
             if (recordsProcessed > 0)
                 break;
             elapsedTime = System.currentTimeMillis() - startTime;

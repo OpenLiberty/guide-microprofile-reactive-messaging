@@ -1,8 +1,6 @@
 @ECHO OFF
 set KAFKA_SERVER=kafka:9092
 set NETWORK=reactive-app
-set JOB_SERVICE_URL="http://job:9081"
-set INVENTORY_SERVICE_URL="http://inventory:9085"
 
 docker network create %NETWORK%
 
@@ -25,6 +23,7 @@ start /b docker run -d ^
 
 start /b docker run -d ^
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=%KAFKA_SERVER% ^
+  -p 9083:9083 ^
   --network=%NETWORK% ^
   --name=system ^
   --rm ^
@@ -32,23 +31,8 @@ start /b docker run -d ^
 
 start /b docker run -d ^
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=%KAFKA_SERVER% ^
-  --network=%NETWORK% ^
-  --name=job ^
-  --rm ^
-  job:1.0-SNAPSHOT 
-
-start /b docker run -d ^
-  -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=%KAFKA_SERVER% ^
+  -p 9085:9085 ^
   --network=%NETWORK% ^
   --name=inventory ^
   --rm ^
   inventory:1.0-SNAPSHOT 
-  
-start /b docker run -d ^
-  -e JobClient_mp_rest_url=%JOB_SERVICE_URL% ^
-  -e InventoryClient_mp_rest_url=%INVENTORY_SERVICE_URL% ^
-  -p 9080:9080 ^
-  --network=%NETWORK% ^
-  --name=gateway ^
-  --rm ^
-  gateway:1.0-SNAPSHOT

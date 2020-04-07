@@ -10,22 +10,25 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package io.openliberty.guides.models;
+package io.openliberty.guides.inventory.health;
 
-import java.util.ArrayList;
+import javax.enterprise.context.ApplicationScoped;
 
-import javax.validation.constraints.NotBlank;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Liveness;
 
-@JobListNotEmpty()
-public class JobRequest {
+@Liveness
+@ApplicationScoped
+public class InventoryLivenessCheck implements HealthCheck {
 
-    private ArrayList<@NotBlank(message="Task descrption cannot be an empty string!") String> taskList = new ArrayList<>();
-
-    public ArrayList<String> getTaskList() {
-        return taskList;
+    private boolean isAlive() {
+        return true;
     }
 
-    public void setTaskList(ArrayList<String> taskList) {
-        this.taskList = taskList;
+    @Override
+    public HealthCheckResponse call() {
+        boolean up = isAlive();
+        return HealthCheckResponse.named(this.getClass().getSimpleName()).state(up).build();
     }
 }

@@ -14,6 +14,7 @@ package io.openliberty.guides.inventory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,8 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
-import io.openliberty.guides.models.Job;
+import io.openliberty.guides.models.SystemLoad;
+
 
 @ApplicationScoped
 @Path("/inventory")
@@ -38,75 +40,49 @@ public class InventoryResource {
     private static Logger logger = Logger.getLogger(InventoryResource.class.getName());
 
     @Inject
-    private JobStatusManager manager;
+    private InventoryManager manager;
 
+    
     @GET
-    @Path("/jobs")
+    // tag::inventoryEndPoint[]
+    @Path("/systems")
+    // end::inventoryEndPoint[]
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getJobsList() {
-        List<Job> jobList = manager.getJobs()
+
+    public Response getSystems() {
+        List<Properties> systems = manager.getSystems()
                 .values()
                 .stream()
                 .collect(Collectors.toList());
         return Response
                 .status(Response.Status.OK)
-                .entity(jobList)
+                .entity(systems)
                 .build();
     }
 
     @GET
+    @Path("/system/{hostId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/job/{jobId}")
-    public Response getJob(@PathParam("jobId") String jobId) {
-        Optional<Job> job = manager.getJob(jobId);
-        if (job.isPresent()) {
+    public Response getSystem(@PathParam("hostId") String hostId) {
+        Optional<Properties> system = manager.getSystem(hostId);
+        if (system.isPresent()) {
             return Response
                     .status(Response.Status.OK)
-                    .entity(job)
+                    .entity(system)
                     .build();
         }
         return Response
                 .status(Response.Status.NOT_FOUND)
-                .entity("Job id does not exist.")
-                .build();
-    }
-    
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/host/{hostId}")
-    public Response getJobsList(@PathParam("hostId") String hostId) {
-        List<Job> jobsList = manager.getJobs()
-                .values()
-                .stream()
-                .filter(job -> job.hostId.equals(hostId))
-                .collect(Collectors.toList());
-        return Response
-                .status(Response.Status.OK)
-                .entity(jobsList)
+                .entity("hostId does not exist.")
                 .build();
     }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public Response resetJob() {
-        manager.resetJob();
+    public Response resetSystems() {
+        manager.resetSystems();
         return Response
                 .status(Response.Status.OK)
                 .build();
-    }
-    
-    // tag::updateStatus[]
-    @Incoming("updateStatus")
-    // end::updateStatus[]
-    public void updateStatus(Job job)  {
-        String jobId = job.jobId;
-        if (manager.getJob(jobId).isPresent()) {
-            manager.updateStatus(jobId, job.hostId, job.status);
-            logger.info("Job " + jobId + " status updated to "
-                + job.status + ": " + job);
-        } else {
-            manager.addJob(job);
-            logger.info("Job " + jobId + " was added: " + job);	
-        }
     }
 }

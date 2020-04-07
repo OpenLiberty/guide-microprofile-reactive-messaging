@@ -20,47 +20,38 @@ import javax.json.bind.JsonbBuilder;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serializer;
 
-public class Job {
-	
-	private static final Jsonb jsonb = JsonbBuilder.create();
-	
-    public String jobId;
-    public String hostId;
-    public String taskDesc;
-    public Status status;
+public class SystemLoad {
 
-    public Job(String jobId,
-                 String hostId,
-                 String taskDesc,
-                 Status status){
-        this.jobId = jobId;
+    private static final Jsonb jsonb = JsonbBuilder.create();
+
+    public String hostId;
+    public Double cpuUsage;
+        
+    public SystemLoad(String hostId, Double cpuUsage) {
         this.hostId = hostId;
-        this.taskDesc = taskDesc;
-        this.status = status;
+        this.cpuUsage = cpuUsage;
     }
 
-    public Job() {
+    public SystemLoad() {
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Job)) return false;
-        Job job = (Job) o;
-        return Objects.equals(jobId, job.jobId)
-                && Objects.equals(hostId, job.hostId)
-                && Objects.equals(taskDesc, job.taskDesc)
-                && Objects.equals(status, job.status);
+        if (!(o instanceof SystemLoad)) return false;
+        SystemLoad c = (SystemLoad) o;
+        return Objects.equals(hostId, c.hostId)
+                && Objects.equals(cpuUsage, c.cpuUsage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(jobId, hostId, taskDesc, status);
+        return Objects.hash(hostId, cpuUsage);
     }
     
     @Override
     public String toString() {
-    	return "Job: " + jsonb.toJson(this);
+        return "CpuUsage: " + jsonb.toJson(this);
     }
     
     public static class JsonbSerializer implements Serializer<Object> {
@@ -70,12 +61,12 @@ public class Job {
         }
     }
       
-    public static class JobDeserializer implements Deserializer<Job> {
+    public static class SystemLoadDeserializer implements Deserializer<SystemLoad> {
         @Override
-        public Job deserialize(String topic, byte[] data) {
+        public SystemLoad deserialize(String topic, byte[] data) {
             if (data == null)
                 return null;
-            return jsonb.fromJson(new String(data), Job.class);
+            return jsonb.fromJson(new String(data), SystemLoad.class);
         }
     }
 }
