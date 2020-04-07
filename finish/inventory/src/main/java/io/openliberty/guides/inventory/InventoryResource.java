@@ -42,9 +42,11 @@ public class InventoryResource {
     @Inject
     private InventoryManager manager;
 
+    // tag::inventoryEndPoint[]
     @GET
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
+    // end::inventoryEndPoint[]
     public Response getSystems() {
         List<Properties> systems = manager.getSystems()
                 .values()
