@@ -34,19 +34,18 @@ import io.openliberty.guides.models.SystemLoad;
 
 
 @ApplicationScoped
+//tag::inventoryEndPoint[]
 @Path("/inventory")
+//end::inventoryEndPoint[]
 public class InventoryResource {
 
     private static Logger logger = Logger.getLogger(InventoryResource.class.getName());
 
     @Inject
     private InventoryManager manager;
-
     
     @GET
-    // tag::inventoryEndPoint[]
     @Path("/systems")
-    // end::inventoryEndPoint[]
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystems() {
         List<Properties> systems = manager.getSystems()

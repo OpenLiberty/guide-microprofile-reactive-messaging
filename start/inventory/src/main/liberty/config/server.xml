@@ -1,4 +1,4 @@
-<server description="Order Service">
+<server description="Inventory Service">
 
   <featureManager>
     <feature>jaxrs-2.1</feature>

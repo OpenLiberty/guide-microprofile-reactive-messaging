@@ -44,9 +44,7 @@ public class InventoryResource {
 
     
     @GET
-    // tag::inventoryEndPoint[]
     @Path("/systems")
-    // end::inventoryEndPoint[]
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSystems() {
         List<Properties> systems = manager.getSystems()
