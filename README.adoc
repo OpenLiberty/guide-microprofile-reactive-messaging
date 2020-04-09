@@ -43,7 +43,7 @@ In the context of REST clients, HTTP request calls can be time consuming. The ne
 
 === What is Reactive programming?
 
-Reactive programming is a programming paradigm that is designed around asynchronous data streams and it's propagation of change. It encourages non-blocking and event-driven outlook for data processing. Reactive Microservices are single function modules that are loosely coupled and message-driven.
+Reactive programming is a programming paradigm that is designed around asynchronous data streams and it's propagation of change. It encourages non-blocking and event-driven outlook for data processing. Reactive microservices are single function modules that are loosely coupled and message-driven.
 
 === What is MicroProfile Reactive Messaging?
 
