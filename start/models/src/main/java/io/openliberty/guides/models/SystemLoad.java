@@ -54,7 +54,7 @@ public class SystemLoad {
         return "CpuUsage: " + jsonb.toJson(this);
     }
     
-    public static class JsonbSerializer implements Serializer<Object> {
+    public static class SystemLoadSerializer implements Serializer<Object> {
         @Override
         public byte[] serialize(String topic, Object data) {
           return jsonb.toJson(data).getBytes();

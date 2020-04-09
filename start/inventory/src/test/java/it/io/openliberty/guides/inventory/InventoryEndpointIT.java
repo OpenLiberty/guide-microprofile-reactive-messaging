@@ -37,7 +37,7 @@ import org.microshed.testing.kafka.KafkaProducerConfig;
 import io.openliberty.guides.inventory.InventoryResource;
 import io.openliberty.guides.models.SystemLoad;
 import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
-import io.openliberty.guides.models.SystemLoad.JsonbSerializer;
+import io.openliberty.guides.models.SystemLoad.SystemLoadSerializer;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
@@ -47,7 +47,7 @@ public class InventoryEndpointIT {
     @RESTClient
     public static InventoryResource inventoryResource;
 
-    @KafkaProducerConfig(valueSerializer = JsonbSerializer.class)
+    @KafkaProducerConfig(valueSerializer = SystemLoadSerializer.class)
     public static KafkaProducer<String, SystemLoad> cpuProducer;
 
     @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class, 
