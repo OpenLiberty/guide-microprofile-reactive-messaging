@@ -200,7 +200,7 @@ models/SystemLoad.java
 include::finish/models/src/main/java/io/openliberty/guides/models/SystemLoad.java[]
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `system` microservice uses an outgoing stream [hotspot=systemLoad file=0]`systemLoad` to send messages to the [hotspot=topic1 file=0]`systemLoadTopic` topic in the Kafka messaging-broker, so that the `inventory` microservices can consume the messages. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 file=0]`value.serializer` properties characterize how to serialize the messages. The custom [hotspot=serializerVal1 file=0]`value.serializer` is defined in the [hotspot=jsonbSerializer file=2]`JsonbSerializer()` method of the `SystemLoad` class.
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property defines the Kafka connector for the Open Liberty runtime. The `system` microservice uses an outgoing stream [hotspot=systemLoad file=0]`systemLoad` to send messages to the [hotspot=topic1 file=0]`systemLoadTopic` topic in the Kafka messaging-broker, so that the `inventory` microservices can consume the messages. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 file=0]`value.serializer` properties characterize how to serialize the messages. The [hotspot=jsonbSerializer file=2]`JsonbSerializer()` method in the `SystemLoad` class defines the custom value for the [hotspot=serializerVal1 file=0]`value.serializer`.
 
 The `inventory` microservices uses a similar `microprofile-config.properties` configuration to define its required incoming stream.
 
@@ -209,7 +209,7 @@ The `inventory` microservices uses a similar `microprofile-config.properties` co
 #Create the inventory microprofile-config.properties file.#
 `inventory/src/main/resources/META-INF/microprofile-config.properties`
 ----
-The `inventory` microservice listens to messages from an incoming stream [hotspot=systemLoad file=1]`systemLoad`, wherein the messages are sent by the `system` microservice through the [hotspot=topic1 file=1]`systemLoadTopic` topic in the Kafka messaging-broker. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The custom [hotspot=deserializerVal1 file=1]`value.deserializer` is defined in the [hotspot=jsonbDeSerializer file=2]`SystemLoadDeserializer()` method of the `SystemLoad` class.
+The `inventory` microservice listens to messages from an incoming stream [hotspot=systemLoad file=1]`systemLoad`, wherein the messages are sent by the `system` microservice through the [hotspot=topic1 file=1]`systemLoadTopic` topic in the Kafka messaging-broker. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The [hotspot=jsonbDeSerializer file=2]`SystemLoadDeserializer()` method in the `SystemLoad` class defines the custom value for the [hotspot=deserializerVal1 file=1]`value.deserializer`.
 
 The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
  
