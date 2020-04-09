@@ -8,7 +8,7 @@
 //
 :projectid: microprofile-reactive-messaging
 :page-layout: guide-multipane
-:page-duration: 15 minutes
+:page-duration: 20 minutes
 :page-releasedate: 2020-04-13
 :page-guide-category: microprofile
 :page-essential: false
