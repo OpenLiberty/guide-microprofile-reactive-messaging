@@ -311,7 +311,7 @@ To access the `inventory` microservice, use the http://localhost:9085/inventory/
 
 You can rerun the http://localhost:9085/inventory/systems[^] URL after a while, and you will notice the CPU systemLoad properties for all the systems have changed.
 
-You can use the `@GET` `\http://localhost:9085/inventory/system/{hostId}` URL to see the CPU usage properties for one particular system.
+You can use the `@GET` `\http://localhost:9085/inventory/system/{hostId}` URL to see the CPU systemLoad property for one particular system.
 
 == Tearing down the environment
 
