@@ -32,7 +32,6 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 import io.openliberty.guides.models.SystemLoad;
 
-
 @ApplicationScoped
 //tag::inventoryEndPoint[]
 @Path("/inventory")
@@ -90,10 +89,10 @@ public class InventoryResource {
     public void updateStatus(SystemLoad s)  {
         String hostId = s.hostId;
         if (manager.getSystem(hostId).isPresent()) {
-            manager.updateCpuStatus(hostId, s.cpuUsage);
+            manager.updateCpuStatus(hostId, s.loadAverage);
             logger.info("Host " + hostId + " was updated: " + s);
         } else {
-            manager.addSystem(hostId, s.cpuUsage);
+            manager.addSystem(hostId, s.loadAverage);
             logger.info("Host " + hostId + " was added: " + s);
         }
     }

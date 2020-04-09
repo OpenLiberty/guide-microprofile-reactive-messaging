@@ -32,7 +32,6 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 import io.openliberty.guides.models.SystemLoad;
 
-
 @ApplicationScoped
 @Path("/inventory")
 public class InventoryResource {
@@ -41,7 +40,6 @@ public class InventoryResource {
 
     @Inject
     private InventoryManager manager;
-
     
     @GET
     @Path("/systems")

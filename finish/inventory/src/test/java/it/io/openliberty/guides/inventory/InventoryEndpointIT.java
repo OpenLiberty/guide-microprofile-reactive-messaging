@@ -62,8 +62,8 @@ public class InventoryEndpointIT {
 
     @Test
     public void testCpuUsage() throws InterruptedException {
-        SystemLoad c = new SystemLoad("localhost", new Double(1.1));
-        cpuProducer.send(new ProducerRecord<String, SystemLoad>("systemLoadTopic", c));
+        SystemLoad s = new SystemLoad("localhost", new Double(1.1));
+        cpuProducer.send(new ProducerRecord<String, SystemLoad>("systemLoadTopic", s));
         Thread.sleep(5000);
         Response response = inventoryResource.getSystems();
         List<Properties> systems = response.readEntity(new GenericType<List<Properties>>() {});
@@ -71,9 +71,9 @@ public class InventoryEndpointIT {
                 "Response should be 200");
         Assertions.assertEquals(systems.size(), 1);
         for (Properties system : systems) {
-            Assertions.assertEquals(c.hostId, system.get("hostname"), "HostId not match!");
-            BigDecimal cpu = (BigDecimal) system.get("systemLoad");
-            Assertions.assertEquals(c.cpuUsage.doubleValue(), cpu.doubleValue(), "CPU Usage not match!");
+            Assertions.assertEquals(s.hostId, system.get("hostname"), "HostId not match!");
+            BigDecimal cpuLoad = (BigDecimal) system.get("systemLoad");
+            Assertions.assertEquals(s.loadAverage.doubleValue(), cpuLoad.doubleValue(), "CPU load doesn't match!");
         }
     }
 }

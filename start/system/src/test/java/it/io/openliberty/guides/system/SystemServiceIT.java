@@ -50,10 +50,10 @@ public class SystemServiceIT {
             ConsumerRecords<String, SystemLoad> records = cpuConsumer.poll(Duration.ofMillis(3000));
             System.out.println("Polled " + records.count() + " records from Kafka:");
             for (ConsumerRecord<String, SystemLoad> record : records) {
-                SystemLoad c = record.value();
-                System.out.println(c);
-                assertNotNull(c.hostId);
-                assertNotNull(c.cpuUsage);
+                SystemLoad sl = record.value();
+                System.out.println(sl);
+                assertNotNull(sl.hostId);
+                assertNotNull(sl.loadAverage);
                 recordsProcessed++;
             }
             cpuConsumer.commitAsync();
