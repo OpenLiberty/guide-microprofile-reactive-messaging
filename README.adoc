@@ -9,17 +9,17 @@
 :projectid: microprofile-reactive-messaging
 :page-layout: guide-multipane
 :page-duration: 20 minutes
-:page-releasedate: 2020-04-13
+:page-releasedate: 2020-04-17
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
 :guide-author: Open Liberty
-:page-tags: ['MicroProfile', 'Jakarta EE', 'Microservices']
-:page-related-guides: ['containerize']
+:page-tags: ['MicroProfile', 'Jakarta EE']
+:page-related-guides: []
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
 :page-seo-title: Creating asynchronous Java microservices using MicroProfile Reactive Messaging 
-:page-seo-description: A getting started tutorial with examples on how to send and receive messages between asynchronous Java microservices using MicroProfile Reactive Messaging and Apache Kafka.
+:page-seo-description: A getting started reactive programming tutorial with examples on how to send and receive messages between asynchronous Java microservices using Eclipse MicroProfile Reactive Messaging and Apache Kafka.
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/dev
 :source-highlighter: prettify
 = Creating reactive microservices using MicroProfile Reactive Messaging
