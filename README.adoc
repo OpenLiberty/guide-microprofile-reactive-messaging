@@ -58,7 +58,7 @@ https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/mi
 
 https://kafka.apache.org/[Apache Kafka^] is a stream-processing platform that manages communication in distributed systems. Communication is message-oriented, and follows the publish-subscribe model. Kafka allows for real-time stream processing and distributed, replicated storage of streams and messages. A Kafka producer is a client or a program, which produces the message and pushes them to a topic. A Kafka consumer is a client or a program, which consumes the published messages from a topic.
 
-The application that you will be working with consists of two microservices, `system` and `inventory`. The `system` microservice sends the system load average data to the `inventory` microservice every 15 seconds. The `inventory` microservice keeps an updated list of all the `system` hostnames and their CPU data.
+The application that you will be working with consists of two microservices, `system` and `inventory`. The `system` microservice sends the average system load data to the `inventory` microservice every 15 seconds. The `inventory` microservice keeps an updated list of all the `system` hostnames and their CPU data.
 
 You'll update the `system` and `inventory` microservices to use MicroProfile Reactive Messaging for message passing. These microservices run on Open Liberty.
 
@@ -179,7 +179,7 @@ The `inventory` microservice receives the message from the `system` microservice
 
 In order to configure the MicroProfile Reactive Messaging connectors, you need to format the configuration keys as follows :
 
-- `mp.messaging.connector.liberty-kafka.` : Applies to all channels using the liberty-kafka connector
+- `mp.messaging.connector.liberty-kafka.<property name>` : Applies to all channels using the liberty-kafka connector
 - `mp.messaging.[incoming|outgoing].<channel name>.<property name>` : Applies to a particular channel
 - Each channel which is to be connected using a connector must have the `connector` property defined to say which connector to use
 
@@ -208,7 +208,7 @@ models/SystemLoad.java
 include::finish/models/src/main/java/io/openliberty/guides/models/SystemLoad.java[]
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property configures the hostname and port of the Kafka server for all channels which use the Kafka connector. The `system` microservice uses an outgoing connector to send messages from the [hotspot=systemLoad file=0]`systemLoad` channel to the [hotspot=topic1 file=0]`systemLoadTopic` topic in the Kafka messaging-broker, so that the `inventory` microservices can consume the messages. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 file=0]`value.serializer` properties characterize how to serialize the messages. The class [hotspot=jsonbSerializer file=2]`SystemLoadSerializer()` implements the logic for turning a `SystemLoad` object into json and is configured as the [hotspot=serializerVal1 file=0]`value.serializer`.
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property configures the hostname and port of the Kafka server for all channels which use the Kafka connector. The `system` microservice uses an outgoing connector to send messages from the [hotspot=systemLoad file=0]`systemLoad` channel to the [hotspot=topic1 file=0]`systemLoadTopic` topic in the Kafka messaging-broker, so that the `inventory` microservices can consume the messages. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 file=0]`value.serializer` properties characterize how to serialize the messages. The class [hotspot=jsonbSerializer file=2]`SystemLoadSerializer` implements the logic for turning a `SystemLoad` object into json and is configured as the [hotspot=serializerVal1 file=0]`value.serializer`.
 
 The `inventory` microservices uses a similar `microprofile-config.properties` configuration to define its required incoming stream.
 
@@ -218,7 +218,7 @@ The `inventory` microservices uses a similar `microprofile-config.properties` co
 `inventory/src/main/resources/META-INF/microprofile-config.properties`
 ----
 
-The `inventory` microservice uses an incoming connector to receive messages on the [hotspot=systemLoad file=1]`systemLoad` channel which were sent by the `system` microservice to the [hotspot=topic1 file=1]`systemLoadTopic` in the Kafka messaging-broker. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The class [hotspot=jsonbDeSerializer file=2]`SystemLoadDeserializer()` implements the logic for turning a `SystemLoad` object into json and is configured as the [hotspot=deserializerVal1 file=1]`value.deserializer`.
+The `inventory` microservice uses an incoming connector to receive messages on the [hotspot=systemLoad file=1]`systemLoad` channel which were sent by the `system` microservice to the [hotspot=topic1 file=1]`systemLoadTopic` in the Kafka messaging-broker. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The class [hotspot=jsonbDeSerializer file=2]`SystemLoadDeserializer` implements the logic for turning json into a `SystemLoad` object and is configured as the [hotspot=deserializerVal1 file=1]`value.deserializer`.
 
 The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
  
