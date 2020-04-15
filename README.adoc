@@ -9,13 +9,13 @@
 :projectid: microprofile-reactive-messaging
 :page-layout: guide-multipane
 :page-duration: 20 minutes
-:page-releasedate: 2020-04-13
+:page-releasedate: 2020-04-17
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
 :guide-author: Open Liberty
 :page-tags: ['MicroProfile', 'Jakarta EE', 'Microservices']
-:page-related-guides: ['containerize']
+:page-related-guides: ['reactive-service-testing ','containerize']
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
 :page-seo-title: Creating asynchronous Java microservices using MicroProfile Reactive Messaging 
@@ -43,16 +43,13 @@ In the context of REST clients, HTTP request calls can be time consuming. The ne
 
 === What is Reactive programming?
 
-Reactive programming is a programming paradigm that is designed around asynchronous data streams and it's propagation of change. It encourages non-blocking and event-driven outlook for data processing. Reactive microservices are single function modules that are loosely coupled and message-driven.
+Reactive programming is a programming paradigm that is designed around asynchronous data streams and its propagation of change. It encourages non-blocking and event-driven outlook for data processing. Reactive microservices are single function modules that are loosely coupled and message-driven.
 
 === What is MicroProfile Reactive Messaging?
 
-Temporal decoupling of services in a microservice-based architecture can be achieved using asynchronous communication. In a microservice-based architecture, temporal coupling can result in a fragile system, with resilience and scaling properties that are worse than a monolith. One way to avoid this is to embrace asynchronous communication as much as possible.
+The degree of association between the services is called coupling. Decoupling of services can be accomplished by means of asynchronous communication in a microservice-based architecture. The coupling may result in a fragile framework in a microservice based architecture, with resilience and scaling properties that are worse than a monolith. One way to prevent this is to embrace asynchronous communication as much as possible.
 
 MicroProfile Reactive Messaging provides a very easy-to-use way to send, receive, and process messages asynchronously and is well-suited to writing applications that process streams of events. With MicroProfile Reactive Messaging, you annotate application beans' methods and, under the covers, Liberty converts these to reactive streams-compatible publishers, subscribers and processors and connects them up to each other. It also provides a Connector API to allow your methods to be connected to external messaging systems.
-
-See the
-https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html#_microprofile_reactive_messaging[ MicroProfile Reactive Messaging Specification^] for more information.
 
 === What is Kafka?
 
@@ -132,9 +129,9 @@ system/microprofile-config.properties
 include::finish/system/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `system` microservice calculates the average system load for the last minute every fifteen seconds. The average system load for a system is calculated by taking the sum of the count of runnable items queued to the available processors and the count of runnable items running on the available processors averaged over a period of time.
+The `system` microservice calculates the average system load for the last minute every fifteen seconds. The average system load for a system is calculated by counting the number of runnable items that are queued to and run on the available processors, and then this count is averaged over a period of time.
 
-The [hotspot=sendSystemLoad file=0]`sendSystemLoad()` method creates CPU system load statistics for a host system every fifteen seconds. The [hotspot=flowableInterval file=0]`Flowable.interval()` from rxJava is used to create a `Publisher`. The `Publisher` is returned from the [hotspot=publishSystemLoad file=0]`@Outgoing("systemLoad")` channel, which will be configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=systemLoad file=1]`systemLoad` stream in the below section. MicroProfile Reactive Messaging takes care of assigning the `Publisher` to the channel.
+The [hotspot=sendSystemLoad file=0]`sendSystemLoad()` method creates CPU system load statistics for a host system every fifteen seconds. rxJava library is used to generate those CPU system load message events that are sent to Kafka every fifteen seconds. The [hotspot=flowableInterval file=0]`Flowable.interval()` from rxJava is used to create a `Publisher`. The `Publisher` is returned from the [hotspot=publishSystemLoad file=0]`@Outgoing("systemLoad")` channel, which will be configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=systemLoad file=1]`systemLoad` stream in the below section. MicroProfile Reactive Messaging takes care of assigning the `Publisher` to the channel.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
@@ -148,11 +145,13 @@ pom.xml
 include::finish/system/pom.xml[]
 ----
 
-In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api`, [hotspot=kafka file=2]`kafka-clients`, and [hotspot=rxjava file=2]`rxjava` dependencies to the [hotspot file=2]`pom.xml`
+In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api`, [hotspot=kafka file=2]`kafka-clients`, and [hotspot=rxjava file=2]`rxjava` dependencies to the [hotspot file=2]`pom.xml`. 
+
+[hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api` dependency is needed because MicroProfile umbrella spec doesn't include reactive messaging. [hotspot=kafka file=2]`kafka-clients` dependency is required since the application needs Kafka client to connect to the Kafka broker. [hotspot=rxjava file=2]`rxjava` dependency is required to create events at regular intervals and Open Liberty doesn't provide an easy way to create a publisher and send events at regular intervals.
 
 == Building the Consumer in the inventory microservice
 
-The `inventory` microservice stores the information about the CPU usage that runs on different systems.
+The `inventory` microservice consumes the events produced by the `system` microservice and stores the information about the CPU usage that runs on different systems.
 
 //inventory
 [role="code_command hotspot file=0", subs="quotes"]
@@ -177,7 +176,7 @@ The `inventory` microservice receives the message from the `system` microservice
 
 == Configuring the MicroProfile Reactive Messaging connectors
 
-In order to configure the MicroProfile Reactive Messaging connectors, you need to format the configuration keys as follows :
+MicroProfile Reactive Messaging uses connectors to send and receive messages from different systems. In order to configure the MicroProfile Reactive Messaging connectors, you need to format the configuration keys as follows :
 
 - `mp.messaging.connector.liberty-kafka.<property name>` : Applies to all channels using the liberty-kafka connector
 - `mp.messaging.[incoming|outgoing].<channel name>.<property name>` : Applies to a particular channel
@@ -219,8 +218,7 @@ The `inventory` microservices uses a similar `microprofile-config.properties` co
 ----
 
 The `inventory` microservice uses an incoming connector to receive messages on the [hotspot=systemLoad file=1]`systemLoad` channel which were sent by the `system` microservice to the [hotspot=topic1 file=1]`systemLoadTopic` in the Kafka messaging-broker. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The class [hotspot=jsonbDeSerializer file=2]`SystemLoadDeserializer` implements the logic for turning json into a `SystemLoad` object and is configured as the [hotspot=deserializerVal1 file=1]`value.deserializer`.
-
-The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
+ The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. Consumer group is a collection of consumers who share a common identifier for the group. This can also be seen as various machines ingesting from the Kafka topics. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
  
 == Configuring the server
 
@@ -251,7 +249,7 @@ The `inventory` microservice has [hotspot file=1]`server.xml` already configured
 
 You will build and run the `system` and `inventory` microservices in Docker containers.
 
-Start your Docker environment.
+Start your Docker environment. Dockerfiles are already provided for use.
 
 To build the application, run the Maven `install` and `package` goals from the command line in the `start` directory:
 
@@ -304,7 +302,7 @@ To access the `inventory` microservice, use the http://localhost:9085/inventory/
 [source, role='no_copy']
 ----
 {
-   "hostname":"Ankits-MacBook-Pro.local",
+   "hostname":"30bec2b63a96",
    "systemLoad":2.25927734375
 }
 ----
@@ -312,6 +310,15 @@ To access the `inventory` microservice, use the http://localhost:9085/inventory/
 You can rerun the http://localhost:9085/inventory/systems[^] URL after a while, and you will notice the CPU systemLoad property for all the systems have changed.
 
 You can use the `@GET` `\http://localhost:9085/inventory/system/{hostId}` URL to see the CPU systemLoad property for one particular system.
+For example. You can use the above `30bec2b63a96` value as the `hostId`. Use the URL `\http://localhost:9085/inventory/system/30bec2b63a96`, and you can see the CPU systemLoad property for that particular `hostId` `30bec2b63a96`.
+
+[source, role='no_copy']
+----
+{
+   "hostname":"30bec2b63a96",
+   "systemLoad":2.25927734375
+}
+----
 
 == Tearing down the environment
 
