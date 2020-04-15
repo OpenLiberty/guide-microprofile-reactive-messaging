@@ -131,7 +131,7 @@ include::finish/system/src/main/resources/META-INF/microprofile-config.propertie
 
 The `system` microservice calculates the average system load for the last minute every fifteen seconds. The average system load for a system is calculated by counting the number of runnable items that are queued to and run on the available processors, and then this count is averaged over a period of time.
 
-The [hotspot=sendSystemLoad file=0]`sendSystemLoad()` method creates CPU system load statistics for a host system every fifteen seconds. rxJava library is used to generate those CPU system load message events that are sent to Kafka every fifteen seconds. The [hotspot=flowableInterval file=0]`Flowable.interval()` from rxJava is used to create a `Publisher`. The `Publisher` is returned from the [hotspot=publishSystemLoad file=0]`@Outgoing("systemLoad")` channel, which will be configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=systemLoad file=1]`systemLoad` stream in the below section. MicroProfile Reactive Messaging takes care of assigning the `Publisher` to the channel.
+The [hotspot=sendSystemLoad file=0]`sendSystemLoad()` method creates CPU system load statistics for a host system every fifteen seconds. The `rxJava` library is used to generate those CPU system load message events that are sent to Kafka every fifteen seconds. The [hotspot=flowableInterval file=0]`Flowable.interval()` from rxJava is used to create a `Publisher`. The `Publisher` is returned from the [hotspot=publishSystemLoad file=0]`@Outgoing("systemLoad")` channel, which will be configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=systemLoad file=1]`systemLoad` stream in the below section. MicroProfile Reactive Messaging takes care of assigning the `Publisher` to the channel.
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
@@ -147,7 +147,7 @@ include::finish/system/pom.xml[]
 
 In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api`, [hotspot=kafka file=2]`kafka-clients`, and [hotspot=rxjava file=2]`rxjava` dependencies to the [hotspot file=2]`pom.xml`. 
 
-[hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api` dependency is needed because MicroProfile umbrella spec doesn't include reactive messaging. [hotspot=kafka file=2]`kafka-clients` dependency is required since the application needs Kafka client to connect to the Kafka broker. [hotspot=rxjava file=2]`rxjava` dependency is required to create events at regular intervals and Open Liberty doesn't provide an easy way to create a publisher and send events at regular intervals.
+[hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api` dependency is needed because MicroProfile umbrella spec doesn't include reactive messaging. [hotspot=kafka file=2]`kafka-clients` dependency is required since the application needs Kafka client to connect to the Kafka broker. [hotspot=rxjava file=2]`rxjava` dependency is necessary to create events at regular intervals and Open Liberty does not provide an simple way to build a publisher and regularly submit events.
 
 == Building the Consumer in the inventory microservice
 
@@ -217,8 +217,7 @@ The `inventory` microservices uses a similar `microprofile-config.properties` co
 `inventory/src/main/resources/META-INF/microprofile-config.properties`
 ----
 
-The `inventory` microservice uses an incoming connector to receive messages on the [hotspot=systemLoad file=1]`systemLoad` channel which were sent by the `system` microservice to the [hotspot=topic1 file=1]`systemLoadTopic` in the Kafka messaging-broker. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The class [hotspot=jsonbDeSerializer file=2]`SystemLoadDeserializer` implements the logic for turning json into a `SystemLoad` object and is configured as the [hotspot=deserializerVal1 file=1]`value.deserializer`.
- The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. Consumer group is a collection of consumers who share a common identifier for the group. This can also be seen as various machines ingesting from the Kafka topics. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
+The `inventory` microservice uses an incoming connector to receive messages on the [hotspot=systemLoad file=1]`systemLoad` channel which were sent by the `system` microservice to the [hotspot=topic1 file=1]`systemLoadTopic` in the Kafka messaging-broker. Similarly the [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The class [hotspot=jsonbDeSerializer file=2]`SystemLoadDeserializer` implements the logic for turning json into a `SystemLoad` object and is configured as the [hotspot=deserializerVal1 file=1]`value.deserializer`. The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. Consumer group is a collection of consumers who share a common identifier for the group. This can also be seen as various machines ingesting from the Kafka topics. All these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
  
 == Configuring the server
 
@@ -310,7 +309,8 @@ To access the `inventory` microservice, use the http://localhost:9085/inventory/
 You can rerun the http://localhost:9085/inventory/systems[^] URL after a while, and you will notice the CPU systemLoad property for all the systems have changed.
 
 You can use the `@GET` `\http://localhost:9085/inventory/system/{hostId}` URL to see the CPU systemLoad property for one particular system.
-For example. You can use the above `30bec2b63a96` value as the `hostId`. Use the URL `\http://localhost:9085/inventory/system/30bec2b63a96`, and you can see the CPU systemLoad property for that particular `hostId` `30bec2b63a96`.
+
+For example. You can use the above `30bec2b63a96` value as the `hostId`. Use the URL `\http://localhost:9085/inventory/system/30bec2b63a96`, and you can see the CPU systemLoad property for that particular `hostId` `30bec2b63a96` as below.
 
 [source, role='no_copy']
 ----
