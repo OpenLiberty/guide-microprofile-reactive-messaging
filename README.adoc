@@ -27,7 +27,7 @@
 [.hidden]
 NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].   
 
-Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
+Learn how to use MicroProfile Reactive Messaging to implement a Java application with a reactive architecture.
 
 == What you'll learn
 
@@ -41,7 +41,7 @@ You can perform lengthy operations, such as input/output (I/O), without blocking
 
 In the context of REST clients, HTTP request calls can be time consuming. The network might be slow, or maybe the upstream service is overwhelmed and can’t respond quickly. These lengthy operations can block the execution of your thread when it’s in use and prevent other work from being completed.
 
-=== What is Reactive programming?
+=== What is reactive programming?
 
 Reactive programming is a programming paradigm that is designed around asynchronous data streams and its propagation of change. It encourages non-blocking and event-driven outlook for data processing. Reactive microservices are single function modules that are loosely coupled and message-driven.
 
@@ -72,7 +72,7 @@ You will build and run the  microservices in Docker containers. You can learn mo
 
 Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
 
-The application also requires Apache Kafka however you will be using Kafka Docker containers to reduce the installation and configuration.
+The application also requires Apache Kafka however you will be using Kafka Docker containers to simplify the installation and configuration process.
 
 // =================================================================================================
 // Getting started
@@ -147,7 +147,7 @@ include::finish/system/pom.xml[]
 
 In order to develop the MicroProfile Reactive Messaging application using Maven, add the [hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api`, [hotspot=kafka file=2]`kafka-clients`, and [hotspot=rxjava file=2]`rxjava` dependencies to the [hotspot file=2]`pom.xml`. 
 
-[hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api` dependency is needed because MicroProfile umbrella spec doesn't include reactive messaging. [hotspot=kafka file=2]`kafka-clients` dependency is required since the application needs Kafka client to connect to the Kafka broker. [hotspot=rxjava file=2]`rxjava` dependency is necessary to create events at regular intervals and Open Liberty does not provide an simple way to build a publisher and regularly submit events.
+[hotspot=reactiveMessaging file=2]`microprofile-reactive-messaging-api` dependency is needed to enable the use of MicroProfile Reactive Messaging API. [hotspot=kafka file=2]`kafka-clients` dependency is added since the application needs a Kafka client to connect to the Kafka broker. [hotspot=rxjava file=2]`rxjava` dependency is used for creating events at regular intervals.
 
 == Building the Consumer in the inventory microservice
 
@@ -258,7 +258,7 @@ mvn -pl models install
 mvn package
 ```
 
-Run the following command to download or update to the latest open-liberty Docker image.
+Run the following command to download or update to the latest `open-liberty` Docker image.
 [role='command']
 ```
 docker pull open-liberty
@@ -344,7 +344,7 @@ include::{common-includes}/os-tabs.adoc[]
 
 == Great work! You're done!
 
-You have just developed an application using MicroProfile Reactive Messaging, Open Liberty and Kakfa.
+You have just developed a reactive Java application using MicroProfile Reactive Messaging, Open Liberty and Kakfa.
 
 == Related Links
 
