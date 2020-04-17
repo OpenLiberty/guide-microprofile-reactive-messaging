@@ -22,12 +22,12 @@
 :page-seo-description: A getting started reactive programming tutorial with examples on how to send and receive messages between asynchronous Java microservices using Eclipse MicroProfile Reactive Messaging and Apache Kafka.
 :common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/dev
 :source-highlighter: prettify
-= Creating reactive microservices using MicroProfile Reactive Messaging
+= Creating reactive Java microservices
 
 [.hidden]
 NOTE: This repository contains the guide documentation source. To view the guide in published form, view it on the https://openliberty.io/guides/{projectid}.html[Open Liberty website].   
 
-Learn how to use MicroProfile Reactive Messaging to implement a Java application with a reactive architecture.
+Learn how to write reactive Java microservices using MicroProfile Reactive Messaging.
 
 == What you'll learn
 
