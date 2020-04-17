@@ -97,7 +97,7 @@ image::reactive-messaging-system-inventory-publisher.png[Reactive system publish
 
 == Creating the Consumer in the inventory microservice
 
-The `inventory` microservice records in its inventory the average system load information that it has received from potentially multiple instances of the `system` service (though there is only one instance in this application for simplicity).
+The `inventory` microservice records in its inventory the average system load information that it has received from potentially multiple instances of the `system` service.
 
 //inventory
 [role="code_command hotspot file=0", subs="quotes"]
