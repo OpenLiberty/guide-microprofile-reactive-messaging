@@ -23,7 +23,6 @@ start /b docker run -d ^
 
 start /b docker run -d ^
   -e MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS=%KAFKA_SERVER% ^
-  -p 9083:9083 ^
   --network=%NETWORK% ^
   --name=system ^
   --rm ^
