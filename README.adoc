@@ -129,6 +129,7 @@ The `SystemService` class contains a `Publisher` method called [hotspot=sendSyst
 
 The messages are transported between the service and the Kafka messaging system using a channel called [hotspot=systemLoad file=1]`systemLoad`. The name of the channel to use is set in the [hotspot=publishSystemLoad file=0]`@Outgoing("systemLoad")` annotation. Later in the guide, you will configure the service so that any messages sent by the `system` service through the [hotspot=systemLoad file=1]`systemLoad` channel are published on a topic called `systemLoadTopic`, as shown in the following diagram:
 
+image::reactive-messaging-system-inventory-publisher.png[Reactive system publisher,align="center"]
 
 
 [role="code_command hotspot file=2", subs="quotes"]
