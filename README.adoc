@@ -37,7 +37,7 @@ Reactive microservices are responsive and resilient under varying workloads beca
 
 HTTP request calls from a REST client to another microservice can be time-consuming; the network might be slow, or the other service might be overwhelmed with requests and can't respond quickly. In a reactive system, a microservice sends an HTTP request to another microservice then continues to send other calls, and to receive and process other responses. When the microservice receives a response to the original request, it can process that request but, in the meantime, it is not blocked from completing other work.
 
-=== What is MicroProfile Reactive Messaging?
+*What is MicroProfile Reactive Messaging?*
 
 MicroProfile Reactive Messaging provides an easy way to asynchronously send, receive, and process messages that are received as continuous streams of events. You simply annotate application beans' methods and Open Liberty converts the annotated methods to reactive streams-compatible publishers, subscribers, and processors and connects them up to each other. MicroProfile Reactive Messaging provides a Connector API so that your methods can be connected to the external messaging systems that produce and consume the streams of events, such as https://kafka.apache.org/[Apache Kafka^].
 
