@@ -83,6 +83,7 @@ public class InventoryResource {
                 .build();
     }
 
+    // tag::updateStatus[]
     // tag::systemLoad[]
     @Incoming("systemLoad")
     // end::systemLoad[]
@@ -96,4 +97,5 @@ public class InventoryResource {
             logger.info("Host " + hostId + " was added: " + s);
         }
     }
+    // end::updateStatus[]
 }
