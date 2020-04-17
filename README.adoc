@@ -172,7 +172,7 @@ The system and inventory microservices each have a MicroProfile Config propertie
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
-#Create the system microprofile-config.properties file.#
+#Create the system/microprofile-config.properties file.#
 `system/src/main/resources/META-INF/microprofile-config.properties`
 ----
 system/microprofile-config.properties
@@ -199,7 +199,7 @@ The `inventory` microservices uses a similar `microprofile-config.properties` co
 
 [role="code_command hotspot file=1", subs="quotes"]
 ----
-#Create the inventory microprofile-config.properties file.#
+#Create the inventory/microprofile-config.properties file.#
 `inventory/src/main/resources/META-INF/microprofile-config.properties`
 ----
 
