@@ -68,11 +68,7 @@ The `inventory` microservice receives status updates and provides queries for th
 // =================================================================================================
 == Additional prerequisites
 
-You will build and run the  microservices in Docker containers. You can learn more about containerizing microservices with Docker in the https://openliberty.io/guides/containerize.html[Containerizing microservices^] guide.
-
-Install Docker by following the instructions on the official https://docs.docker.com/engine/installation[Docker documentation^]. Start your Docker environment.
-
-The application also requires Apache Kafka however you will be using Kafka Docker containers to simplify the installation and configuration process.
+Install Docker (https://docs.docker.com/engine/installation[see the official Docker documentation^]) and start your Docker environment. You will build and run the microservices in Docker containers. An installation of Apache Kafka is provided in another Docker container.
 
 // =================================================================================================
 // Getting started
@@ -105,11 +101,11 @@ Here's a detailed diagram with the MicroProfile Reactive Messaging channels, Apa
 
 image::reactive-messaging-system-inventory-detail.png[Reactive system inventory detail,align="center"]
 
-== Building the Producer in the system microservice
+== Creating the Producer in the system microservice
 
 Navigate to the `start` directory to begin. 
 
-The `system` microservice uses the MicroProfile Reactive Messaging to send CPU usage messages to the `inventory` microservice over Kafka.
+The `system` microservice is the producer of the messages that are published to the Kafka messaging system as a stream of events. The `system` microservice publishes an event every 15 seconds containing its calculation of the average system load (its CPU usage) for the last minute.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -129,9 +125,11 @@ system/microprofile-config.properties
 include::finish/system/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `system` microservice calculates the average system load for the last minute every fifteen seconds. The average system load for a system is calculated by counting the number of runnable items that are queued to and run on the available processors, and then this count is averaged over a period of time.
+The `SystemService` class contains a `Publisher` method called [hotspot=sendSystemLoad file=0]`sendSystemLoad()` which calculates and returns the average system load. The [hotspot=publishSystemLoad file=0]`@Outgoing` annotation on the [hotspot=sendSystemLoad file=0]`sendSystemLoad()` method indicates that the method publishes its calculation as a message on a topic in the Kafka messaging system. The [hotspot=flowableInterval file=0]`Flowable.interval()` method from `rxJava` is used to set the frequency with which the system service publishes the calculation to the event stream.
 
-The [hotspot=sendSystemLoad file=0]`sendSystemLoad()` method creates CPU system load statistics for a host system every fifteen seconds. The `rxJava` library is used to generate those CPU system load message events that are sent to Kafka every fifteen seconds. The [hotspot=flowableInterval file=0]`Flowable.interval()` from rxJava is used to create a `Publisher`. The `Publisher` is returned from the [hotspot=publishSystemLoad file=0]`@Outgoing("systemLoad")` channel, which will be configured in the [hotspot file=1]`microprofile-config.properties` [hotspot=systemLoad file=1]`systemLoad` stream in the below section. MicroProfile Reactive Messaging takes care of assigning the `Publisher` to the channel.
+The messages are transported between the service and the Kafka messaging system using a channel called [hotspot=systemLoad file=1]`systemLoad`. The name of the channel to use is set in the [hotspot=publishSystemLoad file=0]`@Outgoing("systemLoad")` annotation. Later in the guide, you will configure the service so that any messages sent by the `system` service through the [hotspot=systemLoad file=1]`systemLoad` channel are published on a topic called `systemLoadTopic`, as shown in the following diagram:
+
+
 
 [role="code_command hotspot file=2", subs="quotes"]
 ----
