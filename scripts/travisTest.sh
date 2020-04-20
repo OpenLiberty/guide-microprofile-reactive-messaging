@@ -15,7 +15,11 @@ mvn -pl inventory verify
 ./scripts/buildImages.sh
 ./scripts/startContainers.sh
 
-sleep 150
+sleep 180
+
+docker logs system
+
+docker logs inventory
 
 systmeCPULoad="$(curl --write-out "%{http_code}" --silent --output /dev/null "http://localhost:9085/inventory/systems")"
 
