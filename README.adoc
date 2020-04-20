@@ -33,15 +33,15 @@ Learn how to write reactive Java microservices using MicroProfile Reactive Messa
 
 You will learn how to build reactive microservices that can send requests to other microservices, and asynchronously receive and process the responses. You will use an external messaging system to handle the asynchronous messages that are sent and received between the microservices as streams of events. MicroProfile Reactive Messaging makes it easy to write and configure your application to send, receive, and process the events efficiently.
 
-Reactive microservices are responsive and resilient under varying workloads because they receive, process, and send messages asynchronously without blocking other work. For example, in a restaurant, a waitress might come to your table and take your order. Then, while you are waiting for your food to be prepared, she serves other tables, taking their orders too. When your food is ready, she brings your food to your table, then continues to serve the other tables too. The waitress is operating asynchronously; if she were to operate synchronously, she would have to take your order and then wait until she had brought your food to your table before she could serve any other tables. This is clearly not an efficient way to operate a restaurant. Similarly, sending and receiving messages synchronously between microservices is not an efficient way to run microservices.
+Reactive microservices are responsive and resilient under varying workloads because they receive, process, and send messages asynchronously without blocking other work. For example, in a restaurant, a waiter might come to your table and take your order. While you are waiting for your food to be prepared, that waiter serves other tables and takes their orders too. When your food is ready, the waiter brings your food to the table and then continues to serve the other tables. This waiter is operating asynchronously. If the waiter were operating synchronously, they must take your order and then wait until they deliver your food before serving any other tables. Clearly, synchronous operation isn't an efficient way to run a restaurant. Similarly, sending and receiving messages synchronously between microservices isn't an efficient way to run microservices.
 
-HTTP request calls from a REST client to another microservice can be time-consuming; the network might be slow, or the other service might be overwhelmed with requests and can't respond quickly. In a reactive system, a microservice sends an HTTP request to another microservice then continues to send other calls, and to receive and process other responses. When the microservice receives a response to the original request, it can process that request but, in the meantime, it is not blocked from completing other work.
+HTTP request calls from a REST client to another microservice can be time-consuming; the network might be slow, or the other service might be overwhelmed with requests and can't respond quickly. In a reactive system, a microservice sends an HTTP request to another microservice and continues to send other calls and receive and process other responses. When the microservice receives a response to the original request, it can process that request, but it was never blocked from completing other work.
 
 *What is MicroProfile Reactive Messaging?*
 
-MicroProfile Reactive Messaging provides an easy way to asynchronously send, receive, and process messages that are received as continuous streams of events. You simply annotate application beans' methods and Open Liberty converts the annotated methods to reactive streams-compatible publishers, subscribers, and processors and connects them up to each other. MicroProfile Reactive Messaging provides a Connector API so that your methods can be connected to the external messaging systems that produce and consume the streams of events, such as https://kafka.apache.org/[Apache Kafka^].
+MicroProfile Reactive Messaging provides an easy way to asynchronously send, receive, and process messages that are received as continuous streams of events. You simply annotate application beans' methods and Open Liberty converts the annotated methods to reactive streams-compatible publishers, subscribers, and processors and connects them up to each other. MicroProfile Reactive Messaging provides a Connector API so that your methods can be connected to external messaging systems that produce and consume the streams of events, such as https://kafka.apache.org/[Apache Kafka^].
 
-The application in this guide consists of two microservices, `system` and `inventory`. Every 15 seconds, the `system` microservice calculates and publishes an event containing its current average system load. The `inventory` microservice subscribes to that information so that it can keep an updated list of all the systems and their current system loads. The current inventory of systems can be accessed via the REST endpoint `@GET` REST...etc. You'll create the `system` and `inventory` microservices using MicroProfile Reactive Messaging.
+The application in this guide consists of two microservices, `system` and `inventory`. Every 15 seconds, the `system` microservice calculates and publishes an event that contains its current average system load. The `inventory` microservice subscribes to that information so that it can keep an updated list of all the systems and their current system loads. The current inventory of systems can be accessed via the REST endpoint. You'll create the `system` and `inventory` microservices using MicroProfile Reactive Messaging.
 
 image::reactive-messaging-system-inventory.png[Reactive system inventory,align="center"]
 
@@ -50,7 +50,7 @@ image::reactive-messaging-system-inventory.png[Reactive system inventory,align="
 // =================================================================================================
 == Additional prerequisites
 
-Install Docker (https://docs.docker.com/engine/installation[see the official Docker documentation^]) and start your Docker environment. You will build and run the microservices in Docker containers. An installation of Apache Kafka is provided in another Docker container.
+You need to have Docker installed. For installation instructions, refer to the official https://docs.docker.com/get-docker/[Docker documentation^]. You will build and run the microservices in Docker containers. An installation of Apache Kafka is provided in another Docker container.
 
 // =================================================================================================
 // Getting started
@@ -58,11 +58,11 @@ Install Docker (https://docs.docker.com/engine/installation[see the official Doc
 [role='command']
 include::{common-includes}/gitclone.adoc[]
 
-== Creating the Producer in the system microservice
+== Creating the producer in the system microservice
 
 Navigate to the `start` directory to begin. 
 
-The `system` microservice is the producer of the messages that are published to the Kafka messaging system as a stream of events. The `system` microservice publishes an event every 15 seconds containing its calculation of the average system load (its CPU usage) for the last minute.
+The `system` microservice is the producer of the messages that are published to the Kafka messaging system as a stream of events. Every 15 seconds, the `system` microservice publishes an event that contains its calculation of the average system load (its CPU usage) for the last minute.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -82,22 +82,22 @@ system/microprofile-config.properties
 include::finish/system/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-A channel is a bridge for transporting messages between different parts of the reactive system. This can be between the service and a messaging-broker, or between two components within the same service.
+A channel is a bridge for transporting messages between different parts of the reactive system. Channels can occur between the service and a messaging-broker, or between two components within the same service.
 
-`@Outgoing` is an annotation indicating that the method feeds a channel. The name of the channel is given as attribute. For example, `@Outgoing("systemLoad")`.
+`@Outgoing` is an annotation indicating that the method feeds a channel. The name of the channel is provided as an attribute, for example, `@Outgoing("systemLoad")`.
 
-MicroProfile Reactive Messaging uses connectors to attach one end of a channel to another messaging technology and are configured using MicroProfile Config.
+MicroProfile Reactive Messaging uses connectors to attach one end of a channel to another messaging technology. Connectors are configured by using MicroProfile Config.
 Open Liberty includes the `liberty-kafka` connector for sending and receiving messages from Apache Kafka.
 
-The `SystemService` class contains a `Publisher` method called [hotspot=sendSystemLoad file=0]`sendSystemLoad()` which calculates and returns the average system load. The [hotspot=publishSystemLoad file=0]`@Outgoing` annotation on the [hotspot=sendSystemLoad file=0]`sendSystemLoad()` method indicates that the method publishes its calculation as a message on a topic in the Kafka messaging system. The [hotspot=flowableInterval file=0]`Flowable.interval()` method from `rxJava` is used to set the frequency with which the system service publishes the calculation to the event stream.
+The `SystemService` class contains a `Publisher` method that is called [hotspot=sendSystemLoad file=0]`sendSystemLoad()`, which calculates and returns the average system load. The [hotspot=publishSystemLoad file=0]`@Outgoing` annotation on the [hotspot=sendSystemLoad file=0]`sendSystemLoad()` method indicates that the method publishes its calculation as a message on a topic in the Kafka messaging system. The [hotspot=flowableInterval file=0]`Flowable.interval()` method from `RxJava` is used to set the frequency of how often the system service publishes the calculation to the event stream.
 
-The messages are transported between the service and the Kafka messaging system using a channel called [hotspot=systemLoad file=1]`systemLoad`. The name of the channel to use is set in the [hotspot=publishSystemLoad file=0]`@Outgoing("systemLoad")` annotation. Later in the guide, you will configure the service so that any messages sent by the `system` service through the [hotspot=systemLoad file=1]`systemLoad` channel are published on a topic called [hotspot=topic1 file=1]`systemLoadTopic`, as shown in the following diagram:
+The messages are transported between the service and the Kafka messaging system through a channel called [hotspot=systemLoad file=1]`systemLoad`. The name of the channel to use is set in the [hotspot=publishSystemLoad file=0]`@Outgoing("systemLoad")` annotation. Later in the guide, you will configure the service so that any messages sent by the `system` service through the [hotspot=systemLoad file=1]`systemLoad` channel are published on a topic called [hotspot=topic1 file=1]`systemLoadTopic`, as shown in the following diagram:
 
 image::reactive-messaging-system-inventory-publisher.png[Reactive system publisher,align="center"]
 
-== Creating the Consumer in the inventory microservice
+== Creating the consumer in the inventory microservice
 
-The `inventory` microservice records in its inventory the average system load information that it has received from potentially multiple instances of the `system` service.
+The `inventory` microservice records in its inventory the average system load information that it received from potentially multiple instances of the system service.
 
 //inventory
 [role="code_command hotspot file=0", subs="quotes"]
@@ -118,17 +118,17 @@ inventory/microprofile-config.properties
 include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-`@Incoming` is an annotation indicating that the method consumes a channel. The name of the channel is given as attribute. For example, `@Incoming("systemLoad")`.
+`@Incoming` is an annotation indicating that the method consumes a channel. The name of the channel is given as an attribute, for example, `@Incoming("systemLoad")`.
 
-The `inventory` microservice receives the message from the `system` microservice over the [hotspot=systemLoad file=0]`@Incoming("systemLoad")` channel with its properties defined in the [hotspot=systemLoad file=1]`microprofile-config.properties`. It's also a RESTful service that is served at the [hotspot=inventoryEndPoint file=0]`/inventory` endpoint.
+The `inventory` microservice receives the message from the `system` microservice over the [hotspot=systemLoad file=0]`@Incoming("systemLoad")` channel. The properties of this channel are defined in the [hotspot=systemLoad file=1]`microprofile-config.properties`. The `inventory` microservice is also a RESTful service that is served at the [hotspot=inventoryEndPoint file=0]`/inventory` endpoint.
 
-The `InventoryResource` class contains a method called [hotspot=updateStatus file=0]`updateStatus()` which receives the message containing the average system load and updates its existing inventory of systems and their average system load. The [hotspot=systemLoad file=0]`@Incoming("systemLoad")` annotation on the [hotspot=updateStatus file=0]`updateStatus()` method indicates that the method retrieves the average system load information by connecting to the channel called [hotspot=systemLoad file=0]`systemLoad`. Later in the guide, you will configure the service so that any messages sent by the `system` service through the `systemLoad` channel are retrieved from a topic called [hotspot=topic1 file=1]`systemLoadTopic`, as shown in the following diagram:
+The `InventoryResource` class contains a method called [hotspot=updateStatus file=0]`updateStatus()`, which receives the message that contains the average system load and updates its existing inventory of systems and their average system load. The [hotspot=systemLoad file=0]`@Incoming("systemLoad")` annotation on the [hotspot=updateStatus file=0]`updateStatus()` method indicates that the method retrieves the average system load information by connecting to the channel called [hotspot=systemLoad file=0]`systemLoad`. Later in the guide, you will configure the service so that any messages sent by the `system` service through the `systemLoad` channel are retrieved from a topic called [hotspot=topic1 file=1]`systemLoadTopic`, as shown in the following diagram:
 
 image::reactive-messaging-system-inventory-detail.png[Reactive system inventory detail,align="center"]
 
-== Configuring the MicroProfile Reactive Messaging connectors
+== Configuring the MicroProfile Reactive Messaging connectors for Kafka
 
-The `system` and `inventory` services exchange messages with the external messaging system through a `channel`. The MicroProfile Reactive Messaging Connector API makes it easy to connect each service to the channel. You just need to add some configuration keys in a properties file for each of the services to define properties such as the name of the channel and the topic in the Kafka messaging system.
+The `system` and `inventory` services exchange messages with the external messaging system through a `channel`. The MicroProfile Reactive Messaging Connector API makes it easy to connect each service to the channel. You just need to add configuration keys in a properties file for each of the services. These configuration keys define properties such as the name of the channel and the topic in the Kafka messaging system.
 
 The system and inventory microservices each have a MicroProfile Config properties file to define the properties of their outgoing and incoming streams.
 
@@ -149,9 +149,9 @@ inventory/microprofile-config.properties
 include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property configures the host name and port for connecting to the Kafka server. The `system` microservice uses an outgoing connector to send messages through the [hotspot=systemLoad file=0]`systemLoad` channel to the [hotspot=topic1 file=0]`systemLoadTopic` topic in the Kafka message broker, so that the `inventory` microservices can consume the messages. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 file=0]`value.serializer` properties characterize how to serialize the messages. The class `SystemLoadSerializer` implements the logic for turning a `SystemLoad` object into JSON and is configured as the [hotspot=serializerVal1 file=0]`value.serializer`.
+The [hotspot=kafkaConfig file=0]`mp.messaging.connector.liberty-kafka.bootstrap.servers` property configures the hostname and port for connecting to the Kafka server. The `system` microservice uses an outgoing connector to send messages through the [hotspot=systemLoad file=0]`systemLoad` channel to the [hotspot=topic1 file=0]`systemLoadTopic` topic in the Kafka message broker so that the `inventory` microservices can consume the messages. The [hotspot=serializer1 file=0]`key.serializer` and [hotspot=serializerVal1 file=0]`value.serializer` properties characterize how to serialize the messages. The `SystemLoadSerializer` class implements the logic for turning a `SystemLoad` object into JSON and is configured as the [hotspot=serializerVal1 file=0]`value.serializer`.
 
-The `inventory` microservices uses a similar `microprofile-config.properties` configuration to define its required incoming stream.
+The `inventory` microservice uses a similar `microprofile-config.properties` configuration to define its required incoming stream.
 
 [role="code_command hotspot file=1", subs="quotes"]
 ----
@@ -159,11 +159,11 @@ The `inventory` microservices uses a similar `microprofile-config.properties` co
 `inventory/src/main/resources/META-INF/microprofile-config.properties`
 ----
 
-The `inventory` microservice uses an incoming connector to receive messages through the [hotspot=systemLoad file=1]`systemLoad` channel which were published by the `system` microservice to the [hotspot=topic1 file=1]`systemLoadTopic` in the Kafka message broker. The [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The class `SystemLoadDeserializer` implements the logic for turning JSON into a `SystemLoad` object and is configured as the [hotspot=deserializerVal1 file=1]`value.deserializer`. The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. Consumer group is a collection of consumers who share a common identifier for the group. This can also be seen as various machines ingesting from the Kafka topics. All these properties are required by the Apache Kafka Producer Configs and Apache Kafka Consumer Configs.
+The `inventory` microservice uses an incoming connector to receive messages through the [hotspot=systemLoad file=1]`systemLoad` channel. The messages were published by the `system` microservice to the [hotspot=topic1 file=1]`systemLoadTopic` in the Kafka message broker. The [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The `SystemLoadDeserializer` class implements the logic for turning JSON into a `SystemLoad` object and is configured as the [hotspot=deserializerVal1 file=1]`value.deserializer`. The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. A consumer group is a collection of consumers who share a common identifier for the group. A consumer group can also be seen as the various machines that ingest from the Kafka topics. All of these properties are required by the Apache Kafka Producer Configs and Apache Kafka Consumer Configs.
 
 == Configuring the server
 
-To get the services running, the Liberty server on which each service will run needs to be correctly configured. The `system` service and the `inventory` service each need to have its relevant features enabled, including the MicroProfile Reactive Messaging (mpReactiveMessaging-1.0) feature.
+To run the services, the Open Liberty server on which each service runs needs to be correctly configured. Relevant features, including the https://openliberty.io/docs/ref/feature/#mpReactiveMessaging-1.0.html[MicroProfile Reactive Messaging feature^], must be enabled for the `system` and `inventory` services.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
@@ -182,7 +182,7 @@ server.xml
 include::finish/inventory/src/main/liberty/config/server.xml[]
 ----
 
-The `inventory` microservice has [hotspot file=1]`server.xml` already configured.
+The [hotspot file=1]`server.xml` file is already configured for the `inventory` microservice.
 
 == Building and running the application
 
@@ -200,11 +200,11 @@ pom.xml
 include::finish/system/pom.xml[]
 ----
 
-The [hotspot file=0]`pom.xml` lists the [hotspot=reactiveMessaging file=0]`microprofile-reactive-messaging-api`, [hotspot=kafka file=0]`kafka-clients`, and [hotspot=rxjava file=0]`rxjava` dependencies.
+The [hotspot file=0]`pom.xml` file lists the [hotspot=reactiveMessaging file=0]`microprofile-reactive-messaging-api`, [hotspot=kafka file=0]`kafka-clients`, and [hotspot=rxjava file=0]`rxjava` dependencies.
 
-[hotspot=reactiveMessaging file=0]`microprofile-reactive-messaging-api` dependency is needed to enable the use of MicroProfile Reactive Messaging API. [hotspot=kafka file=0]`kafka-clients` dependency is added since the application needs a Kafka client to connect to the Kafka broker. [hotspot=rxjava file=0]`rxjava` dependency is used for creating events at regular intervals.
+The [hotspot=reactiveMessaging file=0]`microprofile-reactive-messaging-api` dependency is needed to enable the use of MicroProfile Reactive Messaging API. The [hotspot=kafka file=0]`kafka-clients` dependency is added because the application needs a Kafka client to connect to the Kafka broker. The [hotspot=rxjava file=0]`rxjava` dependency is used for creating events at regular intervals.
 
-Start your Docker environment. Dockerfiles are already provided for use.
+Start your Docker environment. Dockerfiles are provided for you to use.
 
 To build the application, run the Maven `install` and `package` goals from the command line in the `start` directory:
 
@@ -214,7 +214,7 @@ mvn -pl models install
 mvn package
 ```
 
-Run the following command to download or update to the latest `open-liberty` Docker image.
+Run the following command to download or update to the latest `open-liberty` Docker image:
 [role='command']
 ```
 docker pull open-liberty
@@ -228,7 +228,7 @@ docker build -t system:1.0-SNAPSHOT system/.
 docker build -t inventory:1.0-SNAPSHOT inventory/.
 ```
 
-Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and all of the microservices in the project. For simplicity, the script will start one instance of the system service.
+Next, use the provided script to start the application in Docker containers. The script creates a network for the containers to communicate with each other. It also creates containers for Kafka, Zookeeper, and the microservices in the project. For simplicity, the script starts one instance of the system service.
 
 include::{common-includes}/os-tabs.adoc[]
 
@@ -250,9 +250,9 @@ include::{common-includes}/os-tabs.adoc[]
 
 == Testing the application
 
-Once the application is up and running, you can access the application by making a `@GET` request to the `inventory` endpoint. 
+After the application is up and running, you can access the application by making a `@GET` request to the `inventory` endpoint. 
 
-To access the `inventory` microservice, use the http://localhost:9085/inventory/systems[^] URL, and you see the CPU systemLoad property for all the systems.
+Go to the http://localhost:9085/inventory/systems[^] URL to access the inventory microservice. You see the CPU `systemLoad` property for all the systems.
 
 [source, role='no_copy']
 ----
@@ -262,11 +262,11 @@ To access the `inventory` microservice, use the http://localhost:9085/inventory/
 }
 ----
 
-You can rerun the http://localhost:9085/inventory/systems[^] URL after a while, and you will notice the CPU systemLoad property for all the systems have changed.
+You can revisit the http://localhost:9085/inventory/systems[^] URL after a while, and you will notice the CPU `systemLoad` property for the systems changed.
 
-You can use the `@GET` `\http://localhost:9085/inventory/system/{hostId}` URL to see the CPU systemLoad property for one particular system.
+You can use the `@GET` `\http://localhost:9085/inventory/systems/{hostname}` URL to see the CPU `systemLoad` property for one particular system.
 
-For example. You can use the above `30bec2b63a96` value as the `hostId`. Use the URL `\http://localhost:9085/inventory/system/30bec2b63a96`, and you can see the CPU systemLoad property for that particular `hostId` `30bec2b63a96` as below.
+In the following example, the `30bec2b63a96` value is the `hostname`. If you go to the `\http://localhost:9085/inventory/systems/30bec2b63a96` URL, you can see the CPU `systemLoad` property only for the `30bec2b63a96` `hostname`:
 
 [source, role='no_copy']
 ----
@@ -278,7 +278,7 @@ For example. You can use the above `30bec2b63a96` value as the `hostId`. Use the
 
 == Tearing down the environment
 
-Finally, use the following script to stop the application:
+Run the following script to stop the application:
 
 include::{common-includes}/os-tabs.adoc[]
 
@@ -300,7 +300,7 @@ include::{common-includes}/os-tabs.adoc[]
 
 == Great work! You're done!
 
-You have just developed a reactive Java application using MicroProfile Reactive Messaging, Open Liberty and Kakfa.
+You just developed a reactive Java application using MicroProfile Reactive Messaging, Open Liberty, and Kakfa.
 
 == Related Links
 

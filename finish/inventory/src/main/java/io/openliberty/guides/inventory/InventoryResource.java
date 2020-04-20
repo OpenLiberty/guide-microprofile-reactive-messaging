@@ -58,10 +58,10 @@ public class InventoryResource {
     }
 
     @GET
-    @Path("/system/{hostId}")
+    @Path("/systems/{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSystem(@PathParam("hostId") String hostId) {
-        Optional<Properties> system = manager.getSystem(hostId);
+    public Response getSystem(@PathParam("hostname") String hostname) {
+        Optional<Properties> system = manager.getSystem(hostname);
         if (system.isPresent()) {
             return Response
                     .status(Response.Status.OK)
