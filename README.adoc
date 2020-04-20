@@ -128,7 +128,7 @@ image::reactive-messaging-system-inventory-detail.png[Reactive system inventory 
 
 == Configuring the MicroProfile Reactive Messaging connectors for Kafka
 
-The `system` and `inventory` services exchange messages with the external messaging system through a `channel`. The MicroProfile Reactive Messaging Connector API makes it easy to connect each service to the channel. You just need to add configuration keys in a properties file for each of the services. These configuration keys define properties such as the name of the channel and the topic in the Kafka messaging system.
+The `system` and `inventory` services exchange messages with the external messaging system through a channel. The MicroProfile Reactive Messaging Connector API makes it easy to connect each service to the channel. You just need to add configuration keys in a properties file for each of the services. These configuration keys define properties such as the name of the channel and the topic in the Kafka messaging system.
 
 The system and inventory microservices each have a MicroProfile Config properties file to define the properties of their outgoing and incoming streams.
 
@@ -264,7 +264,7 @@ Go to the http://localhost:9085/inventory/systems[^] URL to access the inventory
 
 You can revisit the http://localhost:9085/inventory/systems[^] URL after a while, and you will notice the CPU `systemLoad` property for the systems changed.
 
-You can use the `@GET` `\http://localhost:9085/inventory/systems/{hostname}` URL to see the CPU `systemLoad` property for one particular system.
+You can use the `\http://localhost:9085/inventory/systems/{hostname}` URL to see the CPU `systemLoad` property for one particular system.
 
 In the following example, the `30bec2b63a96` value is the `hostname`. If you go to the `\http://localhost:9085/inventory/systems/30bec2b63a96` URL, you can see the CPU `systemLoad` property only for the `30bec2b63a96` `hostname`:
 
