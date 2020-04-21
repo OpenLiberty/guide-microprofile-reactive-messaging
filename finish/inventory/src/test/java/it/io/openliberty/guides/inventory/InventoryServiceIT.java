@@ -19,8 +19,6 @@ import java.util.Properties;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterAll;
@@ -31,29 +29,22 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
-import org.microshed.testing.kafka.KafkaConsumerConfig;
 import org.microshed.testing.kafka.KafkaProducerConfig;
 
 import io.openliberty.guides.inventory.InventoryResource;
 import io.openliberty.guides.models.SystemLoad;
-import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 import io.openliberty.guides.models.SystemLoad.SystemLoadSerializer;
 
 @MicroShedTest
 @SharedContainerConfig(AppContainerConfig.class)
 @TestMethodOrder(OrderAnnotation.class)
-public class InventoryEndpointIT {
+public class InventoryServiceIT {
 
     @RESTClient
     public static InventoryResource inventoryResource;
 
     @KafkaProducerConfig(valueSerializer = SystemLoadSerializer.class)
-    public static KafkaProducer<String, SystemLoad> cpuProducer;
-
-    @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class, 
-            groupId = "system-load-status", topics = "systemLoadTopic", 
-            properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
-    public static KafkaConsumer<String, SystemLoad> cpuConsumer;
+    public static KafkaProducer<String, SystemLoad> producer;
 
     @AfterAll
     public static void cleanup() {
@@ -62,18 +53,21 @@ public class InventoryEndpointIT {
 
     @Test
     public void testCpuUsage() throws InterruptedException {
-        SystemLoad s = new SystemLoad("localhost", new Double(1.1));
-        cpuProducer.send(new ProducerRecord<String, SystemLoad>("systemLoadTopic", s));
+        SystemLoad sl = new SystemLoad("localhost", 1.1);
+        producer.send(new ProducerRecord<String, SystemLoad>("systemLoadTopic", sl));
         Thread.sleep(5000);
         Response response = inventoryResource.getSystems();
-        List<Properties> systems = response.readEntity(new GenericType<List<Properties>>() {});
+        List<Properties> systems =
+                response.readEntity(new GenericType<List<Properties>>() {});
         Assertions.assertEquals(200, response.getStatus(),
                 "Response should be 200");
         Assertions.assertEquals(systems.size(), 1);
         for (Properties system : systems) {
-            Assertions.assertEquals(s.hostId, system.get("hostname"), "HostId not match!");
-            BigDecimal cpuLoad = (BigDecimal) system.get("systemLoad");
-            Assertions.assertEquals(s.loadAverage.doubleValue(), cpuLoad.doubleValue(), "CPU load doesn't match!");
+            Assertions.assertEquals(sl.hostId, system.get("hostname"),
+                    "HostId not match!");
+            BigDecimal systemLoad = (BigDecimal) system.get("systemLoad");
+            Assertions.assertEquals(sl.loadAverage, systemLoad.doubleValue(),
+                    "CPU load doesn't match!");
         }
     }
 }
