@@ -111,7 +111,7 @@ inventory/microprofile-config.properties
 include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
 ----
 
-The `inventory` microservice receives the message from the `system` microservice over the [hotspot=systemLoad file=0]`@Incoming("systemLoad")` channel. The properties of this channel are defined in the [hotspot=systemLoad file=1]`microprofile-config.properties`. The `inventory` microservice is also a RESTful service that is served at the [hotspot=inventoryEndPoint file=0]`/inventory` endpoint.
+The `inventory` microservice receives the message from the `system` microservice over the [hotspot=systemLoad file=0]`@Incoming("systemLoad")` channel. The properties of this channel are defined in the [hotspot=systemLoad file=1]`microprofile-config.properties` file. The `inventory` microservice is also a RESTful service that is served at the [hotspot=inventoryEndPoint file=0]`/inventory` endpoint.
 
 The `InventoryResource` class contains a method called [hotspot=updateStatus file=0]`updateStatus()`, which receives the message that contains the average system load and updates its existing inventory of systems and their average system load. The [hotspot=systemLoad file=0]`@Incoming("systemLoad")` annotation on the [hotspot=updateStatus file=0]`updateStatus()` method indicates that the method retrieves the average system load information by connecting to the channel called [hotspot=systemLoad file=0]`systemLoad`. Later in the guide, you will configure the service so that any messages sent by the `system` service through the `systemLoad` channel are retrieved from a topic called [hotspot=topic1 file=1]`systemLoadTopic`, as shown in the following diagram:
 
@@ -150,7 +150,7 @@ The `inventory` microservice uses a similar `microprofile-config.properties` con
 `inventory/src/main/resources/META-INF/microprofile-config.properties`
 ----
 
-The `inventory` microservice uses an incoming connector to receive messages through the [hotspot=systemLoad file=1]`systemLoad` channel. The messages were published by the `system` microservice to the [hotspot=topic1 file=1]`systemLoadTopic` in the Kafka message broker. The [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The `SystemLoadDeserializer` class implements the logic for turning JSON into a `SystemLoad` object and is configured as the [hotspot=deserializerVal1 file=1]`value.deserializer`. The [hotspot=group1 file=1]`group.id` defines a unique name for the consumer group. A consumer group is a collection of consumers who share a common identifier for the group. A consumer group can also be seen as the various machines that ingest from the Kafka topics. All of these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
+The `inventory` microservice uses an incoming connector to receive messages through the [hotspot=systemLoad file=1]`systemLoad` channel. The messages were published by the `system` microservice to the [hotspot=topic1 file=1]`systemLoadTopic` in the Kafka message broker. The [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The `SystemLoadDeserializer` class implements the logic for turning JSON into a `SystemLoad` object and is configured as the [hotspot=deserializerVal1 file=1]`value.deserializer`. The [hotspot=group1 file=1]`group.id` property defines a unique name for the consumer group. A consumer group is a collection of consumers who share a common identifier for the group. You can also view a consumer group as the various machines that ingest from the Kafka topics. All of these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
 
 == Configuring the server
 
@@ -243,7 +243,7 @@ include::{common-includes}/os-tabs.adoc[]
 
 After the application is up and running, you can access the application by making a `@GET` request to the `inventory` endpoint. 
 
-Go to the http://localhost:9085/inventory/systems[^] URL to access the inventory microservice. You see the CPU `systemLoad` property for all the systems.
+Go to the http://localhost:9085/inventory/systems[^] URL to access the inventory microservice. You see the CPU `systemLoad` property for all the systems:
 
 [source, role='no_copy']
 ----
