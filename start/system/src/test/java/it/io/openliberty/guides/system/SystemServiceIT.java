@@ -13,9 +13,7 @@
 package it.io.openliberty.guides.system;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.time.Duration;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -34,33 +32,24 @@ import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 @SharedContainerConfig(AppContainerConfig.class)
 public class SystemServiceIT {
 
-    private static final long POLL_TIMEOUT = 30 * 1000;
-
-    @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class, 
-        groupId = "system-load-status", topics = "systemLoadTopic", 
-        properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
-    public static KafkaConsumer<String, SystemLoad> cpuConsumer;
+    @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class,
+            groupId = "system-load-status",
+            topics = "systemLoadTopic",
+            properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
+    public static KafkaConsumer<String, SystemLoad> consumer;
 
     @Test
-    public void testCpuStatus() throws IOException, InterruptedException {
-        int recordsProcessed = 0;
-        long startTime = System.currentTimeMillis();
-        long elapsedTime = 0;
-        while (recordsProcessed == 0 && elapsedTime < POLL_TIMEOUT) {
-            ConsumerRecords<String, SystemLoad> records = cpuConsumer.poll(Duration.ofMillis(3000));
-            System.out.println("Polled " + records.count() + " records from Kafka:");
-            for (ConsumerRecord<String, SystemLoad> record : records) {
-                SystemLoad sl = record.value();
-                System.out.println(sl);
-                assertNotNull(sl.hostId);
-                assertNotNull(sl.loadAverage);
-                recordsProcessed++;
-            }
-            cpuConsumer.commitAsync();
-            if (recordsProcessed > 0)
-                break;
-            elapsedTime = System.currentTimeMillis() - startTime;
+    public void testCpuStatus() {
+        ConsumerRecords<String, SystemLoad> records =
+                consumer.poll(Duration.ofMillis(30 * 1000));
+        System.out.println("Polled " + records.count() + " records from Kafka:");
+
+        for (ConsumerRecord<String, SystemLoad> record : records) {
+            SystemLoad sl = record.value();
+            System.out.println(sl);
+            assertNotNull(sl.hostId);
+            assertNotNull(sl.loadAverage);
         }
-        assertTrue(recordsProcessed > 0, "No records processed");
+        consumer.commitAsync();
     }
 }
