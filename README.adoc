@@ -41,7 +41,7 @@ HTTP request calls from a REST client to another microservice can be time-consum
 
 MicroProfile Reactive Messaging provides an easy way to asynchronously send, receive, and process messages that are received as continuous streams of events. You simply annotate application beans' methods and Open Liberty converts the annotated methods to reactive streams-compatible publishers, subscribers, and processors and connects them up to each other. MicroProfile Reactive Messaging provides a Connector API so that your methods can be connected to external messaging systems that produce and consume the streams of events, such as https://kafka.apache.org/[Apache Kafka^].
 
-The application in this guide consists of two microservices, `system` and `inventory`. Every 15 seconds, the `system` microservice calculates and publishes an event that contains its current average system load. The `inventory` microservice subscribes to that information so that it can keep an updated list of all the systems and their current system loads. The current inventory of systems can be accessed via the REST endpoint. You'll create the `system` and `inventory` microservices using MicroProfile Reactive Messaging.
+The application in this guide consists of two microservices, `system` and `inventory`. Every 15 seconds, the `system` microservice calculates and publishes an event that contains its current average system load. The `inventory` microservice subscribes to that information so that it can keep an updated list of all the systems and their current system loads. The current inventory of systems can be accessed via the `/inventory` REST endpoint. You'll create the `system` and `inventory` microservices using MicroProfile Reactive Messaging.
 
 image::reactive-messaging-system-inventory.png[Reactive system inventory,align="center"]
 
@@ -110,8 +110,6 @@ inventory/microprofile-config.properties
 ----
 include::finish/inventory/src/main/resources/META-INF/microprofile-config.properties[]
 ----
-
-`@Incoming` is an annotation indicating that the method consumes a channel. The name of the channel is given as an attribute, for example, `@Incoming("systemLoad")`.
 
 The `inventory` microservice receives the message from the `system` microservice over the [hotspot=systemLoad file=0]`@Incoming("systemLoad")` channel. The properties of this channel are defined in the [hotspot=systemLoad file=1]`microprofile-config.properties`. The `inventory` microservice is also a RESTful service that is served at the [hotspot=inventoryEndPoint file=0]`/inventory` endpoint.
 
