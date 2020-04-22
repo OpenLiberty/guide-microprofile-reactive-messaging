@@ -3,9 +3,6 @@
 KAFKA_SERVER=kafka:9092
 NETWORK=reactive-app
 
-JOB_SERVICE_URL="http://job:9081"
-INVENTORY_SERVICE_URL="http://inventory:9085"
-
 docker network create $NETWORK
 
 docker run -d \
