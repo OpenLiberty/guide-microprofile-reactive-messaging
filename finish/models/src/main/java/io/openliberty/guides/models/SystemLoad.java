@@ -24,11 +24,11 @@ public class SystemLoad {
 
     private static final Jsonb jsonb = JsonbBuilder.create();
 
-    public String hostId;
+    public String hostname;
     public Double loadAverage;
         
-    public SystemLoad(String hostId, Double cpuLoadAvg) {
-        this.hostId = hostId;
+    public SystemLoad(String hostname, Double cpuLoadAvg) {
+        this.hostname = hostname;
         this.loadAverage = cpuLoadAvg;
     }
 
@@ -40,13 +40,13 @@ public class SystemLoad {
         if (this == o) return true;
         if (!(o instanceof SystemLoad)) return false;
         SystemLoad sl = (SystemLoad) o;
-        return Objects.equals(hostId, sl.hostId)
+        return Objects.equals(hostname, sl.hostname)
                 && Objects.equals(loadAverage, sl.loadAverage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(hostId, loadAverage);
+        return Objects.hash(hostname, loadAverage);
     }
     
     @Override

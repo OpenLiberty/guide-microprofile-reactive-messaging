@@ -63,7 +63,7 @@ public class InventoryServiceIT {
                 "Response should be 200");
         Assertions.assertEquals(systems.size(), 1);
         for (Properties system : systems) {
-            Assertions.assertEquals(sl.hostId, system.get("hostname"),
+            Assertions.assertEquals(sl.hostname, system.get("hostname"),
                     "HostId not match!");
             BigDecimal systemLoad = (BigDecimal) system.get("systemLoad");
             Assertions.assertEquals(sl.loadAverage, systemLoad.doubleValue(),

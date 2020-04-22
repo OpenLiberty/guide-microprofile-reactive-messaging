@@ -25,25 +25,25 @@ public class InventoryManager {
 
     private Map<String, Properties> systems = Collections.synchronizedMap(new TreeMap<String, Properties>());
 
-    public void addSystem(String hostId, Double systemLoad) {
-        if (!systems.containsKey(hostId)) {
+    public void addSystem(String hostname, Double systemLoad) {
+        if (!systems.containsKey(hostname)) {
             Properties p = new Properties();
-            p.put("hostname", hostId);
+            p.put("hostname", hostname);
             p.put("systemLoad", systemLoad);
-            systems.put(hostId, p);
+            systems.put(hostname, p);
         }
     }
 
-    public void updateCpuStatus(String hostId, Double systemLoad) {
-        Optional<Properties> p = getSystem(hostId);
+    public void updateCpuStatus(String hostname, Double systemLoad) {
+        Optional<Properties> p = getSystem(hostname);
         if (p.isPresent()) {
-            if (p.get().getProperty(hostId) == null && hostId != null)
+            if (p.get().getProperty(hostname) == null && hostname != null)
                 p.get().put("systemLoad", systemLoad);
         }
     }
 
-    public Optional<Properties> getSystem(String hostId) {
-        Properties p = systems.get(hostId);
+    public Optional<Properties> getSystem(String hostname) {
+        Properties p = systems.get(hostname);
         return Optional.ofNullable(p);
     }
 

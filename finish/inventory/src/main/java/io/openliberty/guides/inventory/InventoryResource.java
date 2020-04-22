@@ -87,14 +87,14 @@ public class InventoryResource {
     // tag::systemLoad[]
     @Incoming("systemLoad")
     // end::systemLoad[]
-    public void updateStatus(SystemLoad s)  {
-        String hostId = s.hostId;
-        if (manager.getSystem(hostId).isPresent()) {
-            manager.updateCpuStatus(hostId, s.loadAverage);
-            logger.info("Host " + hostId + " was updated: " + s);
+    public void updateStatus(SystemLoad sl)  {
+        String hostname = sl.hostname;
+        if (manager.getSystem(hostname).isPresent()) {
+            manager.updateCpuStatus(hostname, sl.loadAverage);
+            logger.info("Host " + hostname + " was updated: " + sl);
         } else {
-            manager.addSystem(hostId, s.loadAverage);
-            logger.info("Host " + hostId + " was added: " + s);
+            manager.addSystem(hostname, sl.loadAverage);
+            logger.info("Host " + hostname + " was added: " + sl);
         }
     }
     // end::updateStatus[]
