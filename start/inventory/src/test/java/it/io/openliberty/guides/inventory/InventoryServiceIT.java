@@ -64,7 +64,7 @@ public class InventoryServiceIT {
         Assertions.assertEquals(systems.size(), 1);
         for (Properties system : systems) {
             Assertions.assertEquals(sl.hostname, system.get("hostname"),
-                    "HostId not match!");
+                    "Hostname doesn't match!");
             BigDecimal systemLoad = (BigDecimal) system.get("systemLoad");
             Assertions.assertEquals(sl.loadAverage, systemLoad.doubleValue(),
                     "CPU load doesn't match!");
