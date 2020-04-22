@@ -70,7 +70,7 @@ public class InventoryResource {
         }
         return Response
                 .status(Response.Status.NOT_FOUND)
-                .entity("hostId does not exist.")
+                .entity("hostname does not exist.")
                 .build();
     }
 
