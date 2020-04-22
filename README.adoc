@@ -9,7 +9,7 @@
 :projectid: microprofile-reactive-messaging
 :page-layout: guide-multipane
 :page-duration: 20 minutes
-:page-releasedate: 2020-04-17
+:page-releasedate: 2020-04-22
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
@@ -41,7 +41,7 @@ Asynchronous communication between microservices can be used to build reactive a
 
 MicroProfile Reactive Messaging provides an easy way to asynchronously send, receive, and process messages that are received as continuous streams of events. You simply annotate application beans' methods and Open Liberty converts the annotated methods to reactive streams-compatible publishers, subscribers, and processors and connects them up to each other. MicroProfile Reactive Messaging provides a Connector API so that your methods can be connected to external messaging systems that produce and consume the streams of events, such as https://kafka.apache.org/[Apache Kafka^].
 
-The application in this guide consists of two microservices, `system` and `inventory`. Every 15 seconds, the `system` microservice calculates and publishes an event that contains its current average system load. The `inventory` microservice subscribes to that information so that it can keep an updated list of all the systems and their current system loads. The current inventory of systems can be accessed via the `/inventory` REST endpoint. You'll create the `system` and `inventory` microservices using MicroProfile Reactive Messaging.
+The application in this guide consists of two microservices, `system` and `inventory`. Every 15 seconds, the `system` microservice calculates and publishes an event that contains its current average system load. The `inventory` microservice subscribes to that information so that it can keep an updated list of all the systems and their current system loads. The current inventory of systems can be accessed via the `/systems` REST endpoint. You'll create the `system` and `inventory` microservices using MicroProfile Reactive Messaging.
 
 image::reactive-messaging-system-inventory.png[Reactive system inventory,align="center"]
 
@@ -241,7 +241,7 @@ include::{common-includes}/os-tabs.adoc[]
 
 == Testing the application
 
-After the application is up and running, you can access the application by making a `@GET` request to the `inventory` endpoint. 
+After the application is up and running, you can access the application by making a GET request to the `/systems` endpoint of the `inventory` service. 
 
 Go to the http://localhost:9085/inventory/systems[^] URL to access the inventory microservice. You see the CPU `systemLoad` property for all the systems:
 
