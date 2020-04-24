@@ -293,14 +293,4 @@ include::{common-includes}/os-tabs.adoc[]
 
 You just developed a reactive Java application using MicroProfile Reactive Messaging, Open Liberty, and Kakfa.
 
-== Related Links
-
-Learn more about MicroProfile.
-
-https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/microprofile-reactive-messaging-spec.html[View the MicroProfile Reactive Messaging Specification^]
-
-https://download.eclipse.org/microprofile/microprofile-reactive-messaging-1.0/apidocs/[View the MicroProfile Reactive Messaging Javadoc^]
-
-https://openliberty.io/docs/ref/microprofile[View the MicroProfile API^]
-
 include::{common-includes}/attribution.adoc[subs="attributes"]
