@@ -29,7 +29,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jaxrs.RESTClient;
 import org.microshed.testing.jupiter.MicroShedTest;
-import org.microshed.testing.kafka.KafkaProducerConfig;
+import org.microshed.testing.kafka.KafkaProducerClient;
 
 import io.openliberty.guides.inventory.InventoryResource;
 import io.openliberty.guides.models.SystemLoad;
@@ -43,7 +43,7 @@ public class InventoryServiceIT {
     @RESTClient
     public static InventoryResource inventoryResource;
 
-    @KafkaProducerConfig(valueSerializer = SystemLoadSerializer.class)
+    @KafkaProducerClient(valueSerializer = SystemLoadSerializer.class)
     public static KafkaProducer<String, SystemLoad> producer;
 
     @AfterAll
