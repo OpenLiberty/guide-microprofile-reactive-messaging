@@ -23,7 +23,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.Test;
 import org.microshed.testing.SharedContainerConfig;
 import org.microshed.testing.jupiter.MicroShedTest;
-import org.microshed.testing.kafka.KafkaConsumerConfig;
+import org.microshed.testing.kafka.KafkaConsumerClient;
 
 import io.openliberty.guides.models.SystemLoad;
 import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
@@ -32,7 +32,7 @@ import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 @SharedContainerConfig(AppContainerConfig.class)
 public class SystemServiceIT {
 
-    @KafkaConsumerConfig(valueDeserializer = SystemLoadDeserializer.class,
+    @KafkaConsumerClient(valueDeserializer = SystemLoadDeserializer.class,
             groupId = "system-load-status",
             topics = "systemLoadTopic",
             properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")

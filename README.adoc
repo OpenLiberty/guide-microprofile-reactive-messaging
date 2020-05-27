@@ -20,7 +20,7 @@
 :imagesdir: /img/guide/{projectid}
 :page-seo-title: Creating asynchronous Java microservices using MicroProfile Reactive Messaging 
 :page-seo-description: A getting started reactive programming tutorial with examples on how to send and receive messages between asynchronous Java microservices using Eclipse MicroProfile Reactive Messaging and Apache Kafka.
-:common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/dev
+:common-includes: https://raw.githubusercontent.com/OpenLiberty/guides-common/master
 :source-highlighter: prettify
 = Creating reactive Java microservices
 
@@ -205,11 +205,7 @@ mvn -pl models install
 mvn package
 ```
 
-Run the following command to download or update to the latest `open-liberty` Docker image:
-[role='command']
-```
-docker pull open-liberty
-```
+include::{common-includes}/ol-kernel-docker-pull.adoc[]
 
 Run the following commands to containerize the microservices:
 
