@@ -34,7 +34,7 @@ public class SystemServiceIT {
 
     @KafkaConsumerClient(valueDeserializer = SystemLoadDeserializer.class,
             groupId = "system-load-status",
-            topics = "systemLoadTopic",
+            topics = "system.load",
             properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
     public static KafkaConsumer<String, SystemLoad> consumer;
 
