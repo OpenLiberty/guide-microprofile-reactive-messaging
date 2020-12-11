@@ -23,7 +23,7 @@ docker pull $DOCKER_USERNAME"/olguides:"$BUILD
 
 sudo ../scripts/testApp.sh
 
-sleep 60
+sleep 120
 
 echo "Testing daily Docker image"
 
