@@ -26,9 +26,7 @@ sudo ../scripts/testApp.sh
 
 echo "Testing daily Docker image"
 
-sed -i "\#<artifactId>liberty-maven-plugin</artifactId>#a<configuration><install><runtimeUrl>https://public.dhe.ibm.com/ibmdl/export/pub/software/openliberty/runtime/nightly/"$DATE"/"$DRIVER"</runtimeUrl></install></configuration>" system/pom.xml inventory/pom.xml
-cat system/pom.xml
-cat inventory/pom.xml
+docker image prune -a -f
 
 sed -i "s;FROM "$DOCKER_USERNAME"/olguides:"$BUILD";FROM openliberty/daily:latest;g" inventory/Dockerfile system/Dockerfile
 
