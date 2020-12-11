@@ -15,13 +15,15 @@ sed -i "\#<artifactId>liberty-maven-plugin</artifactId>#a<configuration><install
 cat system/pom.xml
 cat inventory/pom.xml
 
-# sed -i "s;FROM openliberty/open-liberty:kernel-java8-openj9-ubi;FROM "$DOCKER_USERNAME"/olguides:"$BUILD";g" system/Dockerfile inventory/Dockerfile
-# cat system/Dockerfile
-#cat inventory/Dockerfile
+sed -i "s;FROM openliberty/open-liberty:kernel-java8-openj9-ubi;FROM "$DOCKER_USERNAME"/olguides:"$BUILD";g" system/Dockerfile inventory/Dockerfile
+cat system/Dockerfile
+cat inventory/Dockerfile
  
-#docker pull $DOCKER_USERNAME"/olguides:"$BUILD
+docker pull $DOCKER_USERNAME"/olguides:"$BUILD
 
-#sudo ../scripts/testApp.sh
+sudo ../scripts/testApp.sh
+
+sleep 60
 
 echo "Testing daily Docker image"
 
