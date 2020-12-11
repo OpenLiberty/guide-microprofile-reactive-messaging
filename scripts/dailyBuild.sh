@@ -10,7 +10,7 @@ do
 done
 
 echo "Testing daily OpenLiberty image"
-
+docker ps
 sed -i "\#<artifactId>liberty-maven-plugin</artifactId>#a<configuration><install><runtimeUrl>https://public.dhe.ibm.com/ibmdl/export/pub/software/openliberty/runtime/nightly/"$DATE"/"$DRIVER"</runtimeUrl></install></configuration>" system/pom.xml inventory/pom.xml
 cat system/pom.xml
 cat inventory/pom.xml
@@ -21,10 +21,12 @@ cat inventory/Dockerfile
  
 docker pull $DOCKER_USERNAME"/olguides:"$BUILD
 
+docker ps
 sudo ../scripts/testApp.sh
 
+docker ps
 sleep 120
-
+docker ps
 echo "Testing daily Docker image"
 
 sed -i "s;FROM "$DOCKER_USERNAME"/olguides:"$BUILD";FROM openliberty/daily:latest;g" inventory/Dockerfile system/Dockerfile
