@@ -28,7 +28,7 @@ echo "Testing daily Docker image"
 
 # docker image prune -a -f
 
-sed -i "s;FROM openliberty/open-liberty:kernel-java8-openj9-ubi;FROM openliberty/daily:latest;g" inventory/Dockerfile system/Dockerfile
+sed -i "s;FROM "$DOCKER_USERNAME"/olguides:"$BUILD";FROM openliberty/daily:latest;g" inventory/Dockerfile system/Dockerfile
 
 cat inventory/Dockerfile system/Dockerfile
 
