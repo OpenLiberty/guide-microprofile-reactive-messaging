@@ -33,5 +33,11 @@ sed -i "s;FROM "$DOCKER_USERNAME"/olguides:"$BUILD";FROM openliberty/daily:lates
 cat inventory/Dockerfile system/Dockerfile
 
 docker pull "openliberty/daily:latest"
+IMAGEBUILDLEVEL=$(docker inspect --format "{{ index .Config.Labels \"org.opencontainers.image.revision\"}}" openliberty/daily:latest)
 
-../scripts/testApp.sh
+if [ $IMAGEBUILDLEVEL == $BUILD ] 
+then
+    sudo ../scripts/testApp.sh
+else
+    echo "Image does not match input build level for testing"
+fi
