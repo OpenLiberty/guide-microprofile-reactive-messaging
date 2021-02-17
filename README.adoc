@@ -219,19 +219,19 @@ Next, use the provided script to start the application in Docker containers. The
 
 include::{common-includes}/os-tabs.adoc[]
 
-[.tab_content.mac_section.linux_section]
---
-[role='command']
-```
-./scripts/startContainers.sh
-```
---
-
 [.tab_content.windows_section]
 --
 [role='command']
 ```
 .\scripts\startContainers.bat
+```
+--
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/startContainers.sh
 ```
 --
 
@@ -269,19 +269,19 @@ Run the following script to stop the application:
 
 include::{common-includes}/os-tabs.adoc[]
 
-[.tab_content.mac_section.linux_section]
---
-[role='command']
-```
-./scripts/stopContainers.sh
-```
---
-
 [.tab_content.windows_section]
 --
 [role='command']
 ```
 .\scripts\stopContainers.bat
+```
+--
+
+[.tab_content.mac_section.linux_section]
+--
+[role='command']
+```
+./scripts/stopContainers.sh
 ```
 --
 
