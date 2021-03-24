@@ -236,7 +236,9 @@ include::{common-includes}/os-tabs.adoc[]
 --
 
 == Testing the application
-
+ifdef::cloud-hosted[]
+The application might take several minutes to become available.
+endif::[]
 After the application is up and running, you can access the application by making a GET request to the `/systems` endpoint of the `inventory` service. 
 
 Go to the http://localhost:9085/inventory/systems[^] URL to access the inventory microservice. You see the CPU `systemLoad` property for all the systems:
