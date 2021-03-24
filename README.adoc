@@ -236,6 +236,8 @@ include::{common-includes}/os-tabs.adoc[]
 --
 
 == Testing the application
+
+// cloud-hosted guide instructions:
 ifdef::cloud-hosted[]
 The application might take several minutes to become available.
 endif::[]
