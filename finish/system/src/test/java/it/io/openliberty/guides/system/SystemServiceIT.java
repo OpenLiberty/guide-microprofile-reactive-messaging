@@ -41,8 +41,9 @@ public class SystemServiceIT {
     @Test
     public void testCpuStatus() {
         ConsumerRecords<String, SystemLoad> records =
-                consumer.poll(Duration.ofMillis(600 * 1000));
+                consumer.poll(Duration.ofMillis(30 * 1000));
         System.out.println("Polled " + records.count() + " records from Kafka:");
+        System.out.println("hellow");
 
         for (ConsumerRecord<String, SystemLoad> record : records) {
             SystemLoad sl = record.value();
