@@ -237,11 +237,11 @@ include::{common-includes}/os-tabs.adoc[]
 
 == Testing the application
 
-The application might take some time to become available. After the application is up and running, you can access the application by making a GET request to the `/systems` endpoint of the `inventory` service. 
+The application might take some time to become available. After the application is up and running, you can access it by making a GET request to the `/systems` endpoint of the `inventory` service. 
 
 Visit the http://localhost:9085/health[^] URL to confirm that the `inventory` microservice is up and running.
 
-When both health liveness and readiness checks are up, go to the http://localhost:9085/inventory/systems[^] URL to access the `inventory` microservice.
+When both the liveness and readiness health checks are up, go to the http://localhost:9085/inventory/systems[^] URL to access the `inventory` microservice.
 You see the CPU `systemLoad` property for all the systems:
 
 [source, role='no_copy']
