@@ -40,7 +40,7 @@ import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 public class SystemServiceIT {
 
 	private static Logger logger = LoggerFactory.getLogger(SystemServiceIT.class);
-	private static String appImageName = "liberty-deepdive-inventory:1.0-SNAPSHOT";
+	private static String appImageName = "system:1.0-SNAPSHOT";
 	
 	public static Network network = Network.newNetwork();
 	private static String kafkaImageName = "bitnami/kafka:2";
