@@ -46,7 +46,7 @@ public class SystemServiceIT {
 	private static String kafkaImageName = "bitnami/kafka:2";
 	
     @Container
-    public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse(kafkaImageName))
+    public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse(kafkaImageName).asCompatibleSubstituteFor("confluentinc/cp-kafka"))
         .withNetwork(network);
     
 	
