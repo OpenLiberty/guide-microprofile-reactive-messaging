@@ -21,5 +21,4 @@ COPY --chown=1001:0 target/system.war /config/apps
 
 EXPOSE 9083 9446
 
-# It is recommended to run the configure.sh when build image for production.
-# RUN configure.sh
+RUN configure.sh
