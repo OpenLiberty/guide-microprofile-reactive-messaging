@@ -53,7 +53,7 @@ public class LibertyContainer extends GenericContainer<LibertyContainer> {
     private SSLContext sslContext;
 
     public static String getProtocol() {
-        return System.getProperty("test.protocol", "https");
+        return System.getProperty("test.protocol", "http");
     }
 
     public static boolean testHttps() {
@@ -107,43 +107,6 @@ public class LibertyContainer extends GenericContainer<LibertyContainer> {
     // end::getBaseURL[]
 
     private void init() {
-
-        if (!testHttps()) {
-            this.addExposedPorts(9080);
-            return;
-        }
-
-        this.addExposedPorts(9443, 9080);
-        try {
-            String keystoreFile = System.getProperty("user.dir")
-                    + "/../../finish/system/src/main"
-                    + "/liberty/config/resources/security/key.p12";
-            keystore = KeyStore.getInstance("PKCS12");
-            keystore.load(new FileInputStream(keystoreFile), "secret".toCharArray());
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(
-                                        KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(keystore, "secret".toCharArray());
-            X509TrustManager xtm = new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType)
-                    throws CertificateException { }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType)
-                    throws CertificateException { }
-
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-            };
-            TrustManager[] tm = new TrustManager[] {
-                                    xtm
-                                };
-            sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(kmf.getKeyManagers(), tm, new SecureRandom());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.addExposedPorts(9080);
     }
 }
