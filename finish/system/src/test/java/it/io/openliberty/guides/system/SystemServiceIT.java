@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2020, 2021 IBM Corporation and others.
+ * Copyright (c) 2020, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ package it.io.openliberty.guides.system;
 import static org.junit.Assert.assertNotNull;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -22,6 +23,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,53 +42,53 @@ import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 @Testcontainers
 public class SystemServiceIT {
 
-	private static Logger logger = LoggerFactory.getLogger(SystemServiceIT.class);
-	private static String appImageName = "system:1.0-SNAPSHOT";
-	
-	public static Network network = Network.newNetwork();
-	private static String kafkaImageName = "bitnami/kafka:2";
-	
-    @Container
-    public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse(kafkaImageName).asCompatibleSubstituteFor("confluentinc/cp-kafka"))
-        .withNetwork(network);
-    
-	
-    //@KafkaConsumerClient(valueDeserializer = SystemLoadDeserializer.class,
-    //        groupId = "system-load-status",
-    //       topics = "system.load",
-    //        properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
-    
-        
-    public static KafkaConsumer<String, SystemLoad> consumer =
-        new KafkaConsumer<>(getKafkaConsumerProperties(),
-            new StringDeserializer(),
-            new SystemLoadDeserializer());
-    
-    @Container
-    public static LibertyContainer libertyContainer
-        = new LibertyContainer(appImageName)
-              .withNetwork(network)
-              .waitingFor(Wait.forHttp("/health/ready"))
-              .withLogConsumer(new Slf4jLogConsumer(logger));
+    private static final String APP_IMAGE = "system:1.0-SNAPSHOT";
+    private static final String KAFKA_IMAGE = "confluentinc/cp-kafka:5.4.3";
 
-    private static Properties getKafkaConsumerProperties() {
-    	Properties props = new Properties();
-        props.setProperty("bootstrap.servers", "localhost:9092");
-        props.setProperty("group.id", "system-load-status");
-        props.setProperty("topics", "system.load");
+    private static Logger logger = LoggerFactory.getLogger(SystemServiceIT.class);
+    private static Network network = Network.newNetwork();
+
+    @Container
+    private static KafkaContainer kafka =
+        new KafkaContainer(DockerImageName.parse(KAFKA_IMAGE))
+            .withNetworkAliases("kafka")
+            .withNetwork(network);    
+
+    @Container
+    private static LibertyContainer libertyContainer =
+        new LibertyContainer(APP_IMAGE)
+            .withEnv("MP_MESSAGING_CONNECTOR_LIBERTY_KAFKA_BOOTSTRAP_SERVERS",
+                "kafka:9092")
+            .withNetwork(network)
+            .withLogConsumer(new Slf4jLogConsumer(logger))
+            .withStartupTimeout(Duration.ofMinutes(3))
+            .dependsOn(kafka)
+            .waitingFor(Wait.forHttp("/health/ready"));
+
+    private static KafkaConsumer<String, SystemLoad> consumer;
+
+    @BeforeAll
+    private static void setup() {
+        Properties props = new Properties();
+        props.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+            kafka.getBootstrapServers());
+        props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "system-load-status");
         props.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-		return props;
+        consumer = new KafkaConsumer<>(props,
+                       new StringDeserializer(),
+                       new SystemLoadDeserializer());
+        consumer.subscribe(Arrays.asList("system.load"));
     }
-    
+
     @Test
     public void testCpuStatus() {
         ConsumerRecords<String, SystemLoad> records =
                 consumer.poll(Duration.ofMillis(30 * 1000));
         System.out.println("Polled " + records.count() + " records from Kafka:");
-
+        Assertions.assertFalse(records.isEmpty(), "No record from Kafka");
         for (ConsumerRecord<String, SystemLoad> record : records) {
             SystemLoad sl = record.value();
-            System.out.println(sl);
+            System.out.println("    " + sl);
             assertNotNull(sl.hostname);
             assertNotNull(sl.loadAverage);
         }

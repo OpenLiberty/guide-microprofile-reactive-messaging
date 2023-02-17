@@ -10,18 +10,27 @@
  *     IBM Corporation - Initial implementation
  *******************************************************************************/
 // end::copyright[]
-package it.io.openliberty.guides.system;
+package it.io.openliberty.guides.inventory;
 
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
+import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-public class LibertyContainer extends GenericContainer<LibertyContainer> {
+@ApplicationScoped
+@Path("/inventory")
+public interface InventoryResourceClient {
 
-    public LibertyContainer(final String dockerImageName) {
-        super(dockerImageName);
-        // wait for smarter planet message
-        waitingFor(Wait.forLogMessage("^.*CWWKF0011I.*$", 1));
-        addExposedPorts(9083);
-    }
+    @GET
+    @Path("/systems")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSystems();
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response resetSystems();
 
 }
