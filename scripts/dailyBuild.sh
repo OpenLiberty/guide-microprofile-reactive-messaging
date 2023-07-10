@@ -16,6 +16,7 @@ sed -i "\#<artifactId>liberty-maven-plugin</artifactId>#a<configuration><install
 cat system/pom.xml inventory/pom.xml
 
 sed -i "s;FROM icr.io/appcafe/open-liberty:kernel-slim-java11-openj9-ubi;FROM $DOCKER_USERNAME/olguides:$BUILD;g" system/Dockerfile inventory/Dockerfile
+sed -i "s;RUN features.sh;#RUN features.sh;g" system/Dockerfile inventory/Dockerfile
 cat system/Dockerfile inventory/Dockerfile
  
 docker pull -q "$DOCKER_USERNAME""/olguides:""$BUILD"
