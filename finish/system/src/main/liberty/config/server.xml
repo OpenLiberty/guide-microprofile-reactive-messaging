@@ -7,7 +7,7 @@
     <feature>mpHealth-4.0</feature>
     <feature>mpConfig-3.0</feature>
     <!-- tag::featureMP[] -->
-    <feature>mpReactiveMessaging-1.0</feature>
+    <feature>mpReactiveMessaging-3.0</feature>
     <!-- end::featureMP[] -->
   </featureManager>
 
@@ -16,6 +16,8 @@
 
   <httpEndpoint host="*" httpPort="${default.http.port}"
       httpsPort="${default.https.port}" id="defaultHttpEndpoint"/>
+
+  <logging traceSpecification="REACTIVEMESSAGE=all:org.apache.kafka.*=all"/>
 
   <webApplication location="system.war" contextRoot="/"/>
 </server>
