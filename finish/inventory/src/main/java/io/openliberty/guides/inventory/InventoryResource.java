@@ -41,7 +41,7 @@ public class InventoryResource {
 
     @Inject
     private InventoryManager manager;
-    
+
     @GET
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)

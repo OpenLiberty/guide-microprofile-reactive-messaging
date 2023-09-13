@@ -22,7 +22,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class InventoryManager {
 
-    private Map<String, Properties> systems = Collections.synchronizedMap(new TreeMap<String, Properties>());
+    private Map<String, Properties> systems = Collections.synchronizedMap(
+        new TreeMap<String, Properties>());
 
     public void addSystem(String hostname, Double systemLoad) {
         if (!systems.containsKey(hostname)) {
@@ -36,8 +37,9 @@ public class InventoryManager {
     public void updateCpuStatus(String hostname, Double systemLoad) {
         Optional<Properties> p = getSystem(hostname);
         if (p.isPresent()) {
-            if (p.get().getProperty(hostname) == null && hostname != null)
+            if (p.get().getProperty(hostname) == null && hostname != null) {
                 p.get().put("systemLoad", systemLoad);
+            }
         }
     }
 
