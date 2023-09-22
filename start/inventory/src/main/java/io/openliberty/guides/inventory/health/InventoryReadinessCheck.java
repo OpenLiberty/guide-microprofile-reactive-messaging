@@ -33,15 +33,15 @@ public class InventoryReadinessCheck implements HealthCheck {
 
     private static Logger logger = Logger.getLogger(
         InventoryReadinessCheck.class.getName());
-    
+
     @Inject
     @ConfigProperty(name = "mp.messaging.connector.liberty-kafka.bootstrap.servers")
     String kafkaServer;
-    
+
     @Inject
     @ConfigProperty(name = "mp.messaging.incoming.systemLoad.group.id")
     String groupId;
-    
+
     @Override
     public HealthCheckResponse call() {
         boolean up = isReady();
@@ -60,16 +60,17 @@ public class InventoryReadinessCheck implements HealthCheck {
         AdminClient adminClient = AdminClient.create(connectionProperties);
         return adminClient;
     }
-    
+
     private boolean checkIfBarConsumerGroupRegistered(AdminClient adminClient) {
         ListConsumerGroupsResult groupsResult = adminClient.listConsumerGroups();
-        KafkaFuture<Collection<ConsumerGroupListing>> consumerGroupsFuture = 
+        KafkaFuture<Collection<ConsumerGroupListing>> consumerGroupsFuture =
             groupsResult.valid();
         try {
-            Collection<ConsumerGroupListing> consumerGroups = 
+            Collection<ConsumerGroupListing> consumerGroups =
                 consumerGroupsFuture.get();
-            for (ConsumerGroupListing g : consumerGroups)
+            for (ConsumerGroupListing g : consumerGroups) {
                 logger.info("groupId: " + g.groupId());
+            }
             return consumerGroups.stream().anyMatch(
                 group -> group.groupId().equals(groupId));
         } catch (Exception e) {

@@ -25,7 +25,7 @@ public class SystemLoad {
 
     public String hostname;
     public Double loadAverage;
-        
+
     public SystemLoad(String hostname, Double cpuLoadAvg) {
         this.hostname = hostname;
         this.loadAverage = cpuLoadAvg;
@@ -51,19 +51,19 @@ public class SystemLoad {
     public int hashCode() {
         return Objects.hash(hostname, loadAverage);
     }
-    
+
     @Override
     public String toString() {
         return "CpuLoadAverage: " + JSONB.toJson(this);
     }
-    
+
     public static class SystemLoadSerializer implements Serializer<Object> {
         @Override
         public byte[] serialize(String topic, Object data) {
           return JSONB.toJson(data).getBytes();
         }
     }
-    
+
     public static class SystemLoadDeserializer implements Deserializer<SystemLoad> {
         @Override
         public SystemLoad deserialize(String topic, byte[] data) {
