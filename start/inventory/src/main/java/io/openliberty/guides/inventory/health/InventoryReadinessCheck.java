@@ -53,7 +53,7 @@ public class InventoryReadinessCheck implements HealthCheck {
         AdminClient adminClient = createAdminClient();
         return checkIfBarConsumerGroupRegistered(adminClient);
     }
-    
+
     private AdminClient createAdminClient() {
         Properties connectionProperties = new Properties();
         connectionProperties.put("bootstrap.servers", kafkaServer);
