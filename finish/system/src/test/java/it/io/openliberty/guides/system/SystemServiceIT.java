@@ -62,7 +62,7 @@ public class SystemServiceIT {
             .withListener(() -> "kafka:19092")
             .withNetwork(network);
 
-    private static GenericContainer<?> systemContainer = 
+    private static GenericContainer<?> systemContainer =
         new GenericContainer(systemImage)
             .withNetwork(network)
             .withExposedPorts(9083)
@@ -81,15 +81,20 @@ public class SystemServiceIT {
     public void setUp() {
         Properties consumerProps = new Properties();
         consumerProps.put(
-            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                kafkaContainer.getBootstrapServers());
         consumerProps.put(
-            ConsumerConfig.GROUP_ID_CONFIG, "system-load-status");
+            ConsumerConfig.GROUP_ID_CONFIG,
+                "system-load-status");
         consumerProps.put(
-            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                StringDeserializer.class.getName());
         consumerProps.put(
-            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SystemLoadDeserializer.class.getName());
+            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                SystemLoadDeserializer.class.getName());
         consumerProps.put(
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+                "earliest");
 
         consumer = new KafkaConsumer<String, SystemLoad>(consumerProps);
         consumer.subscribe(Collections.singletonList("system.load"));
