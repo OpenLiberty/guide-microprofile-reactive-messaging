@@ -57,11 +57,13 @@ public class SystemServiceIT {
         = new ImageFromDockerfile("system:1.0-SNAPSHOT")
               .withDockerfile(Paths.get("./Dockerfile"));
 
-    private static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
+    private static KafkaContainer kafkaContainer = new KafkaContainer(
+        DockerImageName.parse("confluentinc/cp-kafka:latest"))
             .withListener(() -> "kafka:19092")
-            .withNetwork(network); 
+            .withNetwork(network);
 
-    private static GenericContainer<?> systemContainer = new GenericContainer(systemImage)
+    private static GenericContainer<?> systemContainer = 
+        new GenericContainer(systemImage)
             .withNetwork(network)
             .withExposedPorts(9083)
             .withStartupTimeout(Duration.ofMinutes(2))
@@ -70,20 +72,24 @@ public class SystemServiceIT {
     @BeforeAll
     public static void startContainers() {
         kafkaContainer.start();
-        systemContainer.withEnv("mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
-        systemContainer.start(); 
+        systemContainer.withEnv(
+            "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
+        systemContainer.start();
     }
 
     @BeforeEach
     public void setUp() {
-        // Configure Kafka consumer
-
         Properties consumerProps = new Properties();
-        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
-        consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "system-load-status");
-        consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SystemLoadDeserializer.class.getName());
-        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        consumerProps.put(
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
+        consumerProps.put(
+            ConsumerConfig.GROUP_ID_CONFIG, "system-load-status");
+        consumerProps.put(
+            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        consumerProps.put(
+            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SystemLoadDeserializer.class.getName());
+        consumerProps.put(
+            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         consumer = new KafkaConsumer<String, SystemLoad>(consumerProps);
         consumer.subscribe(Collections.singletonList("system.load"));
@@ -115,5 +121,5 @@ public class SystemServiceIT {
             assertNotNull(sl.loadAverage);
         }
         consumer.commitAsync();
-    }  
+    }
 }
