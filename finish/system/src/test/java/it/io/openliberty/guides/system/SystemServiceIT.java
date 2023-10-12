@@ -11,31 +11,96 @@
 // end::copyright[]
 package it.io.openliberty.guides.system;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+import java.nio.file.Paths;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.utility.DockerImageName;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.junit.jupiter.api.Test;
-import org.microshed.testing.SharedContainerConfig;
-import org.microshed.testing.jupiter.MicroShedTest;
-import org.microshed.testing.kafka.KafkaConsumerClient;
+import org.apache.kafka.common.serialization.StringDeserializer;
 
 import io.openliberty.guides.models.SystemLoad;
 import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 
-@MicroShedTest
-@SharedContainerConfig(AppContainerConfig.class)
+@Testcontainers
 public class SystemServiceIT {
 
-    @KafkaConsumerClient(valueDeserializer = SystemLoadDeserializer.class,
-            groupId = "system-load-status",
-            topics = "system.load",
-            properties = ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=earliest")
+    private static Logger logger = LoggerFactory.getLogger(SystemServiceIT.class);
+
+    private static Network network = Network.newNetwork();
+
     public static KafkaConsumer<String, SystemLoad> consumer;
+
+    private static ImageFromDockerfile systemImage
+        = new ImageFromDockerfile("system:1.0-SNAPSHOT")
+              .withDockerfile(Paths.get("./Dockerfile"));
+
+    private static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
+            .withListener(() -> "kafka:19092")
+            .withNetwork(network); 
+
+    private static GenericContainer<?> systemContainer = new GenericContainer(systemImage)
+            .withNetwork(network)
+            .withExposedPorts(9083)
+            .withStartupTimeout(Duration.ofMinutes(2))
+            .withLogConsumer(new Slf4jLogConsumer(logger));
+
+    @BeforeAll
+    public static void startContainers() {
+        kafkaContainer.start();
+        systemContainer.withEnv("mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
+        systemContainer.start(); 
+    }
+
+    @BeforeEach
+    public void setUp() {
+        // Configure Kafka consumer
+
+        Properties consumerProps = new Properties();
+        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
+        consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "system-load-status");
+        consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SystemLoadDeserializer.class.getName());
+        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+        consumer = new KafkaConsumer<String, SystemLoad>(consumerProps);
+        consumer.subscribe(Collections.singletonList("system.load"));
+    }
+
+
+    @AfterAll
+    public static void closeAllContainer() {
+        systemContainer.stop();
+        kafkaContainer.stop();
+        network.close();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        consumer.close();
+    }
 
     @Test
     public void testCpuStatus() {
@@ -50,5 +115,5 @@ public class SystemServiceIT {
             assertNotNull(sl.loadAverage);
         }
         consumer.commitAsync();
-    }
+    }  
 }
