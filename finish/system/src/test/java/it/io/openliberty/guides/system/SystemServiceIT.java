@@ -66,6 +66,7 @@ public class SystemServiceIT {
         new GenericContainer(systemImage)
             .withNetwork(network)
             .withExposedPorts(9083)
+            .waitingFor(Wait.forHttp("/health/ready").forPort(9083))
             .withStartupTimeout(Duration.ofMinutes(2))
             .withLogConsumer(new Slf4jLogConsumer(logger));
 
