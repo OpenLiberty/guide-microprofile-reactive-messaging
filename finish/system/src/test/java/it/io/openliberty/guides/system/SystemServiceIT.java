@@ -13,7 +13,6 @@ package it.io.openliberty.guides.system;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 import java.nio.file.Paths;
 
@@ -103,7 +102,7 @@ public class SystemServiceIT {
 
 
     @AfterAll
-    public static void closeAllContainer() {
+    public static void stopContainers() {
         systemContainer.stop();
         kafkaContainer.stop();
         network.close();
