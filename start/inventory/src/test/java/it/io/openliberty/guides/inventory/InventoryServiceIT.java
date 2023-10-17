@@ -68,9 +68,10 @@ public class InventoryServiceIT {
     private static KafkaContainer kafkaContainer = new KafkaContainer(
         DockerImageName.parse("confluentinc/cp-kafka:latest"))
             .withListener(() -> "kafka:19092")
-            .withNetwork(network); 
+            .withNetwork(network);
 
-    private static GenericContainer<?> inventoryContainer = new GenericContainer(inventoryImage)
+    private static GenericContainer<?> inventoryContainer =
+        new GenericContainer(inventoryImage)
             .withNetwork(network)
             .withExposedPorts(9085)
             .waitingFor(Wait.forHttp("/health/ready").forPort(9085))
@@ -92,10 +93,10 @@ public class InventoryServiceIT {
         kafkaContainer.start();
         inventoryContainer.withEnv(
             "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
-        inventoryContainer.start(); 
-        client = createRestClient("http://" 
-            + inventoryContainer.getHost() 
-            + ":" + inventoryContainer.getFirstMappedPort()); 
+        inventoryContainer.start();
+        client = createRestClient("http://"
+            + inventoryContainer.getHost()
+            + ":" + inventoryContainer.getFirstMappedPort());
     }
 
     @BeforeEach
@@ -129,7 +130,7 @@ public class InventoryServiceIT {
 
     @Test
     public void testCpuUsage() throws InterruptedException {
-         
+
         SystemLoad sl = new SystemLoad("localhost", 1.1);
         producer.send(new ProducerRecord<String, SystemLoad>("system.load", sl));
         Thread.sleep(5000);
