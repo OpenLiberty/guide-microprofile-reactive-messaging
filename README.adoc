@@ -157,9 +157,9 @@ include::finish/inventory/src/main/resources/META-INF/microprofile-config.proper
 
 The `inventory` microservice uses an incoming connector to receive messages through the [hotspot=systemLoad file=1]`systemLoad` channel. The messages were published by the `system` microservice to the [hotspot=topic1 file=1]`system.load` topic in the Kafka message broker. The [hotspot=deserializer1 file=1]`key.deserializer` and [hotspot=deserializerVal1 file=1]`value.deserializer` properties define how to deserialize the messages. The `SystemLoadDeserializer` class implements the logic for turning JSON into a `SystemLoad` object and is configured as the [hotspot=deserializerVal1 file=1]`value.deserializer`. The [hotspot=group1 file=1]`group.id` property defines a unique name for the consumer group. A consumer group is a collection of consumers who share a common identifier for the group. You can also view a consumer group as the various machines that ingest from the Kafka topics. All of these properties are required by the https://kafka.apache.org/documentation/#producerconfigs[Apache Kafka Producer Configs^] and https://kafka.apache.org/documentation/#consumerconfigs[Apache Kafka Consumer Configs^].
 
-== Configuring the server
+== Configuring liberty
 
-To run the services, the Open Liberty server on which each service runs needs to be correctly configured. Relevant features, including the https://openliberty.io/docs/ref/feature/#mpReactiveMessaging-1.0.html[MicroProfile Reactive Messaging feature^], must be enabled for the `system` and `inventory` services.
+To run the services, the Open Liberty on which each service runs needs to be correctly configured. Relevant features, including the https://openliberty.io/docs/ref/feature/#mpReactiveMessaging-1.0.html[MicroProfile Reactive Messaging feature^], must be enabled for the `system` and `inventory` services.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
