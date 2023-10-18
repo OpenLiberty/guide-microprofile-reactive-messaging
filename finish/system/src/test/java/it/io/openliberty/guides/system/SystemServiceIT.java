@@ -47,20 +47,21 @@ import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 public class SystemServiceIT {
 
     private static Logger logger = LoggerFactory.getLogger(SystemServiceIT.class);
-
+    // tag::network[]
     private static Network network = Network.newNetwork();
-
+    // end::network[]
     public static KafkaConsumer<String, SystemLoad> consumer;
 
     private static ImageFromDockerfile systemImage
         = new ImageFromDockerfile("system:1.0-SNAPSHOT")
               .withDockerfile(Paths.get("./Dockerfile"));
-
+    // tag::kafkaContainerSetup[]
     private static KafkaContainer kafkaContainer = new KafkaContainer(
         DockerImageName.parse("confluentinc/cp-kafka:latest"))
             .withListener(() -> "kafka:19092")
             .withNetwork(network);
-
+    // end::kafkaContainerSetup[]
+    // tag::systemContainerSetup[]
     private static GenericContainer<?> systemContainer =
         new GenericContainer(systemImage)
             .withNetwork(network)
@@ -68,7 +69,7 @@ public class SystemServiceIT {
             .waitingFor(Wait.forHttp("/health/ready").forPort(9083))
             .withStartupTimeout(Duration.ofMinutes(2))
             .withLogConsumer(new Slf4jLogConsumer(logger));
-
+    // end::systemContainerSetup[]
     @BeforeAll
     public static void startContainers() {
         kafkaContainer.start();
@@ -79,6 +80,7 @@ public class SystemServiceIT {
 
     @BeforeEach
     public void setUp() {
+        // tag::setUpConsumerProps[]
         Properties consumerProps = new Properties();
         consumerProps.put(
             ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -95,7 +97,7 @@ public class SystemServiceIT {
         consumerProps.put(
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
                 "earliest");
-
+        // end::setUpConsumerProps[]
         consumer = new KafkaConsumer<String, SystemLoad>(consumerProps);
         consumer.subscribe(Collections.singletonList("system.load"));
     }
@@ -112,7 +114,7 @@ public class SystemServiceIT {
     public void tearDown() {
         consumer.close();
     }
-
+    // tag::testCpuUsage[]
     @Test
     public void testCpuStatus() {
         ConsumerRecords<String, SystemLoad> records =
@@ -127,4 +129,5 @@ public class SystemServiceIT {
         }
         consumer.commitAsync();
     }
+    // end::testCpuUsage[]
 }

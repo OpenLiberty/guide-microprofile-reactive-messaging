@@ -56,20 +56,21 @@ public class InventoryServiceIT {
     private static Logger logger = LoggerFactory.getLogger(InventoryServiceIT.class);
 
     public static InventoryResourceCleint client;
-
+    // tag::network[]
     private static Network network = Network.newNetwork();
-
+    // end::network[]
     public static KafkaProducer<String, SystemLoad> producer;
 
     private static ImageFromDockerfile inventoryImage
         = new ImageFromDockerfile("inventory:1.0-SNAPSHOT")
             .withDockerfile(Paths.get("./Dockerfile"));
-
+    // tag::kafkaContainerSetup[]
     private static KafkaContainer kafkaContainer = new KafkaContainer(
         DockerImageName.parse("confluentinc/cp-kafka:latest"))
             .withListener(() -> "kafka:19092")
             .withNetwork(network);
-
+    // end::kafkaContainerSetup[]
+    // tag::inventoryContainerSetup[]
     private static GenericContainer<?> inventoryContainer =
         new GenericContainer(inventoryImage)
             .withNetwork(network)
@@ -78,7 +79,7 @@ public class InventoryServiceIT {
             .withStartupTimeout(Duration.ofMinutes(2))
             .withLogConsumer(new Slf4jLogConsumer(logger))
             .dependsOn(kafkaContainer);
-
+    // end::inventoryContainerSetup[]
     // tag::createRestClient[]
     private static InventoryResourceCleint createRestClient(String urlPath) {
         ClientBuilder builder = ResteasyClientBuilder.newBuilder();
@@ -101,7 +102,7 @@ public class InventoryServiceIT {
 
     @BeforeEach
     public void setUp() {
-
+        // tag::setUpProducerProps[]
         Properties producerProps = new Properties();
         producerProps.put(
             ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -112,7 +113,7 @@ public class InventoryServiceIT {
         producerProps.put(
             ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 SystemLoadSerializer.class.getName());
-
+        // end::setUpProducerProps[]
         producer = new KafkaProducer<String, SystemLoad>(producerProps);
     }
 
@@ -127,14 +128,16 @@ public class InventoryServiceIT {
     public void tearDown() {
         producer.close();
     }
-
+    // tag::testCpuUsage[]
     @Test
     public void testCpuUsage() throws InterruptedException {
 
         SystemLoad sl = new SystemLoad("localhost", 1.1);
         producer.send(new ProducerRecord<String, SystemLoad>("system.load", sl));
         Thread.sleep(5000);
+        // tag::getSystem[]
         Response response = client.getSystem("localhost");
+        // end::getSystem[]
         List<Properties> systems =
                 response.readEntity(new GenericType<List<Properties>>() { });
         Assertions.assertEquals(200, response.getStatus(),
@@ -148,4 +151,5 @@ public class InventoryServiceIT {
                     "CPU load doesn't match!");
         }
     }
+    // end::testCpuUsage[]
 }
