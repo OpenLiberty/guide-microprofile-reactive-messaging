@@ -118,8 +118,8 @@ public class InventoryServiceIT {
 
     @AfterAll
     public static void stopContainers() {
-        kafkaContainer.stop();
         inventoryContainer.stop();
+        kafkaContainer.stop();
         network.close();
     }
 
