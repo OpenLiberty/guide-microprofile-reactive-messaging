@@ -20,12 +20,9 @@ import jakarta.ws.rs.core.Response;
 
 @Path("/inventory")
 public interface InventoryResourceCleint {
-
-    // tag::getSystem[]
     @GET
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
     Response getSystem(
         @HeaderParam("Authorization") String authHeader);
-    // end::getSystem[]
 }
