@@ -79,14 +79,12 @@ public class InventoryServiceIT {
             .withLogConsumer(new Slf4jLogConsumer(logger))
             .dependsOn(kafkaContainer);
 
-    // tag::createRestClient[]
     private static InventoryResourceCleint createRestClient(String urlPath) {
         ClientBuilder builder = ResteasyClientBuilder.newBuilder();
         ResteasyClient client = (ResteasyClient) builder.build();
         ResteasyWebTarget target = client.target(UriBuilder.fromPath(urlPath));
         return target.proxy(InventoryResourceCleint.class);
     }
-    // end::createRestClient[]
 
     @BeforeAll
     public static void startContainers() {
