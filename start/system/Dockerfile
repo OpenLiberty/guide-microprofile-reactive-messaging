@@ -1,4 +1,4 @@
-FROM icr.io/appcafe/open-liberty:kernel-slim-java11-openj9-ubi
+FROM guidesbot/olguides:cl231120231019-1107
 
 ARG VERSION=1.0
 ARG REVISION=SNAPSHOT
@@ -17,7 +17,7 @@ LABEL \
   description="This image contains the system microservice running with the Open Liberty runtime."
 
 COPY --chown=1001:0 src/main/liberty/config /config/
-RUN features.sh
+# RUN features.sh
 COPY --chown=1001:0 target/system.war /config/apps
 
 EXPOSE 9083 9446
