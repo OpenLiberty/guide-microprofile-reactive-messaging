@@ -99,7 +99,6 @@ public class InventoryServiceIT {
 
     @BeforeEach
     public void setUp() {
-
         Properties producerProps = new Properties();
         producerProps.put(
             ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -132,7 +131,7 @@ public class InventoryServiceIT {
         SystemLoad sl = new SystemLoad("localhost", 1.1);
         producer.send(new ProducerRecord<String, SystemLoad>("system.load", sl));
         Thread.sleep(5000);
-        Response response = client.getSystem("localhost");
+        Response response = client.getSystems();
         List<Properties> systems =
                 response.readEntity(new GenericType<List<Properties>>() { });
         Assertions.assertEquals(200, response.getStatus(),

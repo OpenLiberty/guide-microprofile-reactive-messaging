@@ -12,7 +12,6 @@
 package it.io.openliberty.guides.inventory;
 
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -20,9 +19,10 @@ import jakarta.ws.rs.core.Response;
 
 @Path("/inventory")
 public interface InventoryResourceCleint {
+
     @GET
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getSystem(
-        @HeaderParam("Authorization") String authHeader);
+    Response getSystems();
+
 }
