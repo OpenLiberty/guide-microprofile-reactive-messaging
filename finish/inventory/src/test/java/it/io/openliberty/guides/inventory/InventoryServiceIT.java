@@ -115,6 +115,7 @@ public class InventoryServiceIT {
 
     @AfterAll
     public static void stopContainers() {
+        client.resetSystems();
         inventoryContainer.stop();
         kafkaContainer.stop();
         network.close();

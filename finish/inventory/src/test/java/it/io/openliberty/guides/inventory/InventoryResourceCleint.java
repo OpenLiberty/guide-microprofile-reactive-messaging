@@ -11,6 +11,7 @@
 // end::copyright[]
 package it.io.openliberty.guides.inventory;
 
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -24,5 +25,9 @@ public interface InventoryResourceCleint {
     @Path("/systems")
     @Produces(MediaType.APPLICATION_JSON)
     Response getSystems();
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    Response resetSystems();
 
 }
