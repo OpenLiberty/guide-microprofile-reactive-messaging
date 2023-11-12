@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c)  2021 IBM Corporation and others.
+ * Copyright (c) 2020, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -43,14 +43,15 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import io.openliberty.guides.models.SystemLoad;
 import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
 
-
 @Testcontainers
 public class SystemServiceIT {
 
     private static Logger logger = LoggerFactory.getLogger(SystemServiceIT.class);
 
     private static Network network = Network.newNetwork();
+
     public static KafkaConsumer<String, SystemLoad> consumer;
+
     private static ImageFromDockerfile systemImage
         = new ImageFromDockerfile("system:1.0-SNAPSHOT")
               .withDockerfile(Paths.get("./Dockerfile"));
@@ -61,13 +62,13 @@ public class SystemServiceIT {
             .withNetwork(network);
 
     private static GenericContainer<?> systemContainer =
-    new GenericContainer(systemImage)
-        .withNetwork(network)
-        .withExposedPorts(9083)
-        .waitingFor(Wait.forHttp("/health/ready").forPort(9083))
-        .withStartupTimeout(Duration.ofMinutes(2))
-        .withLogConsumer(new Slf4jLogConsumer(logger))
-        .dependsOn(kafkaContainer);
+        new GenericContainer(systemImage)
+            .withNetwork(network)
+            .withExposedPorts(9083)
+            .waitingFor(Wait.forHttp("/health/ready").forPort(9083))
+            .withStartupTimeout(Duration.ofMinutes(2))
+            .withLogConsumer(new Slf4jLogConsumer(logger))
+            .dependsOn(kafkaContainer);
 
     @BeforeAll
     public static void startContainers() {
