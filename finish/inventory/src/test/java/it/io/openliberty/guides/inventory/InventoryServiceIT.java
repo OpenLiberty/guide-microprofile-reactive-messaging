@@ -55,7 +55,7 @@ public class InventoryServiceIT {
 
     private static Logger logger = LoggerFactory.getLogger(InventoryServiceIT.class);
 
-    public static InventoryResourceCleint client;
+    public static InventoryResourceClient client;
 
     private static Network network = Network.newNetwork();
 
@@ -79,11 +79,11 @@ public class InventoryServiceIT {
             .withLogConsumer(new Slf4jLogConsumer(logger))
             .dependsOn(kafkaContainer);
 
-    private static InventoryResourceCleint createRestClient(String urlPath) {
+    private static InventoryResourceClient createRestClient(String urlPath) {
         ClientBuilder builder = ResteasyClientBuilder.newBuilder();
         ResteasyClient client = (ResteasyClient) builder.build();
         ResteasyWebTarget target = client.target(UriBuilder.fromPath(urlPath));
-        return target.proxy(InventoryResourceCleint.class);
+        return target.proxy(InventoryResourceClient.class);
     }
 
     @BeforeAll
