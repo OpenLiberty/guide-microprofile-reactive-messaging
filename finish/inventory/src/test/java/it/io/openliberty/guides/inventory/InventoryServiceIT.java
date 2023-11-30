@@ -67,7 +67,7 @@ public class InventoryServiceIT {
 
     private static KafkaContainer kafkaContainer = new KafkaContainer(
         DockerImageName.parse("confluentinc/cp-kafka:latest"))
-            .withListener(() -> "kafka:19092")
+            .withListener(() -> "kafka:19082")
             .withNetwork(network);
 
     private static GenericContainer<?> inventoryContainer =
@@ -90,7 +90,7 @@ public class InventoryServiceIT {
     public static void startContainers() {
         kafkaContainer.start();
         inventoryContainer.withEnv(
-            "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
+            "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19082");
         inventoryContainer.start();
         client = createRestClient("http://"
             + inventoryContainer.getHost()
