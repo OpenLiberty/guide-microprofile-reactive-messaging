@@ -1,5 +1,5 @@
 @ECHO OFF
-set KAFKA_SERVER=kafka:9082
+set KAFKA_SERVER=kafka:9092
 set NETWORK=reactive-app
 
 docker network create %NETWORK%
