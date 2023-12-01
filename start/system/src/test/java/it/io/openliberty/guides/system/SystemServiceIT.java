@@ -58,7 +58,7 @@ public class SystemServiceIT {
 
     private static KafkaContainer kafkaContainer = new KafkaContainer(
         DockerImageName.parse("confluentinc/cp-kafka:latest"))
-            .withListener(() -> "kafka:19082")
+            .withListener(() -> "kafka:19092")
             .withNetwork(network);
 
     private static GenericContainer<?> systemContainer =
@@ -74,7 +74,7 @@ public class SystemServiceIT {
     public static void startContainers() {
         kafkaContainer.start();
         systemContainer.withEnv(
-            "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19082");
+            "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
         systemContainer.start();
     }
 
