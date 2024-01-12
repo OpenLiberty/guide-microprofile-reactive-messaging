@@ -14,6 +14,7 @@ package it.io.openliberty.guides.system;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
+import java.net.Socket;
 import java.nio.file.Paths;
 
 import org.slf4j.Logger;
@@ -70,20 +71,43 @@ public class SystemServiceIT {
             .withLogConsumer(new Slf4jLogConsumer(logger))
             .dependsOn(kafkaContainer);
 
+    private static boolean isServiceRunning(String host, int port) {
+        try {
+            Socket socket = new Socket(host, port);
+            socket.close();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @BeforeAll
     public static void startContainers() {
-        kafkaContainer.start();
-        systemContainer.withEnv(
+        if (isServiceRunning("localhost", 9083)) {
+            System.out.println("Testing with mvn liberty:devc");
+        } else {
+            kafkaContainer.start();
+            systemContainer.withEnv(
             "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
-        systemContainer.start();
+            systemContainer.start();
+            System.out.println("Testing with mvn verify");
+        }
     }
 
     @BeforeEach
     public void setUp() {
         Properties consumerProps = new Properties();
-        consumerProps.put(
+
+        if (isServiceRunning("localhost", 9083)) {
+            consumerProps.put(
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                "localhost:9094");
+        } else {
+            consumerProps.put(
             ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 kafkaContainer.getBootstrapServers());
+        }
+        
         consumerProps.put(
             ConsumerConfig.GROUP_ID_CONFIG,
                 "system-load-status");

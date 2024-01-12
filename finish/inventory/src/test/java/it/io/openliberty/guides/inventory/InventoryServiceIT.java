@@ -14,6 +14,7 @@ package it.io.openliberty.guides.inventory;
 import java.util.List;
 import java.time.Duration;
 import java.math.BigDecimal;
+import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.Properties;
 
@@ -86,23 +87,53 @@ public class InventoryServiceIT {
         return target.proxy(InventoryResourceClient.class);
     }
 
+    private static boolean isServiceRunning(String host, int port) {
+        try {
+            Socket socket = new Socket(host, port);
+            socket.close();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @BeforeAll
     public static void startContainers() {
-        kafkaContainer.start();
-        inventoryContainer.withEnv(
+
+        String urlPath;
+        if (isServiceRunning("localhost", 9085)) {
+            System.out.println("Testing with mvn liberty:devc");
+            urlPath = "http://localhost:9085";
+        } else {
+            kafkaContainer.start();
+            inventoryContainer.withNetwork(network);
+            inventoryContainer.withEnv(
             "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
-        inventoryContainer.start();
-        client = createRestClient("http://"
-            + inventoryContainer.getHost()
-            + ":" + inventoryContainer.getFirstMappedPort());
+            System.out.println("Testing with mvn verify");
+            inventoryContainer.start();
+            urlPath = "http://"
+                + inventoryContainer.getHost()
+                + ":" + inventoryContainer.getFirstMappedPort();
+        }
+
+        System.out.println("Creating REST client with: " + urlPath);
+        client = createRestClient(urlPath);
     }
 
     @BeforeEach
     public void setUp() {
         Properties producerProps = new Properties();
-        producerProps.put(
+
+        if (isServiceRunning("localhost", 9085)) {
+            producerProps.put(
+            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                "localhost:9094");
+        } else {
+            producerProps.put(
             ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 kafkaContainer.getBootstrapServers());
+        }
+    
         producerProps.put(
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
                 StringSerializer.class.getName());
