@@ -107,7 +107,7 @@ public class SystemServiceIT {
             ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 kafkaContainer.getBootstrapServers());
         }
-        
+
         consumerProps.put(
             ConsumerConfig.GROUP_ID_CONFIG,
                 "system-load-status");
