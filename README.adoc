@@ -1,4 +1,4 @@
-//  Copyright (c) 2020, 2023 IBM Corporation and others.
+//  Copyright (c) 2020, 2024 IBM Corporation and others.
 // Licensed under Creative Commons Attribution-NoDerivatives
 // 4.0 International (CC BY-ND 4.0)
 //   https://creativecommons.org/licenses/by-nd/4.0/
@@ -14,7 +14,7 @@
 :page-essential: false
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
 :guide-author: Open Liberty
-:page-tags: ['MicroProfile', 'Jakarta EE']
+:page-tags: ['microProfile', 'jakarta-ee']
 :page-related-guides: ['reactive-service-testing']
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
