@@ -14,7 +14,7 @@
 :page-essential: false
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
 :guide-author: Open Liberty
-:page-tags: ['microProfile', 'jakarta-ee']
+:page-tags: ['microprofile', 'jakarta-ee']
 :page-related-guides: ['reactive-service-testing']
 :page-permalink: /guides/{projectid}
 :imagesdir: /img/guide/{projectid}
