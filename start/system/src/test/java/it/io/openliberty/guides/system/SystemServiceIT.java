@@ -125,7 +125,6 @@ public class SystemServiceIT {
         consumer.subscribe(Collections.singletonList("system.load"));
     }
 
-
     @AfterAll
     public static void stopContainers() {
         systemContainer.stop();
