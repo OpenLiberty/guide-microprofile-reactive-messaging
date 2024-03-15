@@ -10,6 +10,7 @@
 :page-layout: guide-multipane
 :page-duration: 20 minutes
 :page-releasedate: 2020-04-22
+:page-majorupdateddate: 2024-04-30
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
@@ -159,7 +160,7 @@ The `inventory` microservice uses an incoming connector to receive messages thro
 
 == Configuring liberty
 
-To run the services, the Open Liberty on which each service runs needs to be correctly configured. Relevant features, including the https://openliberty.io/docs/ref/feature/#mpReactiveMessaging-1.0.html[MicroProfile Reactive Messaging feature^], must be enabled for the `system` and `inventory` services.
+To run the services, the Open Liberty on which each service runs needs to be correctly configured. Relevant features, including the https://openliberty.io/docs/ref/feature/#mpReactiveMessaging-3.0.html[MicroProfile Reactive Messaging feature^], must be enabled for the `system` and `inventory` services.
 
 [role="code_command hotspot file=0", subs="quotes"]
 ----
