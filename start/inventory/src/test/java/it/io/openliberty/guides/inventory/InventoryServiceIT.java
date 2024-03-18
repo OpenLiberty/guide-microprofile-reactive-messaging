@@ -13,6 +13,9 @@ package it.io.openliberty.guides.inventory;
 
 import java.util.List;
 import java.time.Duration;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.math.BigDecimal;
 import java.net.Socket;
 import java.nio.file.Paths;
@@ -62,12 +65,12 @@ public class InventoryServiceIT {
 
     public static KafkaProducer<String, SystemLoad> producer;
 
-    private static ImageFromDockerfile inventoryImage
-        = new ImageFromDockerfile("inventory:1.0-SNAPSHOT")
+    private static ImageFromDockerfile inventoryImage =
+        new ImageFromDockerfile("inventory:1.0-SNAPSHOT")
             .withDockerfile(Paths.get("./Dockerfile"));
 
-    private static KafkaContainer kafkaContainer = new KafkaContainer(
-        DockerImageName.parse("confluentinc/cp-kafka:latest"))
+    private static KafkaContainer kafkaContainer =
+        new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
             .withListener(() -> "kafka:19092")
             .withNetwork(network);
 
@@ -105,10 +108,11 @@ public class InventoryServiceIT {
             System.out.println("Testing with mvn liberty:devc");
             urlPath = "http://localhost:9085";
         } else {
+            System.out.println("Testing with mvn verify");
             kafkaContainer.start();
             inventoryContainer.withEnv(
-            "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
-            System.out.println("Testing with mvn verify");
+                "mp.messaging.connector.liberty-kafka.bootstrap.servers",
+                "kafka:19092");
             inventoryContainer.start();
             urlPath = "http://"
                 + inventoryContainer.getHost()
@@ -164,16 +168,15 @@ public class InventoryServiceIT {
         Thread.sleep(5000);
         Response response = client.getSystems();
         List<Properties> systems =
-                response.readEntity(new GenericType<List<Properties>>() { });
-        Assertions.assertEquals(200, response.getStatus(),
-                "Response should be 200");
+            response.readEntity(new GenericType<List<Properties>>() { });
+        assertEquals(200, response.getStatus(), "Response should be 200");
         Assertions.assertEquals(systems.size(), 1);
         for (Properties system : systems) {
-            Assertions.assertEquals(sl.hostname, system.get("hostname"),
-                    "Hostname doesn't match!");
+            assertEquals(sl.hostname, system.get("hostname"),
+                "Hostname doesn't match!");
             BigDecimal systemLoad = (BigDecimal) system.get("systemLoad");
-            Assertions.assertEquals(sl.loadAverage, systemLoad.doubleValue(),
-                    "CPU load doesn't match!");
+            assertEquals(sl.loadAverage, systemLoad.doubleValue(),
+                "CPU load doesn't match!");
         }
     }
 }

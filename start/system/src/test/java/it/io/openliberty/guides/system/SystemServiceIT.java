@@ -14,8 +14,8 @@ package it.io.openliberty.guides.system;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
-import java.nio.file.Paths;
 import java.net.Socket;
+import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,12 +53,12 @@ public class SystemServiceIT {
 
     public static KafkaConsumer<String, SystemLoad> consumer;
 
-    private static ImageFromDockerfile systemImage
-        = new ImageFromDockerfile("system:1.0-SNAPSHOT")
-              .withDockerfile(Paths.get("./Dockerfile"));
+    private static ImageFromDockerfile systemImage =
+        new ImageFromDockerfile("system:1.0-SNAPSHOT")
+            .withDockerfile(Paths.get("./Dockerfile"));
 
-    private static KafkaContainer kafkaContainer = new KafkaContainer(
-        DockerImageName.parse("confluentinc/cp-kafka:latest"))
+    private static KafkaContainer kafkaContainer =
+        new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
             .withListener(() -> "kafka:19092")
             .withNetwork(network);
 
@@ -88,7 +88,8 @@ public class SystemServiceIT {
         } else {
             kafkaContainer.start();
             systemContainer.withEnv(
-            "mp.messaging.connector.liberty-kafka.bootstrap.servers", "kafka:19092");
+                "mp.messaging.connector.liberty-kafka.bootstrap.servers",
+                "kafka:19092");
             systemContainer.start();
             System.out.println("Testing with mvn verify");
         }
