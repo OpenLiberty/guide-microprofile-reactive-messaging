@@ -44,7 +44,7 @@ public class SystemLoad {
         }
         SystemLoad sl = (SystemLoad) o;
         return Objects.equals(hostname, sl.hostname)
-                && Objects.equals(loadAverage, sl.loadAverage);
+               && Objects.equals(loadAverage, sl.loadAverage);
     }
 
     @Override
