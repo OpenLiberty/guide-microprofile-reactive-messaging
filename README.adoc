@@ -10,7 +10,7 @@
 :page-layout: guide-multipane
 :page-duration: 20 minutes
 :page-releasedate: 2020-04-22
-:page-majorupdateddate: 2024-04-30
+:page-majorupdateddate: 2024-04-04
 :page-guide-category: microprofile
 :page-essential: false
 :page-description: Learn how to use MicroProfile Reactive Messaging to implement an application with a reactive architecture.
