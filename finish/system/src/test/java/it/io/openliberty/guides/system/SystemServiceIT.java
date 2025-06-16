@@ -1,6 +1,6 @@
 // tag::copyright[]
 /*******************************************************************************
- * Copyright (c) 2020, 2024 IBM Corporation and others.
+ * Copyright (c) 2020, 2025 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -11,35 +11,33 @@
 // end::copyright[]
 package it.io.openliberty.guides.system;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.net.Socket;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
-import java.net.Socket;
-import java.nio.file.Paths;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.utility.DockerImageName;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.kafka.ConfluentKafkaContainer;
 
 import io.openliberty.guides.models.SystemLoad;
 import io.openliberty.guides.models.SystemLoad.SystemLoadDeserializer;
@@ -57,9 +55,9 @@ public class SystemServiceIT {
         new ImageFromDockerfile("system:1.0-SNAPSHOT")
             .withDockerfile(Paths.get("./Dockerfile"));
 
-    private static KafkaContainer kafkaContainer =
-        new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
-            .withListener(() -> "kafka:19092")
+    private static ConfluentKafkaContainer kafkaContainer =
+        new ConfluentKafkaContainer("confluentinc/cp-kafka:latest")
+            .withListener("kafka:19092")
             .withNetwork(network);
 
     private static GenericContainer<?> systemContainer =
