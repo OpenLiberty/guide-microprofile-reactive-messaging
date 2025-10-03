@@ -65,7 +65,7 @@ public class InventoryServiceIT {
     private static ImageFromDockerfile inventoryImage =
         new ImageFromDockerfile("inventory:1.0-SNAPSHOT")
             .withDockerfile(Paths.get("./Dockerfile"));
-    
+
     private static KafkaContainer kafkaContainer =
         new KafkaContainer("apache/kafka:latest")
             .withListener("kafka:19092")
