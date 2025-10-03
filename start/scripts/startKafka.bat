@@ -17,4 +17,4 @@ docker run -d ^
     --network=%NETWORK% ^
     --name=kafka ^
     --rm ^
-    apache/kafka:latest &
+    apache/kafka:latest
